@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "console-test"
+version = "0.1.0"
+description = ""
+authors = ["Matthew Russell <mattrussell36@gmail.com>"]
+readme = "README.md"
+packages = [{include = "console_test"}]
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.11"
+psutil = "^5.9.5"
+python-dotenv = "0.21"
+vega-sim = {git = "https://github.com/vegaprotocol/vega-market-sim.git", rev = "fix/allow-single-port-in-port-config"}
+pytest-playwright = "^0.3.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

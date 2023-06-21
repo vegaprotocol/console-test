@@ -1,6 +1,7 @@
-import re
+
 import logging
 import pytest
+
 from collections import namedtuple
 from playwright.sync_api import Page, expect
 
@@ -16,7 +17,6 @@ TERMINATE_WALLET = WalletConfig("FJMKnwfZdd48C8NqvYrG", "bY3DxwtsCstMIIZdNpKs")
 wallets = [MM_WALLET, TERMINATE_WALLET]
 
 console_port = 8080
-datanode_port = 1111
 
 def test_settlement(page: Page):
     market_name = "BTC:DAI_Mar22"
@@ -27,10 +27,7 @@ def test_settlement(page: Page):
         launch_graphql=False,
         retain_log_files=True,
         use_full_vega_wallet=True,
-        store_transactions=True,
-        port_config={
-            Ports.DATA_NODE_REST: datanode_port
-        }
+        store_transactions=True
     ) as vega:
         for wallet in wallets:
             vega.create_key(wallet.name)
@@ -81,10 +78,9 @@ def test_settlement(page: Page):
         vega.forward("10s")
 
         page.goto(f"http://localhost:{console_port}/#/markets/all")
-
         # Manually change node to one served by vega-sim
         page.get_by_text("Change node").click()
-        page.query_selector('[data-testid="custom-node"] input').fill(f"http://localhost:{datanode_port}/graphql")
+        page.query_selector('[data-testid="custom-node"] input').fill(f"http://localhost:{vega.data_node_rest_port}/graphql")
         page.get_by_text("Connect to this node").click()
 
         # Navigate to chosen market
@@ -101,8 +97,7 @@ def test_settlement(page: Page):
 
         vega.wait_for_total_catchup()
         vega.forward("10s")
-
         print("END")
-        
+
 if __name__ == "__main__":
         pytest.main([__file__])

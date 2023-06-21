@@ -28,10 +28,12 @@ jobs:
 
     - name: pull console
       run: |    
-        docker pull vegaprotocol/trading:testnet
+        poetry run docker pull vegaprotocol/trading:testnet
 
     - name: Run your tests
-      run: poetry run pytest
+      run:
+        poetry run playwright install
+        poetry run pytest
 
     - uses: actions/upload-artifact@v3
       if: always()

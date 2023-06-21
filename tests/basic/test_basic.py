@@ -1,18 +1,11 @@
 import re
 import logging
-import numpy as np
+import pytest
+import docker
 from collections import namedtuple
-import json
-import os
 from playwright.sync_api import Page, expect
 
 from vega_sim.null_service import VegaServiceNull, Ports
-import vega_sim.proto.vega as vega_protos
-from vega_sim.proto.vega.governance_pb2 import UpdateMarketConfiguration
-
-from vega_sim.tools import load_binaries
-from enum import Enum, auto
-import subprocess
 
 WalletConfig = namedtuple("WalletConfig", ["name", "passphrase"])
 
@@ -31,7 +24,30 @@ TERMINATE_WALLET = WalletConfig("FJMKnwfZdd48C8NqvYrG", "bY3DxwtsCstMIIZdNpKs")
 
 wallets = [MM_WALLET, MM_WALLET2, TRADER_WALLET, RANDOM_WALLET, TERMINATE_WALLET]
 
-def test_foo(page: Page):
+
+docker_client = docker.from_env()
+container_name = "vegaprotocol/trading:latest"
+console_port = 8080
+datanode_port = 1111
+
+@pytest.fixture(scope="function", autouse=True)
+def setup():
+    # Start website from docker
+    container = docker_client.containers.run(container_name, detach=True, ports={'80/tcp': console_port})
+    print(f'Container {container.id} started')
+
+    yield
+
+    try:
+        container.stop()
+        print(f"Container '{container_name}' stopped successfully.")
+    except docker.errors.NotFound:
+        print(f"Container '{container_name}' not found.")
+    except docker.errors.APIError as e:
+        print(f"An error occurred while stopping the container: {e}")
+
+
+def test_basic(page: Page):
     market_name = "BTC:DAI_Mar22"
     logging.basicConfig(level=logging.INFO)
 
@@ -42,7 +58,7 @@ def test_foo(page: Page):
         use_full_vega_wallet=True,
         store_transactions=True,
         port_config={
-            Ports.DATA_NODE_REST: 1111
+            Ports.DATA_NODE_REST: datanode_port
         }
     ) as vega:
         for wallet in wallets:
@@ -165,11 +181,19 @@ def test_foo(page: Page):
 
         vega.forward("10s")
 
-        page.goto("http://localhost:4200/#/markets/all")
-        page.get_by_text("Continue").click()
-        result = page.get_by_text("BTC:DAI_Mar22")
+        page.goto(f"http://localhost:{console_port}/#/markets/all")
+
+        # Manually change node to one served by vega-sim
+        page.get_by_text("Change node").click()
+        page.query_selector('[data-testid="custom-node"] input').fill(f"http://localhost:{datanode_port}/graphql")
+        page.get_by_text("Connect to this node").click()
+
+        # Navigate to chosen market
+        result = page.get_by_text(market_name)
         result.first.click()
-        expect(page.get_by_test_id("header-title")).to_have_text(re.compile(market_name))
+
+        expect(page).not_to_have_url(re.compile(r"\/markets\/all"))
+        expect(page.get_by_text(market_name).first).to_be_attached()
 
         vega.settle_market(
             settlement_key=TERMINATE_WALLET.name,
@@ -182,3 +206,5 @@ def test_foo(page: Page):
 
         print("END")
         
+if __name__ == "__main__":
+        pytest.main([__file__])

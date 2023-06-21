@@ -6,6 +6,7 @@ from collections import namedtuple
 from playwright.sync_api import Page, expect
 
 from vega_sim.null_service import VegaServiceNull, Ports
+from config import console_port, datanode_port
 
 WalletConfig = namedtuple("WalletConfig", ["name", "passphrase"])
 
@@ -16,8 +17,6 @@ TERMINATE_WALLET = WalletConfig("FJMKnwfZdd48C8NqvYrG", "bY3DxwtsCstMIIZdNpKs")
 
 wallets = [MM_WALLET, TERMINATE_WALLET]
 
-console_port = 8080
-
 def test_settlement(page: Page):
     market_name = "BTC:DAI_Mar22"
     logging.basicConfig(level=logging.INFO)
@@ -27,7 +26,10 @@ def test_settlement(page: Page):
         launch_graphql=False,
         retain_log_files=True,
         use_full_vega_wallet=True,
-        store_transactions=True
+        store_transactions=True,
+        port_config={
+            Ports.DATA_NODE_REST: datanode_port
+        }
     ) as vega:
         for wallet in wallets:
             vega.create_key(wallet.name)

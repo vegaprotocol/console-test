@@ -30,9 +30,11 @@ jobs:
       run: |    
         poetry run docker pull vegaprotocol/trading:testnet
 
-    - name: Run your tests
+    - name: install playwright
       run:
         poetry run playwright install
+    - name: run tests
+      run:
         poetry run pytest
 
     - uses: actions/upload-artifact@v3

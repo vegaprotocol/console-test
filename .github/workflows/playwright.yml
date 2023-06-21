@@ -1,27 +1,42 @@
-name: Playwright Tests
+name: Playwright Tests poetry
 on:
   push:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+  workflow_dispatch:  
 jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
+    - name: Set up Python
+      uses: actions/setup-python@v4
       with:
-        node-version: 16
-    - uses: pnpm/action-setup@v2
-      with:
-        version: 6.0.2    
+        python-version: '3.10.6'
+    - name: Install Poetry
+      uses: snok/install-poetry@v1   
+
     - name: Install dependencies
-      run: pnpm install
-    - name: Install Playwright Browsers
-      run: pnpm exec playwright install
-    - name: Run Playwright tests
-      run: pnpm exec playwright test
+      run: |
+        poetry install --no-root
+
+    - name: load Binaries
+      run: |    
+        poetry run python -m vega_sim.tools.load_binaries
+
+    - name: pull console
+      run: |    
+        poetry run docker pull vegaprotocol/trading:testnet
+
+    - name: install playwright
+      run:
+        poetry run playwright install
+    - name: run tests
+      run:
+        poetry run pytest
+
     - uses: actions/upload-artifact@v3
       if: always()
       with:

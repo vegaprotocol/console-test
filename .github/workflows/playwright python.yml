@@ -20,8 +20,14 @@ jobs:
 
     - name: Install dependencies
       run: |
-        poetry install --no-root
-        python -m vega_sim.tools.load_binaries
+        poetry install
+
+    - name: load Binaries
+      run: |    
+        python vega_sim.tools.load_binaries
+        
+    - name: pull console
+      run: |    
         docker pull vegaprotocol/trading:testnet
 
     - name: Run your tests

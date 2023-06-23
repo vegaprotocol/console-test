@@ -35,7 +35,7 @@ jobs:
         poetry run playwright install
     - name: run tests
       run:
-        poetry run pytest
+        poetry run pytest --numprocesses auto
 
     - uses: actions/upload-artifact@v3
       if: always()

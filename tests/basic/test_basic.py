@@ -1,11 +1,12 @@
 import re
 import logging
 import pytest
+import helpers 
 from collections import namedtuple
 from playwright.sync_api import Page, expect
 
-from vega_sim.null_service import VegaServiceNull, Ports
-from config import console_port, datanode_port
+from vega_sim.null_service import VegaServiceNull
+from config import console_port 
 
 WalletConfig = namedtuple("WalletConfig", ["name", "passphrase"])
 
@@ -34,10 +35,9 @@ def test_basic(page: Page):
         retain_log_files=True,
         use_full_vega_wallet=True,
         store_transactions=True,
-        port_config={
-            Ports.DATA_NODE_REST: datanode_port
-        }
     ) as vega:
+        helpers.setup(page, vega.data_node_rest_port)
+
         for wallet in wallets:
             vega.create_key(wallet.name)
 
@@ -179,6 +179,7 @@ def test_basic(page: Page):
 
         vega.wait_for_total_catchup()
         vega.forward("10s")
+
         print("END")
   
 if __name__ == "__main__":

@@ -12,6 +12,7 @@ psutil = "^5.9.5"
 vega-sim = {git = "https://github.com/vegaprotocol/vega-market-sim.git", rev = "fix/allow-single-port-in-port-config"}
 pytest-playwright = "^0.3.3"
 docker = "^6.1.3"
+pytest-xdist = "^3.3.1"
 
 [build-system]
 requires = ["poetry-core"]

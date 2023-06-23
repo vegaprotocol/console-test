@@ -7,8 +7,8 @@ on:
   workflow_dispatch:  
 jobs:
   test:
-    timeout-minutes: 60
-    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    runs-on: macos-latest
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python

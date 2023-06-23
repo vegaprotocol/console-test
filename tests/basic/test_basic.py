@@ -6,7 +6,6 @@ from collections import namedtuple
 from playwright.sync_api import Page, expect
 
 from vega_sim.null_service import VegaServiceNull
-from config import console_port 
 
 WalletConfig = namedtuple("WalletConfig", ["name", "passphrase"])
 
@@ -36,7 +35,7 @@ def test_basic(page: Page):
         use_full_vega_wallet=True,
         store_transactions=True,
     ) as vega:
-        helpers.setup(page, vega.data_node_rest_port)
+        console_port = helpers.setup(page, vega.data_node_rest_port)
 
         for wallet in wallets:
             vega.create_key(wallet.name)
@@ -181,6 +180,7 @@ def test_basic(page: Page):
         vega.forward("10s")
 
         print("END")
+        helpers.teardown()
   
 if __name__ == "__main__":
         pytest.main([__file__])

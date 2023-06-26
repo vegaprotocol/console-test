@@ -1,4 +1,4 @@
-name: Playwright Tests poetry
+name: Build and Run Tests
 on:
   push:
     branches: [ main, master ]
@@ -39,7 +39,7 @@ jobs:
 
     - name: Upload Playwright Trace
       uses: actions/upload-artifact@v3
-      if: failure()
+      if: always()
       with:
           name: playwright-trace
           path: ./
@@ -49,7 +49,7 @@ jobs:
       id: artifact_url
       run: |
         echo "::set-output name=url::https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts"
-        echo "::set-output name=traceviewer_url::https://playwright.dev/docs/trace-viewer/?traces=$(basename path/to/traces/${{ steps.generate_trace_name.outputs.trace_name }})"
+        echo "::set-output name=traceviewer_url::https://trace.playwright.dev/?trace=$(basename path/to/traces/${{ steps.generate_trace_name.outputs.trace_name }})"
 
     - name: Display Artifact URL
       run: |

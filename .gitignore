@@ -4,3 +4,4 @@ node_modules/
 /playwright/.cache/
 *.pyc
 .pytest_cache
+traces/

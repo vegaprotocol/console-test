@@ -54,7 +54,7 @@ jobs:
         path: |
         
           # List all the trace files in the 'traces' folder
-          traces=$(find ./traces -type f)
+          traces=$(find ./traces/ -type f)
         
           # Iterate over each trace file and upload it individually
           for trace in $traces; do

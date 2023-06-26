@@ -52,7 +52,6 @@ jobs:
         name: playwright-trace
         retention-days: 30
         path: |
-        
           # List all the trace files in the 'traces' folder
           traces=$(find ./traces/ -type f)
         
@@ -61,8 +60,9 @@ jobs:
             trace_name=$(basename "$trace")
             echo "Uploading trace: $trace_name"
             echo "::set-env name=TRACE_PATH::$trace" # Set an environment variable for future reference if needed
-            tar -czf "$trace_name.tar.gz" "$trace" # Compress the trace file
-            echo "::add-path::$trace_name.tar.gz" # Add the compressed file to the list of artifacts to upload
+            echo "::add-path::$trace" # Add the trace file to the list of artifacts to upload
           done
+        
+
         
         

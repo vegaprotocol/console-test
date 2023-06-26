@@ -1,4 +1,5 @@
 import pytest
+import os
 
 from playwright.sync_api import Browser, BrowserContext, Page
 
@@ -8,7 +9,9 @@ def page(request, browser):
         context.tracing.start(screenshots=True, snapshots=True, sources=True)
         with context.new_page() as page:
             yield page
+        trace_path = os.path.join("traces", request.node.name + "trace.zip")
         if request.node.rep_call.failed:
-            context.tracing.stop(path=request.node.name + "trace.zip")
+            context.tracing.stop(path=trace_path)
         else:
-            context.tracing.stop(path=request.node.name + "trace.zip")
+        
+            context.tracing.stop(path=trace_path)

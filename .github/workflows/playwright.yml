@@ -42,16 +42,27 @@ jobs:
       if: always()
       with:
           name: playwright-trace
-          path: ./
+          path: ./traces/
           retention-days: 30
 
-    - name: Get Artifact URL
-      id: artifact_url
-      run: |
-        echo "::set-output name=url::https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts"
-        echo "::set-output name=traceviewer_url::https://trace.playwright.dev/?trace=$(basename path/to/traces/${{ steps.generate_trace_name.outputs.trace_name }})"
-
-    - name: Display Artifact URL
-      run: |
-        echo "Artifact URL: ${{ steps.artifact_url.outputs.url }}"
-        echo "Trace Viewer URL: ${{ steps.artifact_url.outputs.traceviewer_url }}"
+    - name: Upload Playwright Traces
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: playwright-trace
+        retention-days: 30
+        path: |
+        
+          # List all the trace files in the 'traces' folder
+          traces=$(find ./traces -type f)
+        
+          # Iterate over each trace file and upload it individually
+          for trace in $traces; do
+            trace_name=$(basename "$trace")
+            echo "Uploading trace: $trace_name"
+            echo "::set-env name=TRACE_PATH::$trace" # Set an environment variable for future reference if needed
+            tar -czf "$trace_name.tar.gz" "$trace" # Compress the trace file
+            echo "::add-path::$trace_name.tar.gz" # Add the compressed file to the list of artifacts to upload
+          done
+        
+        

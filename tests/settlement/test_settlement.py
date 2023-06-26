@@ -17,7 +17,7 @@ TERMINATE_WALLET = WalletConfig("FJMKnwfZdd48C8NqvYrG", "bY3DxwtsCstMIIZdNpKs")
 
 wallets = [MM_WALLET, TERMINATE_WALLET]
 
-def test_settlement(page: Page):
+def test_settlement(page):
     market_name = "BTC:DAI_Mar22"
     logging.basicConfig(level=logging.INFO)
 
@@ -29,7 +29,6 @@ def test_settlement(page: Page):
         store_transactions=True,
     ) as vega:
         console_port = helpers.setup(page, vega.data_node_rest_port)
-
         for wallet in wallets:
             vega.create_key(wallet.name)
 

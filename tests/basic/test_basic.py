@@ -24,7 +24,7 @@ TERMINATE_WALLET = WalletConfig("FJMKnwfZdd48C8NqvYrG", "bY3DxwtsCstMIIZdNpKs")
 
 wallets = [MM_WALLET, MM_WALLET2, TRADER_WALLET, RANDOM_WALLET, TERMINATE_WALLET]
 
-def test_basic(page: Page):
+def test_basic(page):
     market_name = "BTC:DAI_Mar22"
     logging.basicConfig(level=logging.INFO)
 

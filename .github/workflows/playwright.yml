@@ -37,9 +37,21 @@ jobs:
       run:
         poetry run pytest --numprocesses auto
 
-    - uses: actions/upload-artifact@v3
-      if: always()
+    - name: Upload Playwright Trace
+      uses: actions/upload-artifact@v3
+      if: failure()
       with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30
+          name: playwright-trace
+          path: ./
+          retention-days: 30
+
+    - name: Get Artifact URL
+      id: artifact_url
+      run: |
+        echo "::set-output name=url::https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts"
+        echo "::set-output name=traceviewer_url::https://playwright.dev/docs/trace-viewer/?traces=$(basename path/to/traces/${{ steps.generate_trace_name.outputs.trace_name }})"
+
+    - name: Display Artifact URL
+      run: |
+        echo "Artifact URL: ${{ steps.artifact_url.outputs.url }}"
+        echo "Trace Viewer URL: ${{ steps.artifact_url.outputs.traceviewer_url }}"

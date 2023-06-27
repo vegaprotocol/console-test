@@ -14,6 +14,7 @@ TERMINATE_WALLET = WalletConfig("FJMKnwfZdd48C8NqvYrG", "bY3DxwtsCstMIIZdNpKs")
 
 wallets = [MM_WALLET, TERMINATE_WALLET]
 
+
 def test_settlement(vega, page):
     market_name = "BTC:DAI_Mar22"
     logging.basicConfig(level=logging.INFO)
@@ -66,16 +67,17 @@ def test_settlement(vega, page):
 
     vega.forward("10s")
 
-    page.goto(f"http://localhost:{console_port}/#/markets/all")
+    page.goto(f"http://localhost:{vega.console_port}/#/markets/all")
     # Manually change node to one served by vega-sim
     page.get_by_text("Change node").click()
-    page.query_selector('[data-testid="custom-node"] input').fill(f"http://localhost:{vega.data_node_rest_port}/graphql")
+    page.query_selector('[data-testid="custom-node"] input').fill(
+        f"http://localhost:{vega.data_node_rest_port}/graphql")
     page.get_by_text("Connect to this node").click()
 
     # Navigate to chosen market
     result = page.get_by_text(market_name)
     result.first.click()
-    assert market_id in page.url 
+    assert market_id in page.url
     expect(page.get_by_text(market_name).first).to_be_attached()
 
     vega.settle_market(
@@ -89,6 +91,6 @@ def test_settlement(vega, page):
 
     print("END")
 
+
 if __name__ == "__main__":
-        pytest.main([__file__])
-        """
+    pytest.main([__file__])

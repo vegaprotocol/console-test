@@ -19,7 +19,9 @@ RANDOM_WALLET = WalletConfig("OJpVLvU5fgLJbhNPdESa", "GmJTt9Gk34BHDlovB7AJ")
 # The party to terminate the market and send settlment price
 TERMINATE_WALLET = WalletConfig("FJMKnwfZdd48C8NqvYrG", "bY3DxwtsCstMIIZdNpKs")
 
-wallets = [MM_WALLET, MM_WALLET2, TRADER_WALLET, RANDOM_WALLET, TERMINATE_WALLET]
+wallets = [MM_WALLET, MM_WALLET2, TRADER_WALLET,
+           RANDOM_WALLET, TERMINATE_WALLET]
+
 
 def test_basic(vega, page):
     market_name = "BTC:DAI_Mar22"
@@ -29,10 +31,10 @@ def test_basic(vega, page):
         vega.create_key(wallet.name)
 
     vega.mint(
-    MM_WALLET.name,
-    asset="VOTE",
-    amount=1e4,
-)
+        MM_WALLET.name,
+        asset="VOTE",
+        amount=1e4,
+    )
 
     vega.update_network_parameter(
         MM_WALLET.name, parameter="market.fee.factors.makerFee", new_value="0.1"
@@ -148,16 +150,15 @@ def test_basic(vega, page):
 
     # Manually change node to one served by vega-sim
     page.get_by_text("Change node").click()
-    page.query_selector('[data-testid="custom-node"] input').fill(f"http://localhost:{vega.data_node_rest_port}/graphql")
+    page.query_selector('[data-testid="custom-node"] input').fill(
+        f"http://localhost:{vega.data_node_rest_port}/graphql")
     page.get_by_text("Connect to this node").click()
-
-    page.pause()
 
     # Navigate to chosen market
     result = page.get_by_text(market_name)
     result.first.click()
 
-    assert market_id in page.url 
+    assert market_id in page.url
     expect(page.get_by_text(market_name).first).to_be_attached()
 
     vega.settle_market(
@@ -170,6 +171,7 @@ def test_basic(vega, page):
     vega.forward("10s")
 
     print("END")
-  
+
+
 if __name__ == "__main__":
-        pytest.main([__file__])
+    pytest.main([__file__])

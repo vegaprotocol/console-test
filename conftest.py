@@ -1,8 +1,9 @@
 import docker
 import pytest
 import os
+import json
 
-from vega_sim.null_service import VegaServiceNull
+from vega_sim.null_service import VegaServiceNull, Ports
 from playwright.sync_api import Browser, BrowserContext, Page
 from config import container_name
 
@@ -52,12 +53,45 @@ def vega():
 @pytest.fixture(scope="function", autouse=True)
 def page(vega, page_with_trace):
     # Set window._env_ so built docker image data uses datanode from vega market sim
-    window_env = f"window._env_ = Object.assign({{}}, window._env_, {{ VEGA_URL: 'http://localhost:{vega.data_node_rest_port}/graphql' }})"
+    env = json.dumps({
+        "VEGA_URL": f"http://localhost:{vega.data_node_rest_port}/graphql",
+        "VEGA_WALLET_URL": f"http://localhost:{vega.wallet_port}"
+    })
+    window_env = f"window._env_ = Object.assign({{}}, window._env_, {env})"
     page_with_trace.add_init_script(
         script=window_env
     )
 
     # Just pass on the main page object
     return page_with_trace
+
+# Set auth token so eager connection for MarketSim wallet is successful
+@pytest.fixture(scope="function")
+def auth(vega, page_with_trace):
+    DEFAULT_WALLET_NAME = "MarketSim" # This is the default wallet name within VegaServiceNull and CANNOT be changed
+
+    # Calling get_keypairs will internally call _load_tokens for the given wallet
+    keypairs = vega.wallet.get_keypairs(DEFAULT_WALLET_NAME)
+    wallet_api_token = vega.wallet.login_tokens[DEFAULT_WALLET_NAME]
+
+    # Set token to localStorage so eager connect hook picks it up and immediately connects
+    wallet_config = json.dumps({
+        "token": f"VWT {wallet_api_token}",
+        "connector": "jsonRpc",
+        "url": f"http://localhost:{vega.wallet_port}"
+    })
+
+    # Set wallet config and risk flag in local storage so eager connection works
+    page_with_trace.add_init_script(
+        script=f"localStorage.setItem('vega_wallet_config', '{wallet_config}');localStorage.setItem('vega_wallet_risk_accepted', 'true')"
+    )
+
+    return {
+        "wallet": DEFAULT_WALLET_NAME,
+        "wallet_api_token": wallet_api_token,
+        "public_key": keypairs["Key 1"]
+    }
+
+
 
 

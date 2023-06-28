@@ -19,17 +19,21 @@ RANDOM_WALLET = WalletConfig("OJpVLvU5fgLJbhNPdESa", "GmJTt9Gk34BHDlovB7AJ")
 # The party to terminate the market and send settlment price
 TERMINATE_WALLET = WalletConfig("FJMKnwfZdd48C8NqvYrG", "bY3DxwtsCstMIIZdNpKs")
 
+
+# The party to terminate the market and send settlment price
+USER_WALLET = WalletConfig("MarketSim", "pin")
+
 wallets = [MM_WALLET, MM_WALLET2, TRADER_WALLET,
            RANDOM_WALLET, TERMINATE_WALLET]
 
-
+@pytest.mark.usefixtures("auth") # Use auth fixture in conftest.py but we don't need the actual return value
 def test_basic(vega, page):
     market_name = "BTC:DAI_Mar22"
     logging.basicConfig(level=logging.INFO)
 
     for wallet in wallets:
         vega.create_key(wallet.name)
-
+    
     vega.mint(
         MM_WALLET.name,
         asset="VOTE",
@@ -148,18 +152,14 @@ def test_basic(vega, page):
     vega.forward("10s")
     page.goto(f"http://localhost:{vega.console_port}/#/markets/all")
 
-    # Manually change node to one served by vega-sim
-    page.get_by_text("Change node").click()
-    page.query_selector('[data-testid="custom-node"] input').fill(
-        f"http://localhost:{vega.data_node_rest_port}/graphql")
-    page.get_by_text("Connect to this node").click()
-
     # Navigate to chosen market
     result = page.get_by_text(market_name)
     result.first.click()
 
     assert market_id in page.url
     expect(page.get_by_text(market_name).first).to_be_attached()
+
+    page.pause()
 
     vega.settle_market(
         settlement_key=TERMINATE_WALLET.name,

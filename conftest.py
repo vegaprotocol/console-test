@@ -81,10 +81,16 @@ def auth(vega, page_with_trace):
         "url": f"http://localhost:{vega.wallet_port}"
     })
 
-    # Set wallet config and risk flag in local storage so eager connection works
-    page_with_trace.add_init_script(
-        script=f"localStorage.setItem('vega_wallet_config', '{wallet_config}');localStorage.setItem('vega_wallet_risk_accepted', 'true')"
-    )
+    storage_javascript = [
+        # Store wallet config so eager connection is initiated
+        f"localStorage.setItem('vega_wallet_config', '{wallet_config}');", 
+        # Ensure wallet ris dialog doesnt show, otherwise eager connect wont work
+        "localStorage.setItem('vega_wallet_risk_accepted', 'true');",
+        # Ensure initial risk dialog doesnt show
+        "localStorage.setItem('vega_risk_accepted', 'true');"
+    ]
+    script = "".join(storage_javascript)
+    page_with_trace.add_init_script(script)
 
     return {
         "wallet": DEFAULT_WALLET_NAME,

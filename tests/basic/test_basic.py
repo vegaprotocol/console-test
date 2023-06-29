@@ -159,8 +159,6 @@ def test_basic(vega, page):
     assert market_id in page.url
     expect(page.get_by_text(market_name).first).to_be_attached()
 
-    page.pause()
-
     vega.settle_market(
         settlement_key=TERMINATE_WALLET.name,
         settlement_price=100,

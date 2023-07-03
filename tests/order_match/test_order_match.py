@@ -98,6 +98,7 @@ def setup_continuous_market(vega, page):
 
     page.goto(f"http://localhost:{vega.console_port}/#/markets/{market_id}")
 
+    submit_order(vega, USER_WALLET, market_id, "SIDE_BUY", 1, 110)
 
 
 def submit_order(vega, wallet, market_id, side, volume, price):

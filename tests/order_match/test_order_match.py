@@ -113,6 +113,9 @@ def submit_order(vega, wallet_name, market_id, side, volume, price):
 
 # Could be turned into a helper function in the future.
 def verify_data_grid(page, data_test_id, expected_pattern):
+    # Required so that we can get liquidation price
+    if data_test_id == "Positions":
+        wait_for_graphql_response(page, 'EstimatePosition')
 
     page.get_by_test_id(data_test_id).click()
     expect(page.locator(
@@ -140,7 +143,7 @@ def verify_data_grid(page, data_test_id, expected_pattern):
 # Required so that we can get liquidation price - Could also become a helper
 
 
-def wait_for_graphql_response(page, query_name, timeout=5000):
+def wait_for_graphql_response(page, query_name, timeout=500):
     response_data = {}
 
     def handle_response(route, request):
@@ -192,9 +195,8 @@ def test_limit_order_trade(vega, page):
     vega.wait_for_total_catchup()
     vega.forward("10s")
 
-    # Required so that we can get liquidation price
-    wait_for_graphql_response(page, 'EstimatePosition')
     print("Assert Position:")
+
     # Assert that Position exists - Will fail if the order is incorrect.
     expected_position = [
         'BTC:DAI_Mar22',

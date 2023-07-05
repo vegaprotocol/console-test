@@ -22,7 +22,7 @@ def setup_continuous_market(vega, page):
 
     for wallet in wallets:
         vega.create_key(wallet.name)
-        
+
     vega.mint(
         MM_WALLET.name,
         asset="VOTE",
@@ -41,7 +41,7 @@ def setup_continuous_market(vega, page):
     vega.wait_for_total_catchup()
 
     tdai_id = vega.find_asset_id(symbol="tDAI")
-    
+
     vega.mint(
         "Key 1",
         asset=tdai_id,
@@ -94,9 +94,9 @@ def setup_continuous_market(vega, page):
     vega.forward("10s")
 
     page.goto(f"http://localhost:{vega.console_port}/#/markets/{market_id}")
-    
+
     submit_order(vega, "Key 1", market_id, "SIDE_BUY", 1, 110)
-    
+
 
 def submit_order(vega, wallet_name, market_id, side, volume, price):
     vega.submit_order(
@@ -107,15 +107,18 @@ def submit_order(vega, wallet_name, market_id, side, volume, price):
         side=side,
         volume=volume,
         price=price,
-        
+
     )
 
 
-def verify_data_grid(page, data_test_id, expected_pattern): # Could be turned into a helper function in the future.
-    
+# Could be turned into a helper function in the future.
+def verify_data_grid(page, data_test_id, expected_pattern):
+
     page.get_by_test_id(data_test_id).click()
-    expect(page.locator(f'[data-testid^="tab-{data_test_id.lower()}"] >> .ag-center-cols-container .ag-row-first')).to_be_visible()
-    actual_text = page.locator(f'[data-testid^="tab-{data_test_id.lower()}"] >> .ag-center-cols-container .ag-row-first').inner_text()
+    expect(page.locator(
+        f'[data-testid^="tab-{data_test_id.lower()}"] >> .ag-center-cols-container .ag-row-first')).to_be_visible()
+    actual_text = page.locator(
+        f'[data-testid^="tab-{data_test_id.lower()}"] >> .ag-center-cols-container .ag-row-first').inner_text()
     lines = actual_text.strip().split('\n')
     for expected, actual in zip(expected_pattern, lines):
         # We are using regex so that we can run tests in different timezones.
@@ -124,25 +127,28 @@ def verify_data_grid(page, data_test_id, expected_pattern): # Could be turned in
                 print(f"Matched: {expected} == {actual}")
             else:
                 print(f"Not Matched: {expected} != {actual}")
-                raise AssertionError(f"Pattern does not match: {expected} != {actual}")
+                raise AssertionError(
+                    f"Pattern does not match: {expected} != {actual}")
         else:  # it's not a regex, so we escape it
             if re.search(re.escape(expected), actual):
                 print(f"Matched: {expected} == {actual}")
             else:
                 print(f"Not Matched: {expected} != {actual}")
-                raise AssertionError(f"Pattern does not match: {expected} != {actual}")
-            
+                raise AssertionError(
+                    f"Pattern does not match: {expected} != {actual}")
+
+
 @pytest.mark.usefixtures("auth")
 def test_limit_order_trade(vega, page):
     # setup continuous trading market with one user buy trade
     setup_continuous_market(vega, page)
     # Assert that the user order is displayed on the orderbook
     orderbook_trade = page.get_by_test_id('price-11000000').nth(1)
-    
+
     # 6003-ORDB-001
     # 6003-ORDB-002
     expect(orderbook_trade).to_be_visible()
-    
+
     expected_open_order = [
         'BTC:DAI_Mar22',
         '+1',
@@ -153,9 +159,9 @@ def test_limit_order_trade(vega, page):
         "Good 'til Cancelled (GTC)",
         r'\d{1,2}/\d{1,2}/\d{4},\s*\d{1,2}:\d{2}:\d{2}\s*(?:AM|PM)',
         '-'
-    ]   
+    ]
     verify_data_grid(page, "Open", expected_open_order)
-    
+
     vega.wait_for_total_catchup()
     vega.forward("10s")
 
@@ -176,8 +182,8 @@ def test_limit_order_trade(vega, page):
     ]
     # 7004-POSI-001
     # 7004-POSI-002
-    verify_data_grid(page, "Positions", expected_position )
-    
+    verify_data_grid(page, "Positions", expected_position)
+
     print("Assert Trades:")
     # Assert that trade exists - Will fail if the order is incorrect.
     expected_trade = [
@@ -197,5 +203,3 @@ def test_limit_order_trade(vega, page):
     price_element = page.get_by_test_id('price-11000000').nth(1)
     # 6003-ORDB-010
     expect(price_element).to_be_hidden()
-
-#TODO add spec comments

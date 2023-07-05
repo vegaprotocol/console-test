@@ -137,6 +137,34 @@ def verify_data_grid(page, data_test_id, expected_pattern):
                 raise AssertionError(
                     f"Pattern does not match: {expected} != {actual}")
 
+# Required so that we can get liquidation price - Could also become a helper
+
+
+def wait_for_graphql_response(page, query_name, timeout=500):
+    response_data = {}
+
+    def handle_response(route, request):
+        if "graphql" in request.url:
+            response = request.response()
+            if response is not None:
+                json_response = response.json()
+                if json_response and 'data' in json_response:
+                    data = json_response['data']
+                    if query_name in data:
+                        response_data['data'] = data
+                        route.continue_()
+                        return
+        route.continue_()
+
+    # Register the route handler
+    page.route("**", handle_response)
+
+    # Wait for the response data to be populated
+    page.wait_for_timeout(timeout)
+
+    # Unregister the route handler
+    page.unroute("**", handle_response)
+
 
 @pytest.mark.usefixtures("auth")
 def test_limit_order_trade(vega, page):
@@ -163,6 +191,9 @@ def test_limit_order_trade(vega, page):
     verify_data_grid(page, "Open", expected_open_order)
     vega.wait_for_total_catchup()
     vega.forward("10s")
+
+    # Required so that we can get liquidation price
+    wait_for_graphql_response(page, 'EstimatePosition')
     print("Assert Position:")
     # Assert that Position exists - Will fail if the order is incorrect.
     expected_position = [

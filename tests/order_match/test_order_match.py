@@ -115,6 +115,7 @@ def submit_order(vega, wallet_name, market_id, side, volume, price):
 def verify_data_grid(page, data_test_id, expected_pattern):
     page.get_by_test_id(data_test_id).click()
     # Required so that we can get liquidation price
+    page.pause()
     if data_test_id == "Positions":
         wait_for_graphql_response(page, 'EstimatePosition')
     expect(page.locator(
@@ -138,7 +139,6 @@ def verify_data_grid(page, data_test_id, expected_pattern):
                 print(f"Not Matched: {expected} != {actual}")
                 raise AssertionError(
                     f"Pattern does not match: {expected} != {actual}")
-
 
 
 # Required so that we can get liquidation price - Could also become a helper

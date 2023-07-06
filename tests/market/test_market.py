@@ -5,11 +5,9 @@ from collections import namedtuple
 from playwright.sync_api import Page, expect
 
 
+# Wallet Configurations
 WalletConfig = namedtuple("WalletConfig", ["name", "passphrase"])
-
-# Set up parties in the market/ Submit liquidity provision/ Control midprice
 MM_WALLET = WalletConfig("mm", "pin")
-
 TERMINATE_WALLET = WalletConfig("FJMKnwfZdd48C8NqvYrG", "bY3DxwtsCstMIIZdNpKs")
 
 wallets = [MM_WALLET, TERMINATE_WALLET]

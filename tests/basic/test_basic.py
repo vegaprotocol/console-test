@@ -167,9 +167,3 @@ def test_basic(vega, page):
 
     vega.wait_for_total_catchup()
     vega.forward("10s")
-
-    print("END")
-
-
-if __name__ == "__main__":
-    pytest.main([__file__])

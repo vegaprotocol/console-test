@@ -140,5 +140,3 @@ def test_open_market(vega, page):
     # expect(page.get_by_text("Opening auction")).to_be_hidden()
 
 
-if __name__ == "__main__":
-    pytest.main([__file__])

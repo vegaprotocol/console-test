@@ -113,12 +113,11 @@ def submit_order(vega, wallet_name, market_id, side, volume, price):
 
 # Could be turned into a helper function in the future.
 def verify_data_grid(page, data_test_id, expected_pattern):
+    page.get_by_test_id(data_test_id).click()
     # Required so that we can get liquidation price
     page.pause()
     if data_test_id == "Positions":
         wait_for_graphql_response(page, 'EstimatePosition')
-
-    page.get_by_test_id(data_test_id).click()
     expect(page.locator(
         f'[data-testid^="tab-{data_test_id.lower()}"] >> .ag-center-cols-container .ag-row-first')).to_be_visible()
     actual_text = page.locator(

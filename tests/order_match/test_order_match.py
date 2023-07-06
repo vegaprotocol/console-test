@@ -115,6 +115,7 @@ def submit_order(vega, wallet_name, market_id, side, volume, price):
 def verify_data_grid(page, data_test_id, expected_pattern):
     page.get_by_test_id(data_test_id).click()
     # Required so that we can get liquidation price
+    page.pause()
     if data_test_id == "Positions":
         wait_for_graphql_response(page, 'EstimatePosition')
     expect(page.locator(
@@ -169,7 +170,7 @@ def wait_for_graphql_response(page, query_name, timeout=5000):
 
 
 @pytest.mark.usefixtures("auth")
-def test_limit_order_trade(vega, page):
+def test_limit_order_trade_open_order(vega, page):
     # setup continuous trading market with one user buy trade
     setup_continuous_market(vega, page)
     # Assert that the user order is displayed on the orderbook
@@ -192,17 +193,23 @@ def test_limit_order_trade(vega, page):
     ]
     print("Assert Open orders:")
     verify_data_grid(page, "Open", expected_open_order)
+
+
+@pytest.mark.usefixtures("auth")
+def test_limit_order_trade_open_position(vega, page):
+    # setup continuous trading market with one user buy trade
+    setup_continuous_market(vega, page)
+
     vega.wait_for_total_catchup()
     vega.forward("10s")
 
     print("Assert Position:")
-
     # Assert that Position exists - Will fail if the order is incorrect.
     expected_position = [
         'BTC:DAI_Mar22',
         '107.50',
         '+1',
-        '-',
+        '107.50',
         '0.00',
         'tDAI',
         '107.50',
@@ -215,6 +222,14 @@ def test_limit_order_trade(vega, page):
     # 7004-POSI-002
     verify_data_grid(page, "Positions", expected_position)
 
+
+@pytest.mark.usefixtures("auth")
+def test_limit_order_trade(vega, page):
+    # setup continuous trading market with one user buy trade
+    setup_continuous_market(vega, page)
+
+    vega.wait_for_total_catchup()
+    vega.forward("10s")
     print("Assert Trades:")
     # Assert that trade exists - Will fail if the order is incorrect.
     expected_trade = [
@@ -229,6 +244,14 @@ def test_limit_order_trade(vega, page):
     # 6005-THIS-005
     verify_data_grid(page, "Trades", expected_trade)
 
+
+@pytest.mark.usefixtures("auth")
+def test_limit_order_trade_order_trde_away(vega, page):
+    # setup continuous trading market with one user buy trade
+    setup_continuous_market(vega, page)
+
+    vega.wait_for_total_catchup()
+    vega.forward("10s")
     # Assert that the order is no longer on the orderbook
     page.get_by_test_id('Orderbook').click()
     price_element = page.get_by_test_id('price-11000000').nth(1)

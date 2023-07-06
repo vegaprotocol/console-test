@@ -120,7 +120,7 @@ def verify_data_grid(page, data_test_id, expected_pattern):
     expect(page.locator(
         f'[data-testid^="tab-{data_test_id.lower()}"] >> .ag-center-cols-container .ag-row-first')).to_be_visible()
     actual_text = page.locator(
-        f'[data-testid^="tab-{data_test_id.lower()}"] >> .ag-center-cols-container .ag-row-first').inner_text()
+        f'[data-testid^="tab-{data_test_id.lower()}"] >> .ag-center-cols-container .ag-row-first').text_content()
     lines = actual_text.strip().split('\n')
     for expected, actual in zip(expected_pattern, lines):
         # We are using regex so that we can run tests in different timezones.
@@ -190,6 +190,7 @@ def test_limit_order_trade(vega, page):
         r'\d{1,2}/\d{1,2}/\d{4},\s*\d{1,2}:\d{2}:\d{2}\s*(?:AM|PM)',
         '-'
     ]
+    print("Assert Open orders:")
     verify_data_grid(page, "Open", expected_open_order)
     vega.wait_for_total_catchup()
     vega.forward("10s")

@@ -138,5 +138,3 @@ def test_open_market(vega, page):
         "market-state").get_by_test_id("item-value")).to_have_text("Active")
     # commented out because we have an issue #4233
     # expect(page.get_by_text("Opening auction")).to_be_hidden()
-
-

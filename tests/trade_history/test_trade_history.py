@@ -118,7 +118,6 @@ def submit_order(vega, wallet_name, market_id, side, volume, price):
 def verify_data_grid(page, data_test_id, expected_pattern):
     page.get_by_test_id(data_test_id).click()
     # Required so that we can get liquidation price
-    page.pause()
     if data_test_id == "Positions":
         wait_for_graphql_response(page, 'EstimatePosition')
     expect(page.locator(
@@ -202,6 +201,7 @@ def test_price_copied_to_deal_ticket(vega, page):
     # setup continuous trading market with one user buy trade
     setup_continuous_market(vega, page)
     page.get_by_test_id('Trades').click()
+    wait_for_graphql_response(page, 'Trades')
     page.locator('[col-id=price]').last.click()
     # 6005-THIS-007
     expect(page.get_by_test_id('order-price')).to_have_value('107.50000')

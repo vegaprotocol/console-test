@@ -141,6 +141,7 @@ def verify_data_grid(page, data_test_id, expected_pattern):
                     f"Pattern does not match: {expected} != {actual}")
 
 
+
 # Required so that we can get liquidation price - Could also become a helper
 def wait_for_graphql_response(page, query_name, timeout=5000):
     response_data = {}

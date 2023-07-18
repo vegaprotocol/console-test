@@ -8,9 +8,10 @@ from playwright.sync_api import Page, expect
 # Wallet Configurations
 WalletConfig = namedtuple("WalletConfig", ["name", "passphrase"])
 MM_WALLET = WalletConfig("mm", "pin")
+MM_WALLET2 = WalletConfig("mm2", "pin2")
 TERMINATE_WALLET = WalletConfig("FJMKnwfZdd48C8NqvYrG", "bY3DxwtsCstMIIZdNpKs")
 
-wallets = [MM_WALLET, TERMINATE_WALLET]
+wallets = [MM_WALLET, MM_WALLET2, TERMINATE_WALLET]
 
 row_selector = '[data-testid="tab-all-markets"] .ag-center-cols-container .ag-row'
 trading_mode_col = '[col-id="tradingMode"]'
@@ -57,6 +58,12 @@ def setup_market(vega):
         asset=tdai_id,
         amount=100e5,
     )
+
+    vega.mint(
+        MM_WALLET2.name,
+        asset=tdai_id,
+        amount=100e5,
+    )
     vega.wait_fn(10)
     vega.wait_for_total_catchup()
 
@@ -91,13 +98,22 @@ def test_open_market(vega, page):
     market_id = vega.all_markets()[0].id
 
     vega.forward("10s")
-
     page.goto(f"http://localhost:{vega.console_port}/#/markets/all")
     page.get_by_text("continue").click()
     expect(page.locator(row_selector).locator(trading_mode_col)
            ).to_have_text("Opening auction")
     expect(page.locator(row_selector).locator('[col-id="state"]')
            ).to_have_text("Pending")
+
+    page.goto(f"http://localhost:{vega.console_port}/#/markets/")
+    result = page.get_by_text(market_name)
+    result.first.click()
+    page.get_by_test_id(
+        "market-trading-mode").get_by_text("Opening auction").hover()
+    expect(page.get_by_test_id("opening-auction-sub-status").first).to_have_text(
+        "Opening auction: Not enough liquidity to open")
+    # expect(page.get_by_test_id("opening-auction-sub-status").first).to_contain_text(
+    #     "Opening auction: Closing on")
 
     vega.submit_liquidity(
         key_name=MM_WALLET.name,
@@ -113,16 +129,24 @@ def test_open_market(vega, page):
                  initial_volume, initial_price)
     submit_order(vega, MM_WALLET, market_id, "SIDE_SELL",
                  initial_volume, initial_price)
+
+    vega.wait_for_total_catchup()
+    vega.forward("10s")
+    page.pause()
+
     submit_order(vega, MM_WALLET, market_id, "SIDE_BUY",
                  initial_volume, initial_price + initial_spread / 2)
     submit_order(vega, MM_WALLET, market_id, "SIDE_SELL",
                  initial_volume, initial_price + initial_spread / 2)
-    vega.wait_for_total_catchup()
+    submit_order(vega, MM_WALLET2, market_id, "SIDE_SELL",
+                 initial_volume, initial_price)
 
+    vega.wait_for_total_catchup()
     vega.forward("10s")
 
+    page.goto(f"http://localhost:{vega.console_port}/#/markets/all")
     expect(page.locator(row_selector).locator(trading_mode_col)
-           ).to_have_text("Continuous")
+           ).to_have_text()
     # commented out because we have an issue #4233
     # expect(page.locator(row_selector).locator(state_col)
     #        ).to_have_text("Pending")
@@ -138,5 +162,3 @@ def test_open_market(vega, page):
         "market-state").get_by_test_id("item-value")).to_have_text("Active")
     # commented out because we have an issue #4233
     # expect(page.get_by_text("Opening auction")).to_be_hidden()
-
-

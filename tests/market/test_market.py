@@ -112,8 +112,6 @@ def test_open_market(vega, page):
         "market-trading-mode").get_by_text("Opening auction").hover()
     expect(page.get_by_test_id("opening-auction-sub-status").first).to_have_text(
         "Opening auction: Not enough liquidity to open")
-    # expect(page.get_by_test_id("opening-auction-sub-status").first).to_contain_text(
-    #     "Opening auction: Closing on")
 
     vega.submit_liquidity(
         key_name=MM_WALLET.name,
@@ -129,11 +127,6 @@ def test_open_market(vega, page):
                  initial_volume, initial_price)
     submit_order(vega, MM_WALLET, market_id, "SIDE_SELL",
                  initial_volume, initial_price)
-
-    vega.wait_for_total_catchup()
-    vega.forward("10s")
-    page.pause()
-
     submit_order(vega, MM_WALLET, market_id, "SIDE_BUY",
                  initial_volume, initial_price + initial_spread / 2)
     submit_order(vega, MM_WALLET, market_id, "SIDE_SELL",
@@ -146,7 +139,7 @@ def test_open_market(vega, page):
 
     page.goto(f"http://localhost:{vega.console_port}/#/markets/all")
     expect(page.locator(row_selector).locator(trading_mode_col)
-           ).to_have_text()
+           ).to_have_text("Continuous")
     # commented out because we have an issue #4233
     # expect(page.locator(row_selector).locator(state_col)
     #        ).to_have_text("Pending")

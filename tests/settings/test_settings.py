@@ -53,7 +53,6 @@ def test_toast_positions(page):
     for icon_selector, toast_selector in ICON_TO_TOAST.items():
         # Click the icon
         page.click(f"[{icon_selector}]")
-        page.pause()
         # Expect that the toast is displayed
         expect(page.locator(f"[{toast_selector}]")).to_be_visible()
 

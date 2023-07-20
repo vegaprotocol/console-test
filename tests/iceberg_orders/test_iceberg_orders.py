@@ -1,6 +1,4 @@
-import logging
 import pytest
-import re
 from collections import namedtuple
 from playwright.sync_api import expect
 
@@ -15,10 +13,8 @@ TERMINATE_WALLET = WalletConfig("FJMKnwfZdd48C8NqvYrG", "bY3DxwtsCstMIIZdNpKs")
 
 wallets = [MM_WALLET, MM_WALLET2, TERMINATE_WALLET]
 
-
 def setup_continuous_market(vega, page):
     market_name = "BTC:DAI_Mar22"
-    logging.basicConfig(level=logging.INFO)
 
     for wallet in wallets:
         vega.create_key(wallet.name)
@@ -111,24 +107,49 @@ def submit_order(vega, wallet_name, market_id, side, volume, price):
         volume=volume,
         price=price,
     )
+def hover_and_assert_tooltip(page, element_text):
+    element = page.get_by_text(element_text)
+    element.hover()
+    expect(page.get_by_role("tooltip")).to_be_visible()
 
 @pytest.mark.usefixtures("auth")
 def test_iceberg(vega, page):
     # setup continuous trading market with one user buy trade
     setup_continuous_market(vega, page)
-    page.pause()
     page.get_by_test_id('iceberg').click()
     page.get_by_test_id('order-peak-size').fill("2")
     page.get_by_test_id('order-minimum-size').fill("1")
     page.get_by_test_id('order-size').fill("3")
     page.get_by_test_id('order-price').fill("107")
-    page.pause()
     page.get_by_test_id('place-order').click()
-    page.pause()
     
-    
-# TODO: Test to assert the iceberg/ peaksize / minimum size tooltip
-# TODO: Tests to assert validations
+@pytest.mark.usefixtures("auth")
+def test_iceberg_tooltips(vega, page):
+    setup_continuous_market(vega, page)
+    hover_and_assert_tooltip(page, "Iceberg")
+    page.get_by_test_id('iceberg').click()
+    hover_and_assert_tooltip(page, 'Peak size')
+    hover_and_assert_tooltip(page, 'Minimum size')
+
+@pytest.mark.usefixtures("auth")
+def test_iceberg_validations(vega, page):
+    setup_continuous_market(vega, page)
+    page.get_by_test_id('iceberg').click()
+    page.get_by_test_id('place-order').click()
+    expect(page.get_by_test_id('deal-ticket-peak-error-message-size-limit')).to_be_visible()
+    expect(page.get_by_test_id('deal-ticket-peak-error-message-size-limit')).to_have_text('You need to provide a peak size')
+    expect(page.get_by_test_id('deal-ticket-minimum-error-message-size-limit')).to_be_visible()
+    expect(page.get_by_test_id('deal-ticket-minimum-error-message-size-limit')).to_have_text('You need to provide a minimum visible size')
+    page.get_by_test_id('order-peak-size').fill('1')
+    page.get_by_test_id('order-minimum-size').fill('2')
+    expect(page.get_by_test_id('deal-ticket-peak-error-message-size-limit')).to_be_visible()
+    expect(page.get_by_test_id('deal-ticket-peak-error-message-size-limit')).to_have_text('Peak size cannot be greater than the size (0)')
+    expect(page.get_by_test_id('deal-ticket-minimum-error-message-size-limit')).to_be_visible()
+    expect(page.get_by_test_id('deal-ticket-minimum-error-message-size-limit')).to_have_text('Minimum visible size cannot be greater than the peak size (1)')
+    page.get_by_test_id('order-minimum-size').fill('0.1')
+    expect(page.get_by_test_id('deal-ticket-minimum-error-message-size-limit')).to_be_visible()
+    expect(page.get_by_test_id('deal-ticket-minimum-error-message-size-limit')).to_have_text('Minimum visible size cannot be lower than 1')
+
 # TODO: Test order submitted > shown open order > open position 
 # TODO: order book - Do we want to test refresh/initial added to orderbook?
 # TODO: trade - Do we want to test refresh/initial added to orderbook?

@@ -90,8 +90,8 @@ def setup_continuous_market(vega, page):
     submit_order(vega, MM_WALLET.name, market_id, "SIDE_SELL", 1, 105)
     submit_order(vega, MM_WALLET2.name, market_id, "SIDE_BUY", 1, 95)
 
-    vega.wait_for_total_catchup()
     vega.forward("10s")
+    vega.wait_for_total_catchup()
 
     page.goto(f"http://localhost:{vega.console_port}/#/markets/{market_id}")
 
@@ -198,8 +198,8 @@ def test_limit_order_trade_open_position(vega, page):
     # setup continuous trading market with one user buy trade
     setup_continuous_market(vega, page)
 
-    vega.wait_for_total_catchup()
     vega.forward("10s")
+    vega.wait_for_total_catchup()
 
     print("Assert Position:")
     # Assert that Position exists - Will fail if the order is incorrect.
@@ -226,8 +226,8 @@ def test_limit_order_trade_order_trade_away(vega, page):
     # setup continuous trading market with one user buy trade
     setup_continuous_market(vega, page)
 
-    vega.wait_for_total_catchup()
     vega.forward("10s")
+    vega.wait_for_total_catchup()
     # Assert that the order is no longer on the orderbook
     page.get_by_test_id('Orderbook').click()
     price_element = page.get_by_test_id('price-11000000').nth(1)

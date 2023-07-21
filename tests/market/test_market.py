@@ -1,5 +1,4 @@
 import logging
-import pytest
 
 from collections import namedtuple
 from playwright.sync_api import Page, expect

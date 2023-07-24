@@ -131,6 +131,8 @@ def test_price_monitoring(vega: VegaService, page: Page):
 
     expect(page.get_by_test_id(liquidity_supplied
                                ).get_by_test_id(item_value)).to_have_text("0.00 (0.00%)")
+
+    # add orders to provide liquidity
     submit_order(vega, MM_WALLET.name, market_id, "SIDE_BUY",
                  initial_volume, initial_price)
     submit_order(vega, MM_WALLET.name, market_id, "SIDE_SELL",

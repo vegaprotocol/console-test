@@ -98,6 +98,11 @@ def auth(vega, page_with_trace):
         "public_key": keypairs["Key 1"]
     }
 
+@pytest.fixture(scope="function")
+def risk_accepted(page_with_trace):
+    javascript = "localStorage.setItem('vega_risk_accepted', 'true');"
+    page_with_trace.add_init_script(javascript)
+
 
 
 

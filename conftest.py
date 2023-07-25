@@ -102,7 +102,3 @@ def auth(vega, page_with_trace):
 def risk_accepted(page_with_trace):
     javascript = "localStorage.setItem('vega_risk_accepted', 'true');"
     page_with_trace.add_init_script(javascript)
-
-
-
-

@@ -114,7 +114,7 @@ def test_market_lifecycle(vega: VegaService, page: Page):
     expect(trading_mode).to_have_text("Opening auction")
     expect(market_state).to_have_text("Pending")
 
-    # add liquidity and put some orders. Orders should be matched. Only after first order match, market trading mode should be continous
+    # Add liquidity and place some orders. Orders should match to produce the uncrossing price. A market can only move from opening auction to continuous trading when the enactment date has passed, there is sufficient liquidity and an uncrossing price is produced.
     vega.submit_simple_liquidity(
         key_name=MM_WALLET.name,
         market_id=market_id,

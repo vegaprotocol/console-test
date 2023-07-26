@@ -2,8 +2,8 @@ import pytest
 import re
 from playwright.sync_api import expect, Page
 from vega_sim.service import VegaService
-from marketFixtures.openingAuctionMarket.openingAuctionMarket import setup_opening_auction_market
-from marketFixtures.continuousMarket.continuousMarket import setup_continuous_market
+from market_fixtures.opening_auction_market.opening_auction_market import setup_opening_auction_market
+from market_fixtures.continuous_market.continuous_market import setup_continuous_market
 
 
 # Could be turned into a helper function in the future.
@@ -64,10 +64,8 @@ def wait_for_graphql_response(page, query_name, timeout=5000):
 
 @pytest.mark.usefixtures("auth")
 def test_limit_order_trade_open_order(setup_opening_auction_market, page: Page):
-    setup_opening_auction_market
     # Assert that the user order is displayed on the orderbook
     orderbook_trade = page.get_by_test_id('price-11000000').nth(1)
-
     # 6003-ORDB-001
     # 6003-ORDB-002
     expect(orderbook_trade).to_be_visible()
@@ -89,7 +87,6 @@ def test_limit_order_trade_open_order(setup_opening_auction_market, page: Page):
 
 @pytest.mark.usefixtures("auth")
 def test_limit_order_trade_open_position(setup_continuous_market, page):
-    setup_continuous_market
     print("Assert Position:")
     # Assert that Position exists - Will fail if the order is incorrect.
     expected_position = [
@@ -112,7 +109,6 @@ def test_limit_order_trade_open_position(setup_continuous_market, page):
 
 @pytest.mark.usefixtures("auth")
 def test_limit_order_trade_order_trade_away(setup_continuous_market, page: Page):
-    setup_continuous_market
     # Assert that the order is no longer on the orderbook
     page.get_by_test_id('Orderbook').click()
     price_element = page.get_by_test_id('price-11000000').nth(1)

@@ -19,7 +19,7 @@
     ```bash
     poetry install
     ```
-1. **Download the necessary binaries**: Run the following command within your Python environment:
+1. **Download the necessary binaries: Run the following command within your Python environment (use force so that the binaries are overwritten):
     ```bash
     python -m vega_sim.tools.load_binaries --force
     ```

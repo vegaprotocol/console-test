@@ -86,15 +86,27 @@ def setup_continuous_market(vega, page):
     submit_order(vega, MM_WALLET.name, market_id, "SIDE_SELL", 1, 105)
     submit_order(vega, MM_WALLET2.name, market_id, "SIDE_BUY", 1, 95)
 
-    vega.wait_for_total_catchup()
     vega.forward("10s")
+    vega.wait_for_total_catchup()
+    
 
     page.goto(f"http://localhost:{vega.console_port}/#/markets/{market_id}")
 
     submit_order(vega, "Key 1", market_id, "SIDE_BUY", 1, 110)
-    
-    vega.wait_for_total_catchup()
     vega.forward("10s")
+    vega.wait_for_total_catchup()
+    
+    vega.submit_order(
+        trading_key="Key 1",
+        market_id=market_id,
+        order_type="TYPE_LIMIT",
+        time_in_force="TIME_IN_FORCE_GTC",
+        side="SIDE_SELL",
+        price=120,
+        volume=10,
+        peak_size=5,
+        minimum_visible_size=2,
+    )
 
 
 def submit_order(vega, wallet_name, market_id, side, volume, price):
@@ -113,15 +125,17 @@ def hover_and_assert_tooltip(page, element_text):
     expect(page.get_by_role("tooltip")).to_be_visible()
 
 @pytest.mark.usefixtures("auth")
-def test_iceberg(vega, page):
+def test_iceberg_submit(vega, page):
     # setup continuous trading market with one user buy trade
     setup_continuous_market(vega, page)
+    
     page.get_by_test_id('iceberg').click()
     page.get_by_test_id('order-peak-size').fill("2")
     page.get_by_test_id('order-minimum-size').fill("1")
     page.get_by_test_id('order-size').fill("3")
     page.get_by_test_id('order-price').fill("107")
     page.get_by_test_id('place-order').click()
+    page.pause()
     
 @pytest.mark.usefixtures("auth")
 def test_iceberg_tooltips(vega, page):

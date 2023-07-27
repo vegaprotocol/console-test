@@ -3,6 +3,8 @@ from playwright.sync_api import Page, expect
 from market_fixtures.simple_market.simple_market import setup_simple_market
 from vega_sim.service import VegaService
 from market_fixtures.simple_market.simple_market import setup_simple_market
+from vega_sim.service import VegaService
+
 
 # Wallet Configurations
 WalletConfig = namedtuple("WalletConfig", ["name", "passphrase"])
@@ -13,8 +15,14 @@ TERMINATE_WALLET = WalletConfig("FJMKnwfZdd48C8NqvYrG", "bY3DxwtsCstMIIZdNpKs")
 wallets = [MM_WALLET, MM_WALLET2, TERMINATE_WALLET]
 
 table_row_selector = '[data-testid="tab-all-markets"] .ag-center-cols-container .ag-row'
+table_row_selector = '[data-testid="tab-all-markets"] .ag-center-cols-container .ag-row'
 trading_mode_col = '[col-id="tradingMode"]'
 state_col = '[col-id="state"]'
+item_value = "item-value"
+price_monitoring_bounds_row = "key-value-table-row"
+market_trading_mode = "market-trading-mode"
+market_state = "market-state"
+liquidity_supplied = "liquidity-supplied"
 item_value = "item-value"
 price_monitoring_bounds_row = "key-value-table-row"
 market_trading_mode = "market-trading-mode"

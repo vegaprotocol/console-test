@@ -84,7 +84,7 @@ def submit_order(vega: VegaService, wallet_name, market_id, side, volume, price)
     )
 
 
-@pytest.mark.usefixtures("auth")
+@pytest.mark.usefixtures("risk_accepted")
 def test_market_lifecycle(vega: VegaService, page: Page):
     trading_mode = page.get_by_test_id("market-trading-mode").get_by_test_id(
         "item-value"

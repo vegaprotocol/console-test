@@ -98,6 +98,8 @@ def auth(vega, page_with_trace):
         "public_key": keypairs["Key 1"]
     }
 
-
-
-
+# Set 'risk accepted' flag, so that the risk dialog doesn't show up
+@pytest.fixture(scope="function")
+def risk_accepted(page_with_trace):
+    script = "localStorage.setItem('vega_risk_accepted', 'true');"
+    page_with_trace.add_init_script(script)

@@ -88,15 +88,15 @@ def setup_continuous_market(vega, page):
     submit_order(vega, MM_WALLET.name, market_id, "SIDE_SELL", 1, 105)
     submit_order(vega, MM_WALLET2.name, market_id, "SIDE_BUY", 1, 95)
 
-    vega.wait_for_total_catchup()
     vega.forward("10s")
+    vega.wait_for_total_catchup()
 
     page.goto(f"http://localhost:{vega.console_port}/#/markets/{market_id}")
 
     submit_order(vega, "Key 1", market_id, "SIDE_BUY", 1, 110)
 
-    vega.wait_for_total_catchup()
     vega.forward("10s")
+    vega.wait_for_total_catchup()
 
 
 def submit_order(vega, wallet_name, market_id, side, volume, price):

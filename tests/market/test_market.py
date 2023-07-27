@@ -143,8 +143,8 @@ def test_price_monitoring(vega: VegaService, page: Page):
     submit_order(vega, MM_WALLET2.name, market_id, "SIDE_SELL",
                  initial_volume, initial_price)
 
-    vega.wait_for_total_catchup()
     vega.forward("10s")
+    vega.wait_for_total_catchup()
 
     expect(page.get_by_test_id(liquidity_supplied
                                ).get_by_test_id(item_value)).to_have_text("100.00 (>100%)")

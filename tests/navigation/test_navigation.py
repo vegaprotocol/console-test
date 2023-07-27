@@ -81,7 +81,7 @@ def assert_links(container):
             expect(link).to_have_attribute("href", page_href)
 
 def assert_network_switcher(container):
-    network_switcher_trigger = container.get_by_role('button', name="Stagnet")
+    network_switcher_trigger = container.get_by_test_id("navbar-network-switcher-trigger")
     network_switcher_trigger.click()
     dropdown = container.get_by_test_id("navbar-content-network-switcher")
     expect(dropdown).to_be_visible()

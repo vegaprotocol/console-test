@@ -96,7 +96,7 @@ def test_market_lifecycle(vega: VegaService, page: Page):
     page.goto(f"http://localhost:{vega.console_port}/#/markets/{market_id}")
 
     # check that market is in proposed state
-    expect(trading_mode).to_have_text("Opening auction")
+    expect(trading_mode).to_have_text("No trading")
     expect(market_state).to_have_text("Proposed")
 
     # approve market
@@ -152,7 +152,7 @@ def test_market_lifecycle(vega: VegaService, page: Page):
     vega.wait_for_total_catchup()
 
     # market state should be changed to "Trading Terminated" because of the invalid oracle
-    expect(trading_mode).to_have_text("Continuous")
+    expect(trading_mode).to_have_text("No trading")
     expect(market_state).to_have_text("Trading Terminated")
 
     # settle market
@@ -165,5 +165,5 @@ def test_market_lifecycle(vega: VegaService, page: Page):
     vega.wait_for_total_catchup()
 
     # check market state is now settled
-    expect(trading_mode).to_have_text("Continuous")
+    expect(trading_mode).to_have_text("No trading")
     expect(market_state).to_have_text("Settled")

@@ -2,19 +2,25 @@ import pytest
 from playwright.sync_api import Page, expect
 from vega_sim.service import VegaService
 
+# These tests need to be skipped until the new navigation is merged
+skip_reason = "awaiting merge of https://github.com/vegaprotocol/frontend-monorepo/pull/4375"
+
 @pytest.mark.usefixtures("risk_accepted")
+@pytest.mark.skip(reason=skip_reason)
 def test_network_switcher(vega: VegaService, page: Page):
     setup(vega, page)
     navbar = page.locator('nav[aria-label="Main"]')
     assert_network_switcher(navbar)
     
 @pytest.mark.usefixtures("risk_accepted")
+@pytest.mark.skip(reason=skip_reason)
 def test_navbar_pages(vega: VegaService, page: Page):
     setup(vega, page)
     navbar = page.locator('nav[aria-label="Main"]')
     assert_links(navbar)
 
 @pytest.mark.usefixtures("risk_accepted")
+@pytest.mark.skip(reason=skip_reason)
 def test_navigation_mobile(vega: VegaService, page: Page):
     setup(vega, page)
     page.set_viewport_size({

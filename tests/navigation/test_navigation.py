@@ -4,19 +4,19 @@ from vega_sim.service import VegaService
 
 @pytest.mark.usefixtures("risk_accepted")
 def test_network_switcher(vega: VegaService, page: Page):
-    page.goto(f"http://localhost:{vega.console_port}/#/disclaimer")
+    setup(vega, page)
     navbar = page.locator('nav[aria-label="Main"]')
     assert_network_switcher(navbar)
     
 @pytest.mark.usefixtures("risk_accepted")
 def test_navbar_pages(vega: VegaService, page: Page):
-    page.goto(f"http://localhost:{vega.console_port}/#/disclaimer")
+    setup(vega, page)
     navbar = page.locator('nav[aria-label="Main"]')
     assert_links(navbar)
 
 @pytest.mark.usefixtures("risk_accepted")
 def test_navigation_mobile(vega: VegaService, page: Page):
-    page.goto(f"http://localhost:{vega.console_port}/#/disclaimer")
+    setup(vega, page)
     page.set_viewport_size({
         "width": 800,
         "height": 1040
@@ -41,6 +41,9 @@ def test_navigation_mobile(vega: VegaService, page: Page):
     dialog = page.get_by_test_id("dialog-content")
     expect(dialog.get_by_test_id("wallet-dialog-title")).to_be_visible()
     # endregion
+
+def setup(vega, page):
+    page.goto(f"http://localhost:{vega.console_port}/#/disclaimer")
 
 def assert_links(container):
     pages = [

@@ -97,7 +97,7 @@ def setup_opening_auction_market(vega: VegaService, page: Page):
 
     page.goto(f"http://localhost:{vega.console_port}/#/markets/{market_id}")
 
-    submit_order(vega, "Key 1", market_id, "SIDE_BUY", 1, 110)
+
 
 
 def submit_order(vega, wallet_name, market_id, side, volume, price):

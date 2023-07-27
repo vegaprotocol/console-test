@@ -1,104 +1,7 @@
-import logging
 import pytest
 import re
-from collections import namedtuple
 from playwright.sync_api import expect
-
-# Defined namedtuples
-WalletConfig = namedtuple("WalletConfig", ["name", "passphrase"])
-
-# Wallet Configurations
-MM_WALLET = WalletConfig("mm", "pin")
-MM_WALLET2 = WalletConfig("mm2", "pin2")
-TERMINATE_WALLET = WalletConfig("FJMKnwfZdd48C8NqvYrG", "bY3DxwtsCstMIIZdNpKs")
-
-
-wallets = [MM_WALLET, MM_WALLET2, TERMINATE_WALLET]
-
-
-def setup_continuous_market(vega, page):
-    market_name = "BTC:DAI_Mar22"
-    logging.basicConfig(level=logging.INFO)
-
-    for wallet in wallets:
-        vega.create_key(wallet.name)
-
-    vega.mint(
-        MM_WALLET.name,
-        asset="VOTE",
-        amount=1e4,
-    )
-
-    vega.update_network_parameter(
-        MM_WALLET.name, parameter="market.fee.factors.makerFee", new_value="0.1"
-    )
-
-    vega.forward("10s")
-    vega.wait_for_total_catchup()
-
-    vega.create_asset(MM_WALLET.name, name="tDAI",
-                      symbol="tDAI", decimals=5, max_faucet_amount=1e10)
-    vega.wait_for_total_catchup()
-
-    tdai_id = vega.find_asset_id(symbol="tDAI")
-
-    vega.mint(
-        "Key 1",
-        asset=tdai_id,
-        amount=100e5,
-    )
-
-    vega.mint(
-        MM_WALLET.name,
-        asset=tdai_id,
-        amount=100e5,
-    )
-    vega.mint(
-        MM_WALLET2.name,
-        asset=tdai_id,
-        amount=100e5,
-    )
-
-    vega.wait_fn(10)
-    vega.wait_for_total_catchup()
-
-    vega.create_simple_market(
-        market_name,
-        proposal_key=MM_WALLET.name,
-        settlement_asset_id=tdai_id,
-        termination_key=TERMINATE_WALLET.name,
-        market_decimals=5,
-    )
-    vega.wait_for_total_catchup()
-
-    market_id = vega.all_markets()[0].id
-
-    vega.submit_simple_liquidity(
-        key_name=MM_WALLET.name,
-        market_id=market_id,
-        commitment_amount=10000,
-        fee=0.000,
-        reference_buy="PEGGED_REFERENCE_MID",
-        reference_sell="PEGGED_REFERENCE_MID",
-        delta_buy=1,
-        delta_sell=1,
-        is_amendment=False,
-    )
-
-    submit_order(vega, MM_WALLET.name, market_id, "SIDE_SELL", 1, 110)
-    submit_order(vega, MM_WALLET2.name, market_id, "SIDE_BUY", 1, 90)
-    submit_order(vega, MM_WALLET.name, market_id, "SIDE_SELL", 1, 105)
-    submit_order(vega, MM_WALLET2.name, market_id, "SIDE_BUY", 1, 95)
-
-    vega.wait_for_total_catchup()
-    vega.forward("10s")
-
-    page.goto(f"http://localhost:{vega.console_port}/#/markets/{market_id}")
-
-    submit_order(vega, "Key 1", market_id, "SIDE_BUY", 1, 110)
-
-    vega.wait_for_total_catchup()
-    vega.forward("10s")
+from market_fixtures.continuous_market.continuous_market import setup_continuous_market
 
 
 def submit_order(vega, wallet_name, market_id, side, volume, price):
@@ -110,10 +13,8 @@ def submit_order(vega, wallet_name, market_id, side, volume, price):
         side=side,
         volume=volume,
         price=price,
-
     )
-
-
+    
 # Could be turned into a helper function in the future.
 def verify_data_grid(page, data_test_id, expected_pattern):
     page.get_by_test_id(data_test_id).click()
@@ -171,9 +72,7 @@ def wait_for_graphql_response(page, query_name, timeout=5000):
 
 
 @pytest.mark.usefixtures("auth")
-def test_limit_order_new_trade_top_of_list(vega, page):
-    # setup continuous trading market with one user buy trade
-    setup_continuous_market(vega, page)
+def test_limit_order_new_trade_top_of_list(setup_continuous_market, vega, page):
     market_id = vega.all_markets()[0].id
     submit_order(vega, "Key 1", market_id, "SIDE_BUY", 1, 110)
 
@@ -197,9 +96,7 @@ def test_limit_order_new_trade_top_of_list(vega, page):
 
 
 @pytest.mark.usefixtures("auth")
-def test_price_copied_to_deal_ticket(vega, page):
-    # setup continuous trading market with one user buy trade
-    setup_continuous_market(vega, page)
+def test_price_copied_to_deal_ticket(setup_continuous_market, vega, page):
     page.get_by_test_id('Trades').click()
     wait_for_graphql_response(page, 'Trades')
     page.locator('[col-id=price]').last.click()

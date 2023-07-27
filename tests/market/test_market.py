@@ -1,8 +1,6 @@
-import logging
-
 from collections import namedtuple
 from playwright.sync_api import Page, expect
-
+from market_fixtures.simple_market.simple_market import setup_simple_market
 
 # Wallet Configurations
 WalletConfig = namedtuple("WalletConfig", ["name", "passphrase"])
@@ -24,58 +22,6 @@ initial_spread: float = 0.1
 market_name = "BTC:DAI_YYYYYYYYY"
 
 
-def setup_market(vega):
-    for wallet in wallets:
-        vega.create_key(wallet.name)
-
-    vega.mint(
-        MM_WALLET.name,
-        asset="VOTE",
-        amount=mint_amount,
-    )
-
-    vega.update_network_parameter(
-        MM_WALLET.name, parameter="market.fee.factors.makerFee", new_value="0.1"
-    )
-    vega.forward("10s")
-    vega.wait_for_total_catchup()
-
-    vega.create_asset(
-        MM_WALLET.name,
-        name="tDAI",
-        symbol="tDAI",
-        decimals=5,
-        max_faucet_amount=1e10,
-    )
-
-    vega.wait_for_total_catchup()
-    tdai_id = vega.find_asset_id(symbol="tDAI")
-    print("TDAI: ", tdai_id)
-
-    vega.mint(
-        MM_WALLET.name,
-        asset=tdai_id,
-        amount=100e5,
-    )
-
-    vega.mint(
-        MM_WALLET2.name,
-        asset=tdai_id,
-        amount=100e5,
-    )
-    vega.wait_fn(10)
-    vega.wait_for_total_catchup()
-
-    vega.create_simple_market(
-        market_name,
-        proposal_key=MM_WALLET.name,
-        settlement_asset_id=tdai_id,
-        termination_key=TERMINATE_WALLET.name,
-        market_decimals=5,
-    )
-    vega.wait_for_total_catchup()
-
-
 def submit_order(vega, wallet, market_id, side, volume, price):
     vega.submit_order(
         trading_key=wallet.name,
@@ -88,15 +34,8 @@ def submit_order(vega, wallet, market_id, side, volume, price):
     )
 
 
-def test_open_market(vega, page):
-
-    logging.basicConfig(level=logging.INFO)
-
-    setup_market(vega)
-
+def test_open_market(setup_simple_market, vega, page):
     market_id = vega.all_markets()[0].id
-
-    vega.forward("10s")
     page.goto(f"http://localhost:{vega.console_port}/#/markets/all")
     page.get_by_text("continue").click()
     expect(page.locator(row_selector).locator(trading_mode_col)

@@ -62,8 +62,22 @@ def wait_for_graphql_response(page, query_name, timeout=5000):
     page.unroute("**", handle_response)
 
 
+def submit_order(vega, wallet_name, market_id, side, volume, price):
+    vega.submit_order(
+        trading_key=wallet_name,
+        market_id=market_id,
+        time_in_force="TIME_IN_FORCE_GTC",
+        order_type="TYPE_LIMIT",
+        side=side,
+        volume=volume,
+        price=price,
+    )
+
 @pytest.mark.usefixtures("auth")
-def test_limit_order_trade_open_order(setup_opening_auction_market, page: Page):
+def test_limit_order_trade_open_order(setup_opening_auction_market,vega: VegaService,  page: Page):
+    market_id = vega.all_markets()[0].id
+    submit_order(vega, "Key 1", market_id, "SIDE_BUY", 1, 110)
+
     # Assert that the user order is displayed on the orderbook
     orderbook_trade = page.get_by_test_id('price-11000000').nth(1)
     # 6003-ORDB-001

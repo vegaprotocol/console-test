@@ -32,6 +32,7 @@ def vega():
         retain_log_files=True,
         use_full_vega_wallet=True,
         store_transactions=True,
+        transactions_per_block=1000
     ) as vega:
 
         # docker setup

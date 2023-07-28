@@ -17,10 +17,14 @@ def page_with_trace(request, browser):
         with context.new_page() as page:
             yield page
         trace_path = os.path.join("traces", request.node.name + "trace.zip")
-        if request.node.rep_call.failed:
+        try:
+            if request.node.rep_call.failed:
+                context.tracing.stop(path=trace_path)
+        except AttributeError:
             context.tracing.stop(path=trace_path)
         else:
-            context.tracing.stop(path=trace_path)
+            context.tracing.stop()
+
 
 # Start VegaServiceNull and start up docker container for website
 @pytest.fixture(scope="function", autouse=True)
@@ -32,6 +36,7 @@ def vega():
         retain_log_files=True,
         use_full_vega_wallet=True,
         store_transactions=True,
+        transactions_per_block=1000
     ) as vega:
 
         # docker setup
@@ -98,7 +103,8 @@ def auth(vega, page_with_trace):
         "public_key": keypairs["Key 1"]
     }
 
+# Set 'risk accepted' flag, so that the risk dialog doesn't show up
 @pytest.fixture(scope="function")
 def risk_accepted(page_with_trace):
-    javascript = "localStorage.setItem('vega_risk_accepted', 'true');"
-    page_with_trace.add_init_script(javascript)
+    script = "localStorage.setItem('vega_risk_accepted', 'true');"
+    page_with_trace.add_init_script(script)

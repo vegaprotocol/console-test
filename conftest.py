@@ -17,10 +17,14 @@ def page_with_trace(request, browser):
         with context.new_page() as page:
             yield page
         trace_path = os.path.join("traces", request.node.name + "trace.zip")
-        if request.node.rep_call.failed:
+        try:
+            if request.node.rep_call.failed:
+                context.tracing.stop(path=trace_path)
+        except AttributeError:
             context.tracing.stop(path=trace_path)
         else:
-            context.tracing.stop(path=trace_path)
+            context.tracing.stop()
+
 
 # Start VegaServiceNull and start up docker container for website
 @pytest.fixture(scope="function", autouse=True)

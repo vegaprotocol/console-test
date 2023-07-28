@@ -1,7 +1,8 @@
-import logging
-
 from collections import namedtuple
 from playwright.sync_api import Page, expect
+from market_fixtures.simple_market.simple_market import setup_simple_market
+from vega_sim.service import VegaService
+from market_fixtures.simple_market.simple_market import setup_simple_market
 from vega_sim.service import VegaService
 
 
@@ -14,8 +15,14 @@ TERMINATE_WALLET = WalletConfig("FJMKnwfZdd48C8NqvYrG", "bY3DxwtsCstMIIZdNpKs")
 wallets = [MM_WALLET, MM_WALLET2, TERMINATE_WALLET]
 
 table_row_selector = '[data-testid="tab-all-markets"] .ag-center-cols-container .ag-row'
+table_row_selector = '[data-testid="tab-all-markets"] .ag-center-cols-container .ag-row'
 trading_mode_col = '[col-id="tradingMode"]'
 state_col = '[col-id="state"]'
+item_value = "item-value"
+price_monitoring_bounds_row = "key-value-table-row"
+market_trading_mode = "market-trading-mode"
+market_state = "market-state"
+liquidity_supplied = "liquidity-supplied"
 item_value = "item-value"
 price_monitoring_bounds_row = "key-value-table-row"
 market_trading_mode = "market-trading-mode"
@@ -30,58 +37,6 @@ initial_spread: float = 0.1
 market_name = "BTC:DAI_YYYYYYYYY"
 
 
-def setup_market(vega):
-    for wallet in wallets:
-        vega.create_key(wallet.name)
-
-    vega.mint(
-        MM_WALLET.name,
-        asset="VOTE",
-        amount=mint_amount,
-    )
-
-    vega.update_network_parameter(
-        MM_WALLET.name, parameter="market.fee.factors.makerFee", new_value="0.1"
-    )
-    vega.forward("10s")
-    vega.wait_for_total_catchup()
-
-    vega.create_asset(
-        MM_WALLET.name,
-        name="tDAI",
-        symbol="tDAI",
-        decimals=5,
-        max_faucet_amount=1e10,
-    )
-
-    vega.wait_for_total_catchup()
-    tdai_id = vega.find_asset_id(symbol="tDAI")
-    print("TDAI: ", tdai_id)
-
-    vega.mint(
-        MM_WALLET.name,
-        asset=tdai_id,
-        amount=100e5,
-    )
-
-    vega.mint(
-        MM_WALLET2.name,
-        asset=tdai_id,
-        amount=100e5,
-    )
-    vega.wait_fn(10)
-    vega.wait_for_total_catchup()
-
-    vega.create_simple_market(
-        market_name,
-        proposal_key=MM_WALLET.name,
-        settlement_asset_id=tdai_id,
-        termination_key=TERMINATE_WALLET.name,
-        market_decimals=5,
-    )
-    vega.wait_for_total_catchup()
-
-
 def submit_order(vega, wallet_name, market_id, side, volume, price):
     vega.submit_order(
         trading_key=wallet_name,
@@ -94,15 +49,9 @@ def submit_order(vega, wallet_name, market_id, side, volume, price):
     )
 
 
-def test_price_monitoring(vega: VegaService, page: Page):
-
-    logging.basicConfig(level=logging.INFO)
-
-    setup_market(vega)
+def test_price_monitoring(setup_simple_market, vega: VegaService, page: Page):
 
     market_id = vega.all_markets()[0].id
-
-    vega.forward("10s")
     page.goto(f"http://localhost:{vega.console_port}/#/markets/all")
     page.get_by_text("continue").click()
     expect(page.locator(table_row_selector).locator(trading_mode_col)

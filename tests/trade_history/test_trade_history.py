@@ -76,8 +76,8 @@ def test_limit_order_new_trade_top_of_list(setup_continuous_market, vega, page):
     market_id = vega.all_markets()[0].id
     submit_order(vega, "Key 1", market_id, "SIDE_BUY", 1, 110)
 
-    vega.wait_for_total_catchup()
     vega.forward("10s")
+    vega.wait_for_total_catchup()
     expected_trade = [
         '103.50',
         '1',

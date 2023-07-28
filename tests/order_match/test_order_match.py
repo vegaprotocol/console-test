@@ -5,6 +5,7 @@ from vega_sim.service import VegaService
 from market_fixtures.opening_auction_market.opening_auction_market import setup_opening_auction_market
 from market_fixtures.continuous_market.continuous_market import setup_continuous_market
 
+from playwright.sync_api import expect
 
 # Could be turned into a helper function in the future.
 def verify_data_grid(page, data_test_id, expected_pattern):

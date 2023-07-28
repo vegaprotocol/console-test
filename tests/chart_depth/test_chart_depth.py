@@ -2,8 +2,8 @@ import pytest
 import logging
 from collections import namedtuple
 from playwright.sync_api import expect
-from market_fixtures.continuous_market.continuous_market import setup_continuous_market
 
+from market_fixtures.continuous_market.continuous_market import setup_continuous_market
 
 @pytest.mark.usefixtures("auth")
 def test_see_market_depth_chart(setup_continuous_market, page):

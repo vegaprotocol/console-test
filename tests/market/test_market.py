@@ -2,7 +2,7 @@ from collections import namedtuple
 from playwright.sync_api import Page, expect
 from market_fixtures.simple_market.simple_market import setup_simple_market
 from vega_sim.service import VegaService
-
+from market_fixtures.simple_market.simple_market import setup_simple_market
 
 # Wallet Configurations
 WalletConfig = namedtuple("WalletConfig", ["name", "passphrase"])

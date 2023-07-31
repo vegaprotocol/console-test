@@ -41,7 +41,7 @@ jobs:
     #----------------------------------------------
     #  -----  pull console. -----
     #----------------------------------------------
-    - name: pull console
+    - name: Pull Console
       run: |    
         poetry run docker pull vegaprotocol/trading:testnet
     #----------------------------------------------

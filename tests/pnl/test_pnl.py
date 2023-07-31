@@ -90,7 +90,7 @@ def test_pnl_neutral_portfolio(setup_continuous_market, vega:VegaService, page: 
     check_pnl_color_value(realised_pnl, 'rgb(0, 0, 0)', '0.00')
     check_pnl_color_value(unrealised_pnl, 'rgb(0, 0, 0)', '0.00')
     
-@pytest.mark.skip()    
+ 
 @pytest.mark.usefixtures("auth")
 def test_pnl_loss_trading(setup_continuous_market, vega:VegaService, page: Page):
     market_id = vega.all_markets()[0].id

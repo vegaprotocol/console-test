@@ -24,7 +24,7 @@ jobs:
 
     - name: load Binaries
       run: |    
-        poetry run python -m vega_sim.tools.load_binaries
+        poetry run python -m vega_sim.tools.load_binaries --force
 
     - name: pull console
       run: |    

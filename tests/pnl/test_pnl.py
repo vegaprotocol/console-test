@@ -33,13 +33,10 @@ def check_pnl_color_value(element, expected_color, expected_value):
     assert color == expected_color, f'Unexpected color: {color}'
     assert value == expected_value, f'Unexpected value: {value}'
 
-# - **Realised PnL** = **Closed Volume Amount** * (**Average Entry Price** (of Closed Short Contracts)  - [Average Entry Price](#average-entry-price) (of Closed Long Contracts))
-# - **Unrealised PnL** = **Total Volume** * (**Mark Price** - **Average Entry Price**(of Open Contracts))
 @pytest.mark.usefixtures("auth")
 def test_pnl_loss_portfolio(setup_continuous_market, vega:VegaService, page: Page):
     page.goto(f"http://localhost:{vega.console_port}/#/portfolio")
     page.get_by_test_id('Positions').click()
-    #page.locator('[class="ag-header-cell-label"]').first.click()
     market_id = vega.all_markets()[0].id
     
     submit_order(vega, "Key 1", market_id, "SIDE_BUY", 1, 104.50000)

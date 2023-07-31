@@ -88,10 +88,15 @@ def assert_links(container):
 
 def assert_network_switcher(container):
     network_switcher_trigger = container.get_by_test_id("navbar-network-switcher-trigger")
+    # 0006-NETW-002
+    expect(network_switcher_trigger).to_have_text="Fairground testnet"
     network_switcher_trigger.click()
     dropdown = container.get_by_test_id("navbar-content-network-switcher")
     expect(dropdown).to_be_visible()
     links = dropdown.get_by_role("link")
     expect(links).to_have_count(2)
-    expect(container.get_by_role("link", name="Mainnet")).to_be_visible()
+    mainnet_link = container.get_by_role("link", name="Mainnet")
+    expect(mainnet_link).to_be_visible()
+    # 0006-NETW-003
+    expect(mainnet_link).to_have_attribute("href", "https://console.vega.xyz")
     expect(container.get_by_role("link", name="Fairground testnet")).to_be_visible()

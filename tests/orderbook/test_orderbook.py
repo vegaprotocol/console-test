@@ -5,6 +5,7 @@ from collections import namedtuple
 from playwright.sync_api import Page, expect
 from vega_sim.service import VegaService
 from typing import List
+from actions.submit_order import submit_order
 
 
 # Defined namedtuples
@@ -103,18 +104,6 @@ def setup_continuous_market(vega: VegaService, page: Page):
     vega.forward("10s")
 
     page.goto(f"http://localhost:{vega.console_port}/#/markets/{market_id}")
-
-
-def submit_order(vega, wallet_name, market_id, side, volume, price):
-    vega.submit_order(
-        trading_key=wallet_name,
-        market_id=market_id,
-        time_in_force="TIME_IN_FORCE_GTC",
-        order_type="TYPE_LIMIT",
-        side=side,
-        volume=volume,
-        price=price,
-    )
 
 
 orderbook_content = [

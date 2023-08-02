@@ -33,7 +33,7 @@ def check_pnl_color_value(element, expected_color, expected_value):
     assert color == expected_color, f'Unexpected color: {color}'
     assert value == expected_value, f'Unexpected value: {value}'
 
-@pytest.mark.skip()
+
 @pytest.mark.usefixtures("auth")
 def test_pnl_loss_portfolio(setup_continuous_market, vega:VegaService, page: Page):
     page.goto(f"http://localhost:{vega.console_port}/#/portfolio")
@@ -56,7 +56,7 @@ def test_pnl_loss_portfolio(setup_continuous_market, vega:VegaService, page: Pag
     check_pnl_color_value(realised_pnl, 'rgb(236, 0, 60)', '-8.00')
     check_pnl_color_value(unrealised_pnl, 'rgb(0, 0, 0)', '0.00')
 
-@pytest.mark.skip()
+
 @pytest.mark.usefixtures("auth")
 def test_pnl_profit_portfolio(setup_continuous_market, vega:VegaService, page: Page):
     page.goto(f"http://localhost:{vega.console_port}/#/portfolio")
@@ -78,7 +78,7 @@ def test_pnl_profit_portfolio(setup_continuous_market, vega:VegaService, page: P
     check_pnl_color_value(realised_pnl, 'rgb(1, 145, 75)', '8.00')
     check_pnl_color_value(unrealised_pnl, 'rgb(0, 0, 0)', '0.00')
 
-@pytest.mark.skip()
+
 @pytest.mark.usefixtures("auth")
 def test_pnl_neutral_portfolio(setup_continuous_market, vega:VegaService, page: Page):
     page.goto(f"http://localhost:{vega.console_port}/#/portfolio")

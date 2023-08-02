@@ -1,4 +1,6 @@
-""" import pytest
+import pytest
+import time
+import requests
 from collections import namedtuple
 from playwright.sync_api import expect, Page
 from vega_sim.service import VegaService
@@ -57,12 +59,26 @@ def check_pnl_color_value(element, expected_color, expected_value):
     assert color == expected_color, f'Unexpected color: {color}'
     assert value == expected_value, f'Unexpected value: {value}'
 
+def wait_for_service(url, timeout=60):
+    start_time = time.time()
+    while True:
+        try:
+            response = requests.get(url)
+            if response.status_code == 200:
+                break
+        except Exception:
+            # If the connection attempt fails, wait and try again
+            time.sleep(1)
+            if time.time() - start_time > timeout:
+                raise TimeoutError(f"Timed out waiting for service at {url}")
+
 
 @pytest.mark.usefixtures("auth")
 def test_pnl_loss_portfolio(setup_continuous_market, vega:VegaService, page: Page):
     market_id = vega.all_markets()[0].id
     
     submit_order(vega, "Key 1", market_id, "SIDE_BUY", 1, 104.50000)
+    wait_for_service(f"http://localhost:{vega.console_port}/#/markets/{market_id}")
     page.get_by_test_id('Portfolio').first.click()
     page.get_by_test_id('Positions').click()
     wait_for_graphql_response(page, 'EstimatePosition')
@@ -86,7 +102,7 @@ def test_pnl_loss_portfolio(setup_continuous_market, vega:VegaService, page: Pag
 def test_pnl_profit_portfolio(setup_continuous_market, vega:VegaService, page: Page):
     market_id = vega.all_markets()[0].id
     submit_order(vega, "Key 1", market_id, "SIDE_BUY", 1, 104.50000)
-
+    wait_for_service(f"http://localhost:{vega.console_port}/#/markets/{market_id}")
     page.get_by_test_id('Portfolio').first.click()
     page.get_by_test_id('Positions').click()
     wait_for_graphql_response(page, 'EstimatePosition')
@@ -106,6 +122,8 @@ def test_pnl_profit_portfolio(setup_continuous_market, vega:VegaService, page: P
 
 @pytest.mark.usefixtures("auth")
 def test_pnl_neutral_portfolio(setup_continuous_market, vega:VegaService, page: Page):
+    market_id = vega.all_markets()[0].id
+    wait_for_service(f"http://localhost:{vega.console_port}/#/markets/{market_id}")
     page.get_by_test_id('Portfolio').first.click()
     page.get_by_test_id('Positions').click()
     wait_for_graphql_response(page, 'EstimatePosition')
@@ -121,7 +139,7 @@ def test_pnl_neutral_portfolio(setup_continuous_market, vega:VegaService, page: 
 def test_pnl_loss_trading(setup_continuous_market, vega:VegaService, page: Page):
     market_id = vega.all_markets()[0].id
     submit_order(vega, "Key 1", market_id, "SIDE_BUY", 1, 104.50000)
-    
+    wait_for_service(f"http://localhost:{vega.console_port}/#/markets/{market_id}")
     realised_pnl = page.locator('.ag-center-cols-container .ag-row >> css=[col-id="realisedPNL"]')
     unrealised_pnl = page.locator('.ag-center-cols-container .ag-row >> css=[col-id="unrealisedPNL"]')
 
@@ -139,6 +157,7 @@ def test_pnl_loss_trading(setup_continuous_market, vega:VegaService, page: Page)
 def test_pnl_profit_trading(setup_continuous_market, vega:VegaService, page: Page):
     market_id = vega.all_markets()[0].id
     submit_order(vega, "Key 1", market_id, "SIDE_BUY", 1, 104.50000)
+    wait_for_service(f"http://localhost:{vega.console_port}/#/markets/{market_id}")
     page.get_by_test_id('manage-vega-wallet').click()
     page.get_by_role('menuitemradio').nth(1).click()
     
@@ -156,11 +175,11 @@ def test_pnl_profit_trading(setup_continuous_market, vega:VegaService, page: Pag
 
 @pytest.mark.usefixtures("auth")
 def test_pnl_neutral_trading(setup_continuous_market, vega:VegaService, page: Page):
-    
+    market_id = vega.all_markets()[0].id
+    wait_for_service(f"http://localhost:{vega.console_port}/#/markets/{market_id}")
     realised_pnl = page.locator('.ag-center-cols-container .ag-row >> css=[col-id="realisedPNL"]')
     unrealised_pnl = page.locator('.ag-center-cols-container .ag-row >> css=[col-id="unrealisedPNL"]')
 
     check_pnl_color_value(realised_pnl, 'rgb(0, 0, 0)', '0.00')
     check_pnl_color_value(unrealised_pnl, 'rgb(0, 0, 0)', '0.00')
         
- """

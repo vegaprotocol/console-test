@@ -31,10 +31,9 @@ jobs:
     #----------------------------------------------
     #  -----  install docker  -----
     #----------------------------------------------
-    - name: Install Docker CLI via Homebrew
-      run: brew install docker
-    - run: brew install docker colima
-    - run: colima start
+    - name: Setup Docker on macOS
+      uses: douglascamata/setup-docker-macos-action@v1-alpha
+
     #----------------------------------------------
     #  -----  install dependencies  -----
     #----------------------------------------------

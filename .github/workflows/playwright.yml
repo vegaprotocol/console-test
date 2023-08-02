@@ -31,8 +31,8 @@ jobs:
     #----------------------------------------------
     #  -----  install docker  -----
     #----------------------------------------------
-    - name: setup-docker
-      uses: docker-practice/actions-setup-docker@v1
+    - name: Install Docker CLI via Homebrew
+      run: brew install docker
     #----------------------------------------------
     #  -----  install dependencies  -----
     #----------------------------------------------

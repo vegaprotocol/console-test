@@ -36,7 +36,7 @@ def check_pnl_color_value(element, expected_color, expected_value):
 
 @pytest.mark.usefixtures("auth")
 def test_pnl_loss_portfolio(setup_continuous_market, vega:VegaService, page: Page):
-    page.goto(f"http://localhost:{vega.console_port}/#/portfolio")
+    page.get_by_test_id('Portfolio').first.click()
     page.get_by_test_id('Positions').click()
     market_id = vega.all_markets()[0].id
     
@@ -59,7 +59,7 @@ def test_pnl_loss_portfolio(setup_continuous_market, vega:VegaService, page: Pag
 
 @pytest.mark.usefixtures("auth")
 def test_pnl_profit_portfolio(setup_continuous_market, vega:VegaService, page: Page):
-    page.goto(f"http://localhost:{vega.console_port}/#/portfolio")
+    page.get_by_test_id('Portfolio').first.click()
     page.get_by_test_id('Positions').click()
     market_id = vega.all_markets()[0].id
 
@@ -81,7 +81,7 @@ def test_pnl_profit_portfolio(setup_continuous_market, vega:VegaService, page: P
 
 @pytest.mark.usefixtures("auth")
 def test_pnl_neutral_portfolio(setup_continuous_market, vega:VegaService, page: Page):
-    page.goto(f"http://localhost:{vega.console_port}/#/portfolio")
+    page.get_by_test_id('Portfolio').first.click()
     page.get_by_test_id('Positions').click()
     
     realised_pnl = page.locator('.ag-center-cols-container .ag-row >> css=[col-id="realisedPNL"]').first

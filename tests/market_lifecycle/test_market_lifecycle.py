@@ -1,4 +1,4 @@
-""" import pytest
+import pytest
 import vega_sim.api.governance as governance
 
 from collections import namedtuple
@@ -167,4 +167,3 @@ def test_market_lifecycle(vega: VegaService, page: Page):
     # check market state is now settled
     expect(trading_mode).to_have_text("No trading")
     expect(market_state).to_have_text("Settled")
- """

@@ -1,4 +1,4 @@
-""" import pytest
+import pytest
 import re
 from playwright.sync_api import expect, Page
 from vega_sim.service import VegaService
@@ -129,4 +129,3 @@ def test_limit_order_trade_order_trade_away(setup_continuous_market, page: Page)
     price_element = page.get_by_test_id('price-11000000').nth(1)
     # 6003-ORDB-010
     expect(price_element).to_be_hidden()
- """

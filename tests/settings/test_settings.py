@@ -1,4 +1,4 @@
-""" 
+
 import pytest
 from playwright.sync_api import expect
 
@@ -62,4 +62,3 @@ def test_dark_mode(page):
     assert page.query_selector('html').get_attribute('class') == None
     page.get_by_role('switch').click()
     assert page.query_selector('html').get_attribute('class') == "dark"
- """

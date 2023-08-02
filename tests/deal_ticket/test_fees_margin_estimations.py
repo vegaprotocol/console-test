@@ -1,4 +1,4 @@
-""" import logging
+import logging
 import pytest
 from collections import namedtuple
 from playwright.sync_api import Page, expect
@@ -172,7 +172,3 @@ def test_margin_and_fees_estimations(vega: VegaService, page: Page):
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
     expect(page.get_by_test_id("toast-content")).to_contain_text("Your transaction has been confirmed") 
-
- 
- 
- """

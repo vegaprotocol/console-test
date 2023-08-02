@@ -65,7 +65,7 @@ def test_pnl_loss_portfolio(setup_continuous_market, vega:VegaService, page: Pag
     submit_order(vega, "Key 1", market_id, "SIDE_BUY", 1, 104.50000)
     page.get_by_test_id('Portfolio').first.click()
     page.get_by_test_id('Positions').click()
-    wait_for_graphql_response(page, 'EstimatePosition')
+    #wait_for_graphql_response(page, 'EstimatePosition')
     
     row_element = page.query_selector('//div[@role="row" and .//div[@col-id="partyId"]/div/span[text()="Key 1"]]')
 
@@ -84,11 +84,12 @@ def test_pnl_loss_portfolio(setup_continuous_market, vega:VegaService, page: Pag
 
 @pytest.mark.usefixtures("auth")
 def test_pnl_profit_portfolio(setup_continuous_market, vega:VegaService, page: Page):
+    market_id = vega.all_markets()[0].id
+    submit_order(vega, "Key 1", market_id, "SIDE_BUY", 1, 104.50000)
+
     page.get_by_test_id('Portfolio').first.click()
     page.get_by_test_id('Positions').click()
-    market_id = vega.all_markets()[0].id
-
-    submit_order(vega, "Key 1", market_id, "SIDE_BUY", 1, 104.50000)
+    #wait_for_graphql_response(page, 'EstimatePosition')
    
     row_element = page.query_selector('//div[@role="row" and .//div[@col-id="partyId"]/div/span[text()="mm"]]')
     page.pause()

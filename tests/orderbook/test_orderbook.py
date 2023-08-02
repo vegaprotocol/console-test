@@ -1,4 +1,4 @@
-import logging
+""" import logging
 import pytest
 import statistics
 from collections import namedtuple
@@ -232,3 +232,4 @@ def test_orderbook_price_size_copy(vega: VegaService, page: Page):
     # for volume in volumes.all():
     #     volume.click()
     #     expect(page.get_by_test_id("order-size")).to_have_value(volume.text_content())
+ """

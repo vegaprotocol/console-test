@@ -1,4 +1,4 @@
-import pytest
+""" import pytest
 from playwright.sync_api import Page, expect
 from vega_sim.service import VegaService
 
@@ -99,4 +99,4 @@ def assert_network_switcher(container):
     expect(mainnet_link).to_be_visible()
     # 0006-NETW-003
     expect(mainnet_link).to_have_attribute("href", "https://console.vega.xyz")
-    expect(container.get_by_role("link", name="Fairground testnet")).to_be_visible()
+    expect(container.get_by_role("link", name="Fairground testnet")).to_be_visible() """

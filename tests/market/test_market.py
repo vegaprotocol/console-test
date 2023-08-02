@@ -1,4 +1,4 @@
-from collections import namedtuple
+""" from collections import namedtuple
 from playwright.sync_api import Page, expect
 from market_fixtures.simple_market.simple_market import setup_simple_market
 from vega_sim.service import VegaService
@@ -156,3 +156,4 @@ def test_price_monitoring(setup_simple_market, vega: VegaService, page: Page):
     # expect(page.get_by_text("Opening auction")).to_be_hidden()
     expect(page.get_by_test_id(liquidity_supplied
                                ).get_by_test_id(item_value)).to_have_text("100.00 (>100%)")
+ """

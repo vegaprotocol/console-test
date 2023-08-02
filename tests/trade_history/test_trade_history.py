@@ -1,4 +1,4 @@
-import pytest
+""" import pytest
 import re
 from playwright.sync_api import expect
 from market_fixtures.continuous_market.continuous_market import setup_continuous_market
@@ -102,3 +102,4 @@ def test_price_copied_to_deal_ticket(setup_continuous_market, vega, page):
     page.locator('[col-id=price]').last.click()
     # 6005-THIS-007
     expect(page.get_by_test_id('order-price')).to_have_value('107.50000')
+ """

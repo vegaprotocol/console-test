@@ -10,7 +10,6 @@ from fixtures.market import (
     setup_simple_market,
     setup_opening_auction_market,
     setup_continuous_market,
-    setup_proposed_market,
 )
 
 docker_client = docker.from_env()
@@ -143,4 +142,4 @@ def continuous_market(vega):
 
 @pytest.fixture(scope="function")
 def proposed_market(vega):
-    return setup_proposed_market(vega)
+    return setup_simple_market(vega, approve_proposal=False)

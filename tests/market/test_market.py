@@ -3,7 +3,7 @@ import pytest
 from collections import namedtuple
 from playwright.sync_api import Page, expect
 from vega_sim.service import VegaService
-from actions.submit_order import submit_order
+from actions.vega import submit_order
 
 
 # Wallet Configurations

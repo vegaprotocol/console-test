@@ -4,7 +4,7 @@ import vega_sim.api.governance as governance
 from collections import namedtuple
 from playwright.sync_api import Page, expect
 from vega_sim.service import VegaService
-from actions.submit_order import submit_order
+from actions.vega import submit_order
 
 # Defined namedtuples
 WalletConfig = namedtuple("WalletConfig", ["name", "passphrase"])

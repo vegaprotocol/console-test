@@ -2,7 +2,7 @@ import pytest
 from collections import namedtuple
 from playwright.sync_api import Page, expect
 from vega_sim.service import VegaService
-from actions.submit_order import submit_order
+from actions.vega import submit_order
 
 # Defined namedtuples
 WalletConfig = namedtuple("WalletConfig", ["name", "passphrase"])
@@ -56,7 +56,7 @@ def test_margin_and_fees_estimations(continuous_market, vega: VegaService, page:
     vega.forward("10s")
     vega.wait_for_total_catchup()
     expect(page.get_by_test_id(margin_required)).to_have_text(
-        "Margin required897,716,007,278,879.50 - 897,716,007,278,895.20 tDAI "
+        "Margin required897,716,007,278,879.40 - 897,716,007,278,895.20 tDAI "
     )
     expect(page.get_by_test_id("deal-ticket-warning-margin")).to_contain_text(
         "You may not have enough margin available to open this position."

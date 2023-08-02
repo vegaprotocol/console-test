@@ -1,6 +1,6 @@
 from collections import namedtuple
 from vega_sim.service import VegaService
-from actions.submit_order import submit_order
+from actions.vega import submit_multiple_orders, submit_order, submit_liquidity
 
 
 # Defined namedtuples
@@ -17,61 +17,7 @@ mint_amount: float = 10e5
 market_name = "BTC:DAI_2023"
 
 
-def setup_proposed_market(vega: VegaService):
-    for wallet in wallets:
-        vega.create_key(wallet.name)
-
-    vega.mint(
-        MM_WALLET.name,
-        asset="VOTE",
-        amount=1e4,
-    )
-
-    vega.update_network_parameter(
-        MM_WALLET.name, parameter="market.fee.factors.makerFee", new_value="0.1"
-    )
-
-    vega.forward("10s")
-    vega.wait_for_total_catchup()
-
-    vega.create_asset(
-        MM_WALLET.name, name="tDAI", symbol="tDAI", decimals=5, max_faucet_amount=1e10
-    )
-
-    vega.wait_for_total_catchup()
-
-    tdai_id = vega.find_asset_id(symbol="tDAI")
-
-    vega.mint(
-        MM_WALLET.name,
-        asset=tdai_id,
-        amount=mint_amount,
-    )
-    vega.mint(
-        MM_WALLET2.name,
-        asset=tdai_id,
-        amount=mint_amount,
-    )
-
-    vega.wait_fn(10)
-    vega.wait_for_total_catchup()
-
-    # creates a market before proposal is approved
-    market_id = vega.create_simple_market(
-        market_name,
-        proposal_key=MM_WALLET.name,
-        settlement_asset_id=tdai_id,
-        termination_key=TERMINATE_WALLET.name,
-        market_decimals=5,
-        approve_proposal=False,
-        forward_time_to_enactment=False,
-    )
-    vega.wait_for_total_catchup()
-
-    return market_id
-
-
-def setup_simple_market(vega: VegaService):
+def setup_simple_market(vega: VegaService, approve_proposal=True):
     for wallet in wallets:
         vega.create_key(wallet.name)
 
@@ -125,6 +71,8 @@ def setup_simple_market(vega: VegaService):
         settlement_asset_id=tdai_id,
         termination_key=TERMINATE_WALLET.name,
         market_decimals=5,
+        approve_proposal=approve_proposal,
+        forward_time_to_enactment=approve_proposal,
     )
 
     vega.forward("10s")
@@ -137,22 +85,13 @@ def setup_opening_auction_market(vega: VegaService, market_id: str = None):
     if market_id is None or market_id not in vega.all_markets():
         market_id = setup_simple_market(vega)
 
-    vega.submit_simple_liquidity(
-        key_name=MM_WALLET.name,
-        market_id=market_id,
-        commitment_amount=10000,
-        fee=0.000,
-        reference_buy="PEGGED_REFERENCE_MID",
-        reference_sell="PEGGED_REFERENCE_MID",
-        delta_buy=1,
-        delta_sell=1,
-        is_amendment=False,
+    submit_liquidity(vega, MM_WALLET.name, market_id)
+    submit_multiple_orders(
+        vega, MM_WALLET.name, market_id, "SIDE_SELL", [[1, 110], [1, 105]]
     )
-
-    submit_order(vega, MM_WALLET.name, market_id, "SIDE_SELL", 1, 110)
-    submit_order(vega, MM_WALLET2.name, market_id, "SIDE_BUY", 1, 90)
-    submit_order(vega, MM_WALLET.name, market_id, "SIDE_SELL", 1, 105)
-    submit_order(vega, MM_WALLET2.name, market_id, "SIDE_BUY", 1, 95)
+    submit_multiple_orders(
+        vega, MM_WALLET2.name, market_id, "SIDE_BUY", [[1, 90], [1, 95]]
+    )
 
     vega.forward("10s")
     vega.wait_for_total_catchup()

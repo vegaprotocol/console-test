@@ -1,7 +1,7 @@
 import pytest
 import re
 from playwright.sync_api import expect
-from actions.submit_order import submit_order
+from actions.vega import submit_order
 
 
 # Could be turned into a helper function in the future.

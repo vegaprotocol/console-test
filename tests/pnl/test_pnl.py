@@ -13,6 +13,30 @@ TERMINATE_WALLET = WalletConfig("FJMKnwfZdd48C8NqvYrG", "bY3DxwtsCstMIIZdNpKs")
 
 wallets = [MM_WALLET, MM_WALLET2, TERMINATE_WALLET]
 
+def wait_for_graphql_response(page, query_name, timeout=5000):
+    response_data = {}
+
+    def handle_response(route, request):
+        if "graphql" in request.url:
+            response = request.response()
+            if response is not None:
+                json_response = response.json()
+                if json_response and 'data' in json_response:
+                    data = json_response['data']
+                    if query_name in data:
+                        response_data['data'] = data
+                        route.continue_()
+                        return
+        route.continue_()
+
+    # Register the route handler
+    page.route("**", handle_response)
+
+    # Wait for the response data to be populated
+    page.wait_for_timeout(timeout)
+
+    # Unregister the route handler
+    page.unroute("**", handle_response)
 
 def submit_order(vega, wallet_name, market_id, side, volume, price):
     vega.submit_order(
@@ -36,11 +60,12 @@ def check_pnl_color_value(element, expected_color, expected_value):
 
 @pytest.mark.usefixtures("auth")
 def test_pnl_loss_portfolio(setup_continuous_market, vega:VegaService, page: Page):
-    page.get_by_test_id('Portfolio').first.click()
-    page.get_by_test_id('Positions').click()
     market_id = vega.all_markets()[0].id
     
     submit_order(vega, "Key 1", market_id, "SIDE_BUY", 1, 104.50000)
+    page.get_by_test_id('Portfolio').first.click()
+    page.get_by_test_id('Positions').click()
+    wait_for_graphql_response(page, 'EstimatePosition')
     
     row_element = page.query_selector('//div[@role="row" and .//div[@col-id="partyId"]/div/span[text()="Key 1"]]')
 
@@ -66,7 +91,7 @@ def test_pnl_profit_portfolio(setup_continuous_market, vega:VegaService, page: P
     submit_order(vega, "Key 1", market_id, "SIDE_BUY", 1, 104.50000)
    
     row_element = page.query_selector('//div[@role="row" and .//div[@col-id="partyId"]/div/span[text()="mm"]]')
-
+    page.pause()
     unrealised_pnl = row_element.query_selector('xpath=./div[@col-id="unrealisedPNL"]')
     realised_pnl = row_element.query_selector('xpath=./div[@col-id="realisedPNL"]')
 

@@ -89,7 +89,7 @@ def test_pnl_profit_portfolio(setup_continuous_market, vega:VegaService, page: P
 
     page.get_by_test_id('Portfolio').first.click()
     page.get_by_test_id('Positions').click()
-    #wait_for_graphql_response(page, 'EstimatePosition')
+    wait_for_graphql_response(page, 'EstimatePosition')
    
     row_element = page.query_selector('//div[@role="row" and .//div[@col-id="partyId"]/div/span[text()="mm"]]')
     page.pause()
@@ -109,6 +109,7 @@ def test_pnl_profit_portfolio(setup_continuous_market, vega:VegaService, page: P
 def test_pnl_neutral_portfolio(setup_continuous_market, vega:VegaService, page: Page):
     page.get_by_test_id('Portfolio').first.click()
     page.get_by_test_id('Positions').click()
+    wait_for_graphql_response(page, 'EstimatePosition')
     
     realised_pnl = page.locator('.ag-center-cols-container .ag-row >> css=[col-id="realisedPNL"]').first
     unrealised_pnl = page.locator('.ag-center-cols-container .ag-row >> css=[col-id="unrealisedPNL"]').first

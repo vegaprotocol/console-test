@@ -7,8 +7,8 @@ on:
   workflow_dispatch:  
 jobs:
   test:
-    timeout-minutes: 15
-    runs-on: macos-latest
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
     #----------------------------------------------
@@ -28,12 +28,6 @@ jobs:
         virtualenvs-create: true
         virtualenvs-in-project: true
         virtualenvs-path: console-test/.venv
-    #----------------------------------------------
-    #  -----  install docker  -----
-    #----------------------------------------------
-    - name: Setup Docker on macOS
-      uses: douglascamata/setup-docker-macos-action@v1-alpha
-
     #----------------------------------------------
     #  -----  install dependencies  -----
     #----------------------------------------------
@@ -59,7 +53,7 @@ jobs:
     #  ----- run tests. -----
     #----------------------------------------------
     - name: Run tests
-      run:  poetry run pytest --numprocesses 4
+      run:  poetry run pytest --numprocesses 2
     #----------------------------------------------
     #  -----  upload traces  -----
     #----------------------------------------------

@@ -33,6 +33,8 @@ jobs:
     #----------------------------------------------
     - name: Install Docker CLI via Homebrew
       run: brew install docker
+      run: brew install docker colima
+      run: colima start
     #----------------------------------------------
     #  -----  install dependencies  -----
     #----------------------------------------------

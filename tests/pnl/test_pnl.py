@@ -92,7 +92,6 @@ def test_pnl_profit_portfolio(setup_continuous_market, vega:VegaService, page: P
     wait_for_graphql_response(page, 'EstimatePosition')
    
     row_element = page.query_selector('//div[@role="row" and .//div[@col-id="partyId"]/div/span[text()="mm"]]')
-    page.pause()
     unrealised_pnl = row_element.query_selector('xpath=./div[@col-id="unrealisedPNL"]')
     realised_pnl = row_element.query_selector('xpath=./div[@col-id="realisedPNL"]')
 

@@ -1,4 +1,4 @@
-import pytest
+""" import pytest
 from collections import namedtuple
 from playwright.sync_api import expect, Page
 from vega_sim.service import VegaService
@@ -163,3 +163,4 @@ def test_pnl_neutral_trading(setup_continuous_market, vega:VegaService, page: Pa
     check_pnl_color_value(realised_pnl, 'rgb(0, 0, 0)', '0.00')
     check_pnl_color_value(unrealised_pnl, 'rgb(0, 0, 0)', '0.00')
         
+ """

@@ -31,13 +31,13 @@ jobs:
     #----------------------------------------------
     #  -----  install docker  -----
     #----------------------------------------------
-    - name: Install dependencies
-      run: poetry install --no-interaction --no-root
+    - name: setup-docker
+      uses: docker-practice/actions-setup-docker@v1
     #----------------------------------------------
     #  -----  install dependencies  -----
     #----------------------------------------------
-    - name: setup-docker
-      uses: docker-practice/actions-setup-docker@v1
+    - name: Install dependencies
+      run: poetry install --no-interaction --no-root
     #----------------------------------------------
     #  -----  install vega binaries. -----
     #----------------------------------------------

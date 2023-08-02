@@ -1,16 +1,10 @@
 import pytest
-from playwright.sync_api import expect
+from playwright.sync_api import expect, Page
 
 
-@pytest.fixture()
-def setup(vega, page):
-    page.goto(f"/#/")
-    page.get_by_test_id("dialog-close").click()
-    page.click('[aria-label="cog icon"]')
-
-
-@pytest.mark.usefixtures("auth", "setup")
-def test_share_usage_data(page):
+@pytest.mark.usefixtures("risk_accepted")
+def test_share_usage_data(page: Page):
+    page.goto("/#/settings")
     telemetry_checkbox = page.locator("#telemetry-approval")
     expect(telemetry_checkbox).to_have_attribute("data-state", "unchecked")
 
@@ -41,8 +35,9 @@ ICON_TO_TOAST = {
 }
 
 
-@pytest.mark.usefixtures("auth", "setup")
-def test_toast_positions(page):
+@pytest.mark.usefixtures("risk_accepted")
+def test_toast_positions(page: Page):
+    page.goto("/#/settings")
     for icon_selector, toast_selector in ICON_TO_TOAST.items():
         # Click the icon
         page.click(f"[{icon_selector}]")
@@ -50,8 +45,9 @@ def test_toast_positions(page):
         expect(page.locator(f"[{toast_selector}]")).to_be_visible()
 
 
-@pytest.mark.usefixtures("auth", "setup")
-def test_dark_mode(page):
+@pytest.mark.usefixtures("risk_accepted")
+def test_dark_mode(page: Page):
+    page.goto("/#/settings")
     assert page.query_selector("html").get_attribute("class") == None
     page.get_by_role("switch").click()
     assert page.query_selector("html").get_attribute("class") == "dark"

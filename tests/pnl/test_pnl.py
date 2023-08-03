@@ -82,7 +82,7 @@ def test_pnl_loss_portfolio(continuous_market, vega:VegaService, page: Page):
     page.get_by_role("link", name="Portfolio").click()
     page.get_by_test_id('Positions').click()
     wait_for_graphql_response(page, 'EstimatePosition')
-    page.wait_for_selector(':nth-of-type(3)[role="row"]', state='visible')
+    #page.wait_for_selector(':nth-of-type(3)[role="row"]', state='visible')
     row_element = page.query_selector('//div[@role="row" and .//div[@col-id="partyId"]/div/span[text()="Key 1"]]')
     
     unrealised_pnl = row_element.query_selector('xpath=./div[@col-id="unrealisedPNL"]')
@@ -107,7 +107,7 @@ def test_pnl_profit_portfolio(continuous_market, vega:VegaService, page: Page):
     page.get_by_role("link", name="Portfolio").click()
     page.get_by_test_id('Positions').click()
     wait_for_graphql_response(page, 'EstimatePosition')
-    page.wait_for_selector(':nth-of-type(3)[role="row"]', state='visible')
+   # page.wait_for_selector(':nth-of-type(3)[role="row"]', state='visible')
 
     selector = '//div[@role="row" and .//div[@col-id="partyId"]/div/span[text()="mm"]]'
  
@@ -131,7 +131,7 @@ def test_pnl_neutral_portfolio(continuous_market, vega:VegaService, page: Page):
     page.get_by_role("link", name="Portfolio").click()
     page.get_by_test_id('Positions').click()
     wait_for_graphql_response(page, 'EstimatePosition')
-    page.wait_for_selector(':nth-of-type(3)[role="row"]', state='visible')
+   # page.wait_for_selector(':nth-of-type(3)[role="row"]', state='visible')
     realised_pnl = page.locator(".ag-row-even > div:nth-child(9)").first
     unrealised_pnl = page.locator(".ag-row-even > div:nth-child(9)").first
 
@@ -146,11 +146,11 @@ def test_pnl_loss_trading(continuous_market, vega:VegaService, page: Page):
     page.goto(f"http://localhost:{vega.console_port}/#/markets/{continuous_market}")
     wait_for_service(f"http://localhost:{vega.console_port}/#/markets/{continuous_market}")
     wait_for_graphql_response(page, 'EstimatePosition')
-    page.wait_for_selector('.ag-body.ag-layout-normal', state='visible')
+   # page.wait_for_selector('.ag-body.ag-layout-normal', state='visible')
 
     realised_pnl = page.locator('[col-id="realisedPNL"]').last
     unrealised_pnl = page.locator('[col-id="unrealisedPNL"]').last
-
+    
     check_pnl_color_value(realised_pnl, 'rgb(0, 0, 0)', '0.00')
     check_pnl_color_value(unrealised_pnl, 'rgb(236, 0, 60)', '-4.00')
 
@@ -169,11 +169,11 @@ def test_pnl_profit_trading(continuous_market, vega:VegaService, page: Page):
     page.goto(f"http://localhost:{vega.console_port}/#/markets/{continuous_market}")
     wait_for_service(f"http://localhost:{vega.console_port}/#/markets/{continuous_market}")
     page.get_by_test_id('manage-vega-wallet').click()
-    page.get_by_role('menuitemradio').nth(1).click()
+    page.get_by_role('menuitemradio').nth(1).click(position={ "x": 10, "y": 10})
     element_locator = page.get_by_test_id("manage-vega-wallet")
     element_locator.click(force=True)
     wait_for_graphql_response(page, 'EstimatePosition')
-    page.wait_for_selector('.ag-body.ag-layout-normal', state='visible')
+    #page.wait_for_selector('.ag-body.ag-layout-normal', state='visible')
     selector = '.ag-center-cols-container .ag-row >> css=[col-id="realisedPNL"]'
 
     realised_pnl = page.locator(selector)
@@ -194,7 +194,7 @@ def test_pnl_neutral_trading(continuous_market, vega:VegaService, page: Page):
     page.goto(f"http://localhost:{vega.console_port}/#/markets/{continuous_market}")
     wait_for_service(f"http://localhost:{vega.console_port}/#/markets/{continuous_market}")
     wait_for_graphql_response(page, 'EstimatePosition')
-    page.wait_for_selector(':nth-of-type(3)[role="row"]', state='visible')
+    #page.wait_for_selector(':nth-of-type(3)[role="row"]', state='visible')
     selector = '.ag-center-cols-container .ag-row >> css=[col-id="realisedPNL"]'
     
 

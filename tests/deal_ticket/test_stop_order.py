@@ -1,9 +1,8 @@
-from numpy import size
 import pytest
 from collections import namedtuple
 from playwright.sync_api import Page, expect
 from vega_sim.service import VegaService
-from market_fixtures.continuous_market.continuous_market import setup_continuous_market
+from actions.vega import submit_order
 
 
 # Defined namedtuples
@@ -34,8 +33,11 @@ date_picker_field = "date-picker-field"
 submit_stop_order = "place-order"
 stop_orders_tab = "Stop orders"
 
-@pytest.mark.usefixtures("auth")
-def test_stop_order_form_error_validation(vega: VegaService, setup_continuous_market, page: Page):
+@pytest.mark.usefixtures("continuous_market", "auth")
+def test_stop_order_form_error_validation(continuous_market, vega: VegaService, page: Page):
+
+    market_id = continuous_market
+    page.goto(f"/#/markets/{market_id}")
 
     page.get_by_test_id(stop_order_btn).click()
     page.get_by_test_id(stop_market_order_btn).is_visible()
@@ -46,8 +48,11 @@ def test_stop_order_form_error_validation(vega: VegaService, setup_continuous_ma
     expect(page.get_by_test_id("stop-order-error-message-size")).to_be_visible()
 
 
-@pytest.mark.usefixtures("auth")
-def test_submit_stop_order(vega: VegaService, setup_continuous_market, page: Page):
+@pytest.mark.usefixtures("continuous_market", "auth")
+def test_submit_stop_order(continuous_market, vega: VegaService, page: Page):
+
+    market_id = continuous_market
+    page.goto(f"/#/markets/{market_id}")
 
     page.get_by_test_id(stop_order_btn).click()
     page.get_by_test_id(stop_market_order_btn).is_visible()
@@ -61,7 +66,7 @@ def test_submit_stop_order(vega: VegaService, setup_continuous_market, page: Pag
     vega.wait_for_total_catchup()
     page.get_by_test_id("toast-close").click()
 
-    expect((page.get_by_role("row").locator('[col-id="market.tradableInstrument.instrument.code"]')).nth(1)).to_have_text("BTC:DAI_Mar22")
+    expect((page.get_by_role("row").locator('[col-id="market.tradableInstrument.instrument.code"]')).nth(1)).to_have_text("BTC:DAI_2023")
     expect((page.get_by_role("row").locator('[col-id="trigger"]')).nth(1)).to_have_text("Mark > 103.00")
     expect((page.get_by_role("row").locator('[col-id="expiresAt"]')).nth(1)).to_have_text("")
     expect((page.get_by_role("row").locator('[col-id="expiresAt"]')).nth(1)).to_have_text("")
@@ -69,12 +74,13 @@ def test_submit_stop_order(vega: VegaService, setup_continuous_market, page: Pag
     expect((page.get_by_role("row").locator('[col-id="status"]')).nth(1)).to_have_text("Rejected")
     expect((page.get_by_role("row").locator('[col-id="submission.price"]')).nth(1)).to_have_text("-")
     expect((page.get_by_role("row").locator('[col-id="submission.timeInForce"]')).nth(1)).to_have_text("FOK")
-    expect((page.get_by_role("row").locator('[col-id="updatedAt"]')).nth(1)).to_have_text("09/05/2023, 12:04:14")
+    expect((page.get_by_role("row").locator('[col-id="updatedAt"]')).nth(1)).not_to_be_empty()
 
-    page.pause()
+@pytest.mark.usefixtures("continuous_market", "auth")
+def test_stop_order_form_validation(continuous_market, vega: VegaService, page: Page):
 
-@pytest.mark.usefixtures("auth")
-def test_stop_order_form_validation(vega: VegaService, setup_continuous_market, page: Page):
+    market_id = continuous_market
+    page.goto(f"/#/markets/{market_id}")
 
 
     page.get_by_test_id(stop_order_btn).click()
@@ -90,7 +96,7 @@ def test_stop_order_form_validation(vega: VegaService, setup_continuous_market, 
     expect(page.locator('[for="input-price-quote"]')).to_have_text("Size")
     page.get_by_test_id(order_size).click()
     expect(page.get_by_test_id(order_size)).to_be_empty
-    page.pause()
+  
     # expect(page.get_by_test_id("sidebar-content").get_by_test_id("price")).to_have_text("-")
 
 

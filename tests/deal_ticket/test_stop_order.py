@@ -32,6 +32,8 @@ expiry_strategy_cancel = "expiryStrategy-cancel"
 date_picker_field = "date-picker-field"
 submit_stop_order = "place-order"
 stop_orders_tab = "Stop orders"
+row_table = "row"
+cancel = "cancel"
 
 @pytest.mark.usefixtures("continuous_market", "auth")
 def test_stop_order_form_error_validation(continuous_market, vega: VegaService, page: Page):
@@ -49,7 +51,7 @@ def test_stop_order_form_error_validation(continuous_market, vega: VegaService, 
 
 
 @pytest.mark.usefixtures("continuous_market", "auth")
-def test_submit_stop_order(continuous_market, vega: VegaService, page: Page):
+def test_submit_stop_order_rejected(continuous_market, vega: VegaService, page: Page):
 
     market_id = continuous_market
     page.goto(f"/#/markets/{market_id}")
@@ -58,7 +60,7 @@ def test_submit_stop_order(continuous_market, vega: VegaService, page: Page):
     page.get_by_test_id(stop_market_order_btn).is_visible()
     page.get_by_test_id(stop_market_order_btn).click()
     page.get_by_test_id(trigger_price).type("103")
-    page.get_by_test_id(order_size).type("1")
+    page.get_by_test_id(order_size).type("3")
     page.get_by_test_id(submit_stop_order).click()
     page.get_by_test_id(stop_orders_tab).click()
 
@@ -66,16 +68,132 @@ def test_submit_stop_order(continuous_market, vega: VegaService, page: Page):
     vega.wait_for_total_catchup()
     page.get_by_test_id("toast-close").click()
 
-    expect((page.get_by_role("row").locator('[col-id="market.tradableInstrument.instrument.code"]')).nth(1)).to_have_text("BTC:DAI_2023")
-    expect((page.get_by_role("row").locator('[col-id="trigger"]')).nth(1)).to_have_text("Mark > 103.00")
-    expect((page.get_by_role("row").locator('[col-id="expiresAt"]')).nth(1)).to_have_text("")
-    expect((page.get_by_role("row").locator('[col-id="expiresAt"]')).nth(1)).to_have_text("")
-    expect((page.get_by_role("row").locator('[col-id="submission.size"]')).nth(1)).to_have_text("+1")
-    expect((page.get_by_role("row").locator('[col-id="status"]')).nth(1)).to_have_text("Rejected")
-    expect((page.get_by_role("row").locator('[col-id="submission.price"]')).nth(1)).to_have_text("-")
-    expect((page.get_by_role("row").locator('[col-id="submission.timeInForce"]')).nth(1)).to_have_text("FOK")
-    expect((page.get_by_role("row").locator('[col-id="updatedAt"]')).nth(1)).not_to_be_empty()
+    expect((page.get_by_role(row_table).locator('[col-id="market.tradableInstrument.instrument.code"]')).nth(1)).to_have_text("BTC:DAI_2023")
+    expect((page.get_by_role(row_table).locator('[col-id="trigger"]')).nth(1)).to_have_text("Mark > 103.00")
+    expect((page.get_by_role(row_table).locator('[col-id="expiresAt"]')).nth(1)).to_have_text("")
+    expect((page.get_by_role(row_table).locator('[col-id="submission.size"]')).nth(1)).to_have_text("+3")
+    expect((page.get_by_role(row_table).locator('[col-id="submission.type"]')).nth(1)).to_have_text("Market")
+    expect((page.get_by_role(row_table).locator('[col-id="status"]')).nth(1)).to_have_text("Rejected")
+    expect((page.get_by_role(row_table).locator('[col-id="submission.price"]')).nth(1)).to_have_text("-")
+    expect((page.get_by_role(row_table).locator('[col-id="submission.timeInForce"]')).nth(1)).to_have_text("FOK")
+    expect((page.get_by_role(row_table).locator('[col-id="updatedAt"]')).nth(1)).not_to_be_empty()
 
+
+@pytest.mark.usefixtures("continuous_market", "auth")
+def test_submit_stop_market_order_triggered(continuous_market, vega: VegaService, page: Page):
+
+    market_id = continuous_market
+    page.goto(f"/#/markets/{market_id}")
+
+    
+    submit_order(vega, "Key 1", market_id, "SIDE_SELL", 100, 110)
+    submit_order(vega, "Key 1", market_id, "SIDE_BUY", 100, 110)
+    vega.wait_for_total_catchup
+    vega.forward("10s")
+
+    page.get_by_test_id(stop_order_btn).click()
+    page.get_by_test_id(stop_market_order_btn).is_visible()
+    page.get_by_test_id(stop_market_order_btn).click()
+    page.get_by_test_id(order_side_sell).click()
+    page.get_by_test_id(trigger_price).type("103")
+    page.get_by_test_id(order_size).type("1")
+    page.get_by_test_id(expire).click()
+    page.get_by_test_id(submit_stop_order).click()
+    page.get_by_test_id(stop_orders_tab).click()
+
+    vega.wait_fn(1)
+    vega.wait_for_total_catchup()
+    page.get_by_test_id("toast-close").click()
+
+    expect((page.get_by_role(row_table).locator('[col-id="market.tradableInstrument.instrument.code"]')).nth(1)).to_have_text("BTC:DAI_2023")
+    expect((page.get_by_role(row_table).locator('[col-id="trigger"]')).nth(1)).to_have_text("Mark > 103.00")
+    expect((page.get_by_role(row_table).locator('[col-id="expiresAt"]')).nth(1)).to_have_text("")
+    expect((page.get_by_role(row_table).locator('[col-id="submission.size"]')).nth(1)).to_have_text("-1")
+    expect((page.get_by_role(row_table).locator('[col-id="submission.type"]')).nth(1)).to_have_text("Market")
+    expect((page.get_by_role(row_table).locator('[col-id="status"]')).nth(1)).to_have_text("Triggered")
+    expect((page.get_by_role(row_table).locator('[col-id="submission.price"]')).nth(1)).to_have_text("-")
+    expect((page.get_by_role(row_table).locator('[col-id="submission.timeInForce"]')).nth(1)).to_have_text("FOK")
+    expect((page.get_by_role(row_table).locator('[col-id="updatedAt"]')).nth(1)).not_to_be_empty()
+
+@pytest.mark.usefixtures("continuous_market", "auth")
+def test_submit_stop_limit_order_pending(continuous_market, vega: VegaService, page: Page):
+   
+    market_id = continuous_market
+    page.goto(f"/#/markets/{market_id}")
+
+    
+    submit_order(vega, "Key 1", market_id, "SIDE_SELL", 100, 110)
+    submit_order(vega, "Key 1", market_id, "SIDE_BUY", 100, 110)
+    vega.wait_for_total_catchup
+    vega.forward("10s")
+
+    page.get_by_test_id("deal-ticket-warning-margin").is_visible()
+
+    page.get_by_test_id(stop_order_btn).click()
+    page.get_by_test_id(stop_limit_order_btn).is_visible()
+    page.get_by_test_id(stop_limit_order_btn).click()
+    page.get_by_test_id(order_side_sell).click()
+    page.get_by_test_id(trigger_below).click()
+    page.get_by_test_id(trigger_price).type("102")
+    page.get_by_test_id(order_price).type("99")
+    page.get_by_test_id(order_size).type("1")
+    
+    page.get_by_test_id(expire).click()
+    page.get_by_test_id(submit_stop_order).click()
+    page.get_by_test_id(stop_orders_tab).click()
+
+    vega.wait_fn(1)
+    vega.wait_for_total_catchup()
+    page.get_by_test_id("toast-close").click()
+
+    expect((page.get_by_role(row_table).locator('[col-id="market.tradableInstrument.instrument.code"]')).nth(1)).to_have_text("BTC:DAI_2023")
+    expect((page.get_by_role(row_table).locator('[col-id="trigger"]')).nth(1)).to_have_text("Mark < 102.00")
+    expect((page.get_by_role(row_table).locator('[col-id="expiresAt"]')).nth(1)).to_have_text("")
+    expect((page.get_by_role(row_table).locator('[col-id="submission.size"]')).nth(1)).to_have_text("-1")
+    expect((page.get_by_role(row_table).locator('[col-id="submission.type"]')).nth(1)).to_have_text("Limit")
+    expect((page.get_by_role(row_table).locator('[col-id="status"]')).nth(1)).to_have_text("Pending")
+    expect((page.get_by_role(row_table).locator('[col-id="submission.price"]')).nth(1)).to_have_text("99.00")
+    expect((page.get_by_role(row_table).locator('[col-id="submission.timeInForce"]')).nth(1)).to_have_text("FOK")
+    expect((page.get_by_role(row_table).locator('[col-id="updatedAt"]')).nth(1)).not_to_be_empty()
+
+@pytest.mark.usefixtures("continuous_market", "auth")
+def test_submit_stop_limit_order_cancel(continuous_market, vega: VegaService, page: Page):
+
+    market_id = continuous_market
+    page.goto(f"/#/markets/{market_id}")
+
+    
+    submit_order(vega, "Key 1", market_id, "SIDE_SELL", 100, 110)
+    submit_order(vega, "Key 1", market_id, "SIDE_BUY", 100, 110)
+    vega.wait_for_total_catchup
+    vega.forward("10s")
+
+    page.get_by_test_id("deal-ticket-warning-margin").is_visible()
+
+    page.get_by_test_id(stop_order_btn).click()
+    page.get_by_test_id(stop_limit_order_btn).is_visible()
+    page.get_by_test_id(stop_limit_order_btn).click()
+    page.get_by_test_id(order_side_sell).click()
+    page.get_by_test_id(trigger_below).click()
+    page.get_by_test_id(trigger_price).type("102")
+    page.get_by_test_id(order_price).type("99")
+    page.get_by_test_id(order_size).type("1")
+    
+    page.get_by_test_id(expire).click()
+    page.get_by_test_id(submit_stop_order).click()
+    page.get_by_test_id(stop_orders_tab).click()
+
+    vega.wait_fn(1)
+    vega.wait_for_total_catchup()
+    page.get_by_test_id("toast-close").click()
+
+    page.get_by_test_id(cancel).click()
+    vega.wait_fn(1)
+    vega.wait_for_total_catchup()
+    page.get_by_test_id("toast-close").click()
+
+    expect((page.get_by_role(row_table).locator('[col-id="market.tradableInstrument.instrument.code"]')).nth(1)).to_have_text("")
+    
 @pytest.mark.usefixtures("continuous_market", "auth")
 def test_stop_order_form_validation(continuous_market, vega: VegaService, page: Page):
 
@@ -97,7 +215,7 @@ def test_stop_order_form_validation(continuous_market, vega: VegaService, page: 
     page.get_by_test_id(order_size).click()
     expect(page.get_by_test_id(order_size)).to_be_empty
   
-    # expect(page.get_by_test_id("sidebar-content").get_by_test_id("price")).to_have_text("-")
+
 
 
     

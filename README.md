@@ -26,7 +26,7 @@
 1. **Pull the docker image of the trading app**:
    You can pull the image you want to test, for example:
     ```bash
-    docker pull vegaprotocol/trading:testnet
+    docker pull vegaprotocol/trading:develop
     ```
    All available images can be found [here](https://hub.docker.com/r/vegaprotocol/trading/tags).
 1. **Start Docker**: Make sure your Docker daemon is running.

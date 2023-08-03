@@ -4,6 +4,7 @@ import vega_sim.api.governance as governance
 from collections import namedtuple
 from playwright.sync_api import Page, expect
 from vega_sim.service import VegaService
+from actions.vega import submit_order
 
 # Defined namedtuples
 WalletConfig = namedtuple("WalletConfig", ["name", "passphrase"])
@@ -15,85 +16,17 @@ TERMINATE_WALLET = WalletConfig("FJMKnwfZdd48C8NqvYrG", "bY3DxwtsCstMIIZdNpKs")
 
 wallets = [MM_WALLET, MM_WALLET2, TERMINATE_WALLET]
 
-market_name = "BTC:DAI_YYYYYYYYY"
 
-
-def setup_market(vega: VegaService):
-    for wallet in wallets:
-        vega.create_key(wallet.name)
-
-    vega.mint(
-        MM_WALLET.name,
-        asset="VOTE",
-        amount=1e4,
-    )
-
-    vega.update_network_parameter(
-        MM_WALLET.name, parameter="market.fee.factors.makerFee", new_value="0.1"
-    )
-
-    vega.forward("10s")
-    vega.wait_for_total_catchup()
-
-    vega.create_asset(
-        MM_WALLET.name, name="tDAI", symbol="tDAI", decimals=5, max_faucet_amount=1e10
-    )
-
-    vega.wait_for_total_catchup()
-
-    tdai_id = vega.find_asset_id(symbol="tDAI")
-
-    vega.mint(
-        MM_WALLET.name,
-        asset=tdai_id,
-        amount=100e5,
-    )
-    vega.mint(
-        MM_WALLET2.name,
-        asset=tdai_id,
-        amount=100e5,
-    )
-
-    vega.wait_fn(10)
-    vega.wait_for_total_catchup()
-
-    # creates a market before proposal is approved
-    market_id = vega.create_simple_market(
-        market_name,
-        proposal_key=MM_WALLET.name,
-        settlement_asset_id=tdai_id,
-        termination_key=TERMINATE_WALLET.name,
-        market_decimals=5,
-        approve_proposal=False,
-        forward_time_to_enactment=False,
-    )
-    vega.wait_for_total_catchup()
-
-    return market_id
-
-
-def submit_order(vega: VegaService, wallet_name, market_id, side, volume, price):
-    vega.submit_order(
-        trading_key=wallet_name,
-        market_id=market_id,
-        time_in_force="TIME_IN_FORCE_GTC",
-        order_type="TYPE_LIMIT",
-        side=side,
-        volume=volume,
-        price=price,
-    )
-
-
-@pytest.mark.usefixtures("risk_accepted")
-def test_market_lifecycle(vega: VegaService, page: Page):
+@pytest.mark.usefixtures("proposed_market", "risk_accepted")
+def test_market_lifecycle(proposed_market, vega: VegaService, page: Page):
     trading_mode = page.get_by_test_id("market-trading-mode").get_by_test_id(
         "item-value"
     )
     market_state = page.get_by_test_id("market-state").get_by_test_id("item-value")
 
     # setup market in proposed step, without liquidity provided
-    market_id = setup_market(vega)
-    page.goto(f"http://localhost:{vega.console_port}/#/markets/{market_id}")
+    market_id = proposed_market
+    page.goto(f"/#/markets/{market_id}")
 
     # check that market is in proposed state
     expect(trading_mode).to_have_text("No trading")

@@ -1,7 +1,10 @@
 import pytest
 from playwright.sync_api import expect, Page
 
+skip_reason = "Skipping until we fix waiting for trading page to load"
 
+
+@pytest.mark.skip(reason=skip_reason)
 @pytest.mark.usefixtures("risk_accepted")
 def test_share_usage_data(page: Page):
     page.goto("/#/settings")
@@ -35,6 +38,7 @@ ICON_TO_TOAST = {
 }
 
 
+@pytest.mark.skip(reason=skip_reason)
 @pytest.mark.usefixtures("risk_accepted")
 def test_toast_positions(page: Page):
     page.goto("/#/settings")
@@ -45,6 +49,7 @@ def test_toast_positions(page: Page):
         expect(page.locator(f"[{toast_selector}]")).to_be_visible()
 
 
+@pytest.mark.skip(reason=skip_reason)
 @pytest.mark.usefixtures("risk_accepted")
 def test_dark_mode(page: Page):
     page.goto("/#/settings")

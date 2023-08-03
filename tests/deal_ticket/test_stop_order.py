@@ -32,6 +32,7 @@ expiry_strategy_submit = "expiryStrategy-submit"
 expiry_strategy_cancel = "expiryStrategy-cancel"
 date_picker_field = "date-picker-field"
 submit_stop_order = "place-order"
+stop_orders_tab = "Stop orders"
 
 @pytest.mark.usefixtures("auth")
 def test_stop_order_form_error_validation(vega: VegaService, setup_continuous_market, page: Page):
@@ -48,16 +49,28 @@ def test_stop_order_form_error_validation(vega: VegaService, setup_continuous_ma
 @pytest.mark.usefixtures("auth")
 def test_submit_stop_order(vega: VegaService, setup_continuous_market, page: Page):
 
-
     page.get_by_test_id(stop_order_btn).click()
     page.get_by_test_id(stop_market_order_btn).is_visible()
     page.get_by_test_id(stop_market_order_btn).click()
-    page.get_by_test_id(trigger_price).type("1")
+    page.get_by_test_id(trigger_price).type("103")
     page.get_by_test_id(order_size).type("1")
     page.get_by_test_id(submit_stop_order).click()
+    page.get_by_test_id(stop_orders_tab).click()
 
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
+    page.get_by_test_id("toast-close").click()
+
+    expect((page.get_by_role("row").locator('[col-id="market.tradableInstrument.instrument.code"]')).nth(1)).to_have_text("BTC:DAI_Mar22")
+    expect((page.get_by_role("row").locator('[col-id="trigger"]')).nth(1)).to_have_text("Mark > 103.00")
+    expect((page.get_by_role("row").locator('[col-id="expiresAt"]')).nth(1)).to_have_text("")
+    expect((page.get_by_role("row").locator('[col-id="expiresAt"]')).nth(1)).to_have_text("")
+    expect((page.get_by_role("row").locator('[col-id="submission.size"]')).nth(1)).to_have_text("+1")
+    expect((page.get_by_role("row").locator('[col-id="status"]')).nth(1)).to_have_text("Rejected")
+    expect((page.get_by_role("row").locator('[col-id="submission.price"]')).nth(1)).to_have_text("-")
+    expect((page.get_by_role("row").locator('[col-id="submission.timeInForce"]')).nth(1)).to_have_text("FOK")
+    expect((page.get_by_role("row").locator('[col-id="updatedAt"]')).nth(1)).to_have_text("09/05/2023, 12:04:14")
+
     page.pause()
 
 @pytest.mark.usefixtures("auth")
@@ -72,9 +85,13 @@ def test_stop_order_form_validation(vega: VegaService, setup_continuous_market, 
     expect(page.locator('[for="triggerDirection-fallsBelow"]')).to_have_text("Falls below")
     page.get_by_test_id(trigger_price).click()
     expect(page.get_by_test_id(trigger_price)).to_be_empty
-    # expect(page.get_by_test_id('[for="triggerType-price"]')).to_have_text("Price")
-    # expect(page.get_by_test_id('[for="triggerType-trailingPercentOffset"]')).to_have_text("Trailing Percent Offset")    
-    # expect(page.locator('[for="triggerDirection-fallsBelow"]')).to_have_text("Falls below")
+    expect(page.locator('[for="triggerType-price"]')).to_have_text("Price")
+    expect(page.locator('[for="triggerType-trailingPercentOffset"]')).to_have_text("Trailing Percent Offset")    
+    expect(page.locator('[for="input-price-quote"]')).to_have_text("Size")
+    page.get_by_test_id(order_size).click()
+    expect(page.get_by_test_id(order_size)).to_be_empty
+    page.pause()
+    # expect(page.get_by_test_id("sidebar-content").get_by_test_id("price")).to_have_text("-")
 
 
     

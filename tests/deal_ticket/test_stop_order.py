@@ -109,7 +109,7 @@ def test_submit_stop_market_order_triggered(continuous_market, vega: VegaService
     page.get_by_test_id(order_size).type("1")
     page.get_by_test_id(expire).click()
     expires_at = datetime.now() + timedelta(days=1)
-    expires_at_input_value = expires_at.isoformat()[:16]
+    expires_at_input_value = expires_at.strftime('%d-%Y-%mT%H:%M')
     page.get_by_test_id('date-picker-field').type(expires_at_input_value)
     page.get_by_test_id(expiry_strategy_cancel).click()
 
@@ -152,7 +152,7 @@ def test_submit_stop_limit_order_pending(continuous_market, vega: VegaService, p
     page.get_by_test_id(order_size).type("1")
     page.get_by_test_id(expire).click()
     expires_at = datetime.now() + timedelta(days=1)
-    expires_at_input_value = expires_at.isoformat()[:16]
+    expires_at_input_value = expires_at.strftime('%d-%Y-%mT%H:%M')
     page.get_by_test_id('date-picker-field').type(expires_at_input_value)
     page.get_by_test_id(submit_stop_order).click()
     page.get_by_test_id(stop_orders_tab).click()

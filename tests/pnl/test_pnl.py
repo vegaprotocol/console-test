@@ -82,8 +82,9 @@ def test_pnl_loss_portfolio(setup_continuous_market, vega:VegaService, page: Pag
     page.get_by_test_id('Portfolio').first.click()
     page.get_by_test_id('Positions').click()
     wait_for_graphql_response(page, 'EstimatePosition')
-    
-    row_element = page.query_selector('//div[@role="row" and .//div[@col-id="partyId"]/div/span[text()="Key 1"]]')
+    selector = '//div[@role="row" and .//div[@col-id="partyId"]/div/span[text()="Key 1"]]'
+    page.wait_for_selector(selector, state='visible')
+    row_element = page.query_selector(selector)
 
     unrealised_pnl = row_element.query_selector('xpath=./div[@col-id="unrealisedPNL"]')
     realised_pnl = row_element.query_selector('xpath=./div[@col-id="realisedPNL"]')
@@ -106,12 +107,14 @@ def test_pnl_profit_portfolio(setup_continuous_market, vega:VegaService, page: P
     page.get_by_test_id('Portfolio').first.click()
     page.get_by_test_id('Positions').click()
     wait_for_graphql_response(page, 'EstimatePosition')
-   
-    row_element = page.query_selector('//div[@role="row" and .//div[@col-id="partyId"]/div/span[text()="mm"]]')
+    selector = '//div[@role="row" and .//div[@col-id="partyId"]/div/span[text()="mm"]]'
+    page.wait_for_selector(selector, state='visible')
+
+    row_element = page.query_selector(selector)
     unrealised_pnl = row_element.query_selector('xpath=./div[@col-id="unrealisedPNL"]')
     realised_pnl = row_element.query_selector('xpath=./div[@col-id="realisedPNL"]')
 
-   
+    
     check_pnl_color_value(realised_pnl, 'rgb(0, 0, 0)', '0.00')
     check_pnl_color_value(unrealised_pnl, 'rgb(1, 145, 75)', '4.00')
     
@@ -128,7 +131,10 @@ def test_pnl_neutral_portfolio(setup_continuous_market, vega:VegaService, page: 
     page.get_by_test_id('Positions').click()
     wait_for_graphql_response(page, 'EstimatePosition')
     
-    realised_pnl = page.locator('.ag-center-cols-container .ag-row >> css=[col-id="realisedPNL"]').first
+    selector = '.ag-center-cols-container .ag-row >> css=[col-id="realisedPNL"]'
+    page.wait_for_selector(selector, state='visible')
+
+    realised_pnl = page.locator(selector).first
     unrealised_pnl = page.locator('.ag-center-cols-container .ag-row >> css=[col-id="unrealisedPNL"]').first
 
     check_pnl_color_value(realised_pnl, 'rgb(0, 0, 0)', '0.00')
@@ -140,7 +146,9 @@ def test_pnl_loss_trading(setup_continuous_market, vega:VegaService, page: Page)
     market_id = vega.all_markets()[0].id
     submit_order(vega, "Key 1", market_id, "SIDE_BUY", 1, 104.50000)
     wait_for_service(f"http://localhost:{vega.console_port}/#/markets/{market_id}")
-    realised_pnl = page.locator('.ag-center-cols-container .ag-row >> css=[col-id="realisedPNL"]')
+    selector = '.ag-center-cols-container .ag-row >> css=[col-id="realisedPNL"]'
+    page.wait_for_selector(selector, state='visible')
+    realised_pnl = page.locator(selector)
     unrealised_pnl = page.locator('.ag-center-cols-container .ag-row >> css=[col-id="unrealisedPNL"]')
 
     check_pnl_color_value(realised_pnl, 'rgb(0, 0, 0)', '0.00')
@@ -161,9 +169,11 @@ def test_pnl_profit_trading(setup_continuous_market, vega:VegaService, page: Pag
     page.get_by_test_id('manage-vega-wallet').click()
     page.get_by_role('menuitemradio').nth(1).click()
     
-    
-    realised_pnl = page.locator('.ag-center-cols-container .ag-row >> css=[col-id="realisedPNL"]').last
-    unrealised_pnl = page.locator('.ag-center-cols-container .ag-row >> css=[col-id="unrealisedPNL"]').last
+    selector = '.ag-center-cols-container .ag-row >> css=[col-id="realisedPNL"]'
+    page.wait_for_selector(selector, state='visible')
+    realised_pnl = page.locator(selector)
+
+    unrealised_pnl = page.locator('.ag-center-cols-container .ag-row >> css=[col-id="unrealisedPNL"]')
 
     check_pnl_color_value(realised_pnl, 'rgb(0, 0, 0)', '0.00')
     check_pnl_color_value(unrealised_pnl, 'rgb(1, 145, 75)', '4.00')
@@ -177,7 +187,10 @@ def test_pnl_profit_trading(setup_continuous_market, vega:VegaService, page: Pag
 def test_pnl_neutral_trading(setup_continuous_market, vega:VegaService, page: Page):
     market_id = vega.all_markets()[0].id
     wait_for_service(f"http://localhost:{vega.console_port}/#/markets/{market_id}")
-    realised_pnl = page.locator('.ag-center-cols-container .ag-row >> css=[col-id="realisedPNL"]')
+    selector = '.ag-center-cols-container .ag-row >> css=[col-id="realisedPNL"]'
+    page.wait_for_selector(selector, state='visible')
+
+    realised_pnl = page.locator(selector)
     unrealised_pnl = page.locator('.ag-center-cols-container .ag-row >> css=[col-id="unrealisedPNL"]')
 
     check_pnl_color_value(realised_pnl, 'rgb(0, 0, 0)', '0.00')

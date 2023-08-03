@@ -4,7 +4,7 @@ import requests
 from collections import namedtuple
 from playwright.sync_api import expect, Page
 from vega_sim.service import VegaService
-from market_fixtures.continuous_market.continuous_market import setup_continuous_market
+from actions.vega import submit_order
 
 from playwright.sync_api import expect
 
@@ -73,19 +73,18 @@ def wait_for_service(url, timeout=60):
                 raise TimeoutError(f"Timed out waiting for service at {url}")
 
 
-@pytest.mark.usefixtures("auth")
-def test_pnl_loss_portfolio(setup_continuous_market, vega:VegaService, page: Page):
-    market_id = vega.all_markets()[0].id
-    
-    submit_order(vega, "Key 1", market_id, "SIDE_BUY", 1, 104.50000)
-    wait_for_service(f"http://localhost:{vega.console_port}/#/markets/{market_id}")
-    page.get_by_test_id('Portfolio').first.click()
+@pytest.mark.usefixtures("continuous_market", "auth")
+def test_pnl_loss_portfolio(continuous_market, vega:VegaService, page: Page):    
+    page.set_viewport_size({"width":1748, "height":977})
+    submit_order(vega, "Key 1", continuous_market, "SIDE_BUY", 1, 104.50000)
+    page.goto(f"http://localhost:{vega.console_port}/#/markets/{continuous_market}")
+    wait_for_service(f"http://localhost:{vega.console_port}/#/markets/{continuous_market}")
+    page.get_by_role("link", name="Portfolio").click()
     page.get_by_test_id('Positions').click()
     wait_for_graphql_response(page, 'EstimatePosition')
-    selector = '//div[@role="row" and .//div[@col-id="partyId"]/div/span[text()="Key 1"]]'
-    page.wait_for_selector(selector, state='visible')
-    row_element = page.query_selector(selector)
-
+    page.wait_for_selector(':nth-of-type(3)[role="row"]', state='visible')
+    row_element = page.query_selector('//div[@role="row" and .//div[@col-id="partyId"]/div/span[text()="Key 1"]]')
+    
     unrealised_pnl = row_element.query_selector('xpath=./div[@col-id="unrealisedPNL"]')
     realised_pnl = row_element.query_selector('xpath=./div[@col-id="realisedPNL"]')
 
@@ -93,23 +92,25 @@ def test_pnl_loss_portfolio(setup_continuous_market, vega:VegaService, page: Pag
     check_pnl_color_value(realised_pnl, 'rgb(0, 0, 0)', '0.00')
     check_pnl_color_value(unrealised_pnl, 'rgb(236, 0, 60)', '-4.00')
 
-    submit_order(vega, "Key 1", market_id, "SIDE_SELL", 2, 101.50000)
+    submit_order(vega, "Key 1", continuous_market, "SIDE_SELL", 2, 101.50000)
     
     check_pnl_color_value(realised_pnl, 'rgb(236, 0, 60)', '-8.00')
     check_pnl_color_value(unrealised_pnl, 'rgb(0, 0, 0)', '0.00')
 
 
-@pytest.mark.usefixtures("auth")
-def test_pnl_profit_portfolio(setup_continuous_market, vega:VegaService, page: Page):
-    market_id = vega.all_markets()[0].id
-    submit_order(vega, "Key 1", market_id, "SIDE_BUY", 1, 104.50000)
-    wait_for_service(f"http://localhost:{vega.console_port}/#/markets/{market_id}")
-    page.get_by_test_id('Portfolio').first.click()
+@pytest.mark.usefixtures("continuous_market", "auth")
+def test_pnl_profit_portfolio(continuous_market, vega:VegaService, page: Page):
+    page.set_viewport_size({"width":1748, "height":977})
+    submit_order(vega, "Key 1", continuous_market, "SIDE_BUY", 1, 104.50000)
+    page.goto(f"http://localhost:{vega.console_port}/#/markets/{continuous_market}")
+    wait_for_service(f"http://localhost:{vega.console_port}/#/markets/{continuous_market}")
+    page.get_by_role("link", name="Portfolio").click()
     page.get_by_test_id('Positions').click()
     wait_for_graphql_response(page, 'EstimatePosition')
-    selector = '//div[@role="row" and .//div[@col-id="partyId"]/div/span[text()="mm"]]'
-    page.wait_for_selector(selector, state='visible')
+    page.wait_for_selector(':nth-of-type(3)[role="row"]', state='visible')
 
+    selector = '//div[@role="row" and .//div[@col-id="partyId"]/div/span[text()="mm"]]'
+ 
     row_element = page.query_selector(selector)
     unrealised_pnl = row_element.query_selector('xpath=./div[@col-id="unrealisedPNL"]')
     realised_pnl = row_element.query_selector('xpath=./div[@col-id="realisedPNL"]')
@@ -118,58 +119,63 @@ def test_pnl_profit_portfolio(setup_continuous_market, vega:VegaService, page: P
     check_pnl_color_value(realised_pnl, 'rgb(0, 0, 0)', '0.00')
     check_pnl_color_value(unrealised_pnl, 'rgb(1, 145, 75)', '4.00')
     
-    submit_order(vega, "Key 1", market_id, "SIDE_SELL", 2, 101.50000)
+    submit_order(vega, "Key 1", continuous_market, "SIDE_SELL", 2, 101.50000)
     check_pnl_color_value(realised_pnl, 'rgb(1, 145, 75)', '8.00')
     check_pnl_color_value(unrealised_pnl, 'rgb(0, 0, 0)', '0.00')
-
-
-@pytest.mark.usefixtures("auth")
-def test_pnl_neutral_portfolio(setup_continuous_market, vega:VegaService, page: Page):
-    market_id = vega.all_markets()[0].id
-    wait_for_service(f"http://localhost:{vega.console_port}/#/markets/{market_id}")
-    page.get_by_test_id('Portfolio').first.click()
+ 
+@pytest.mark.usefixtures("continuous_market", "auth")
+def test_pnl_neutral_portfolio(continuous_market, vega:VegaService, page: Page):
+    page.set_viewport_size({"width":1748, "height":977})
+    page.goto(f"http://localhost:{vega.console_port}/#/markets/{continuous_market}")
+    wait_for_service(f"http://localhost:{vega.console_port}/#/markets/{continuous_market}")
+    page.get_by_role("link", name="Portfolio").click()
     page.get_by_test_id('Positions').click()
     wait_for_graphql_response(page, 'EstimatePosition')
-    
-    selector = '.ag-center-cols-container'
-    page.wait_for_selector(selector, state='visible')
-    realised_pnl = page.locator('.ag-center-cols-container .ag-row >> css=[col-id="realisedPNL"]').first
-    unrealised_pnl = page.locator('.ag-center-cols-container .ag-row >> css=[col-id="unrealisedPNL"]').first
+    page.wait_for_selector(':nth-of-type(3)[role="row"]', state='visible')
+    realised_pnl = page.locator(".ag-row-even > div:nth-child(9)").first
+    unrealised_pnl = page.locator(".ag-row-even > div:nth-child(9)").first
 
     check_pnl_color_value(realised_pnl, 'rgb(0, 0, 0)', '0.00')
     check_pnl_color_value(unrealised_pnl, 'rgb(0, 0, 0)', '0.00')
     
 
-@pytest.mark.usefixtures("auth")
-def test_pnl_loss_trading(setup_continuous_market, vega:VegaService, page: Page):
-    market_id = vega.all_markets()[0].id
-    submit_order(vega, "Key 1", market_id, "SIDE_BUY", 1, 104.50000)
-    wait_for_service(f"http://localhost:{vega.console_port}/#/markets/{market_id}")
-    selector = '.ag-center-cols-container .ag-row >> css=[col-id="realisedPNL"]'
-    page.wait_for_selector(selector, state='visible')
-    realised_pnl = page.locator(selector)
-    unrealised_pnl = page.locator('.ag-center-cols-container .ag-row >> css=[col-id="unrealisedPNL"]')
+@pytest.mark.usefixtures("continuous_market", "auth")
+def test_pnl_loss_trading(continuous_market, vega:VegaService, page: Page):
+    submit_order(vega, "Key 1", continuous_market, "SIDE_BUY", 1, 104.50000)
+    page.set_viewport_size({"width":1748, "height":977})
+    page.goto(f"http://localhost:{vega.console_port}/#/markets/{continuous_market}")
+    wait_for_service(f"http://localhost:{vega.console_port}/#/markets/{continuous_market}")
+    wait_for_graphql_response(page, 'EstimatePosition')
+    page.wait_for_selector('.ag-body.ag-layout-normal', state='visible')
+
+    realised_pnl = page.locator('[col-id="realisedPNL"]').last
+    unrealised_pnl = page.locator('[col-id="unrealisedPNL"]').last
 
     check_pnl_color_value(realised_pnl, 'rgb(0, 0, 0)', '0.00')
     check_pnl_color_value(unrealised_pnl, 'rgb(236, 0, 60)', '-4.00')
 
-    submit_order(vega, "Key 1", market_id, "SIDE_SELL", 2, 101.50000)
+    submit_order(vega, "Key 1", continuous_market, "SIDE_SELL", 2, 101.50000)
     
     check_pnl_color_value(realised_pnl, 'rgb(236, 0, 60)', '-8.00')
     check_pnl_color_value(unrealised_pnl, 'rgb(0, 0, 0)', '0.00')
 
     
 
-@pytest.mark.usefixtures("auth")
-def test_pnl_profit_trading(setup_continuous_market, vega:VegaService, page: Page):
-    market_id = vega.all_markets()[0].id
-    submit_order(vega, "Key 1", market_id, "SIDE_BUY", 1, 104.50000)
-    wait_for_service(f"http://localhost:{vega.console_port}/#/markets/{market_id}")
+@pytest.mark.usefixtures("continuous_market", "auth")
+def test_pnl_profit_trading(continuous_market, vega:VegaService, page: Page):
+    submit_order(vega, "Key 1", continuous_market, "SIDE_BUY", 1, 104.50000)
+    page.set_viewport_size({"width":1748, "height":977})
+
+    page.goto(f"http://localhost:{vega.console_port}/#/markets/{continuous_market}")
+    wait_for_service(f"http://localhost:{vega.console_port}/#/markets/{continuous_market}")
     page.get_by_test_id('manage-vega-wallet').click()
     page.get_by_role('menuitemradio').nth(1).click()
-    
+    element_locator = page.get_by_test_id("manage-vega-wallet")
+    element_locator.click(force=True)
+    wait_for_graphql_response(page, 'EstimatePosition')
+    page.wait_for_selector('.ag-body.ag-layout-normal', state='visible')
     selector = '.ag-center-cols-container .ag-row >> css=[col-id="realisedPNL"]'
-    page.wait_for_selector(selector, state='visible')
+
     realised_pnl = page.locator(selector)
 
     unrealised_pnl = page.locator('.ag-center-cols-container .ag-row >> css=[col-id="unrealisedPNL"]')
@@ -177,17 +183,20 @@ def test_pnl_profit_trading(setup_continuous_market, vega:VegaService, page: Pag
     check_pnl_color_value(realised_pnl, 'rgb(0, 0, 0)', '0.00')
     check_pnl_color_value(unrealised_pnl, 'rgb(1, 145, 75)', '4.00')
 
-    submit_order(vega, "Key 1", market_id, "SIDE_SELL", 2, 101.50000)
+    submit_order(vega, "Key 1", continuous_market, "SIDE_SELL", 2, 101.50000)
     
     check_pnl_color_value(realised_pnl, 'rgb(1, 145, 75)', '8.00')
     check_pnl_color_value(unrealised_pnl, 'rgb(0, 0, 0)', '0.00')
 
-@pytest.mark.usefixtures("auth")
-def test_pnl_neutral_trading(setup_continuous_market, vega:VegaService, page: Page):
-    market_id = vega.all_markets()[0].id
-    wait_for_service(f"http://localhost:{vega.console_port}/#/markets/{market_id}")
+@pytest.mark.usefixtures("continuous_market", "auth")
+def test_pnl_neutral_trading(continuous_market, vega:VegaService, page: Page):
+    page.set_viewport_size({"width":1748, "height":977})
+    page.goto(f"http://localhost:{vega.console_port}/#/markets/{continuous_market}")
+    wait_for_service(f"http://localhost:{vega.console_port}/#/markets/{continuous_market}")
+    wait_for_graphql_response(page, 'EstimatePosition')
+    page.wait_for_selector(':nth-of-type(3)[role="row"]', state='visible')
     selector = '.ag-center-cols-container .ag-row >> css=[col-id="realisedPNL"]'
-    page.wait_for_selector(selector, state='visible')
+    
 
     realised_pnl = page.locator(selector)
     unrealised_pnl = page.locator('.ag-center-cols-container .ag-row >> css=[col-id="unrealisedPNL"]')

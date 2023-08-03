@@ -131,10 +131,9 @@ def test_pnl_neutral_portfolio(setup_continuous_market, vega:VegaService, page: 
     page.get_by_test_id('Positions').click()
     wait_for_graphql_response(page, 'EstimatePosition')
     
-    selector = '.ag-center-cols-container .ag-row >> css=[col-id="realisedPNL"]'
+    selector = '.ag-center-cols-container'
     page.wait_for_selector(selector, state='visible')
-
-    realised_pnl = page.locator(selector).first
+    realised_pnl = page.locator('.ag-center-cols-container .ag-row >> css=[col-id="realisedPNL"]').first
     unrealised_pnl = page.locator('.ag-center-cols-container .ag-row >> css=[col-id="unrealisedPNL"]').first
 
     check_pnl_color_value(realised_pnl, 'rgb(0, 0, 0)', '0.00')

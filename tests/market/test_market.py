@@ -14,8 +14,7 @@ TERMINATE_WALLET = WalletConfig("FJMKnwfZdd48C8NqvYrG", "bY3DxwtsCstMIIZdNpKs")
 
 wallets = [MM_WALLET, MM_WALLET2, TERMINATE_WALLET]
 
-table_row_selector = '[data-testid="tab-all-markets"] .ag-center-cols-container .ag-row'
-table_row_selector = '[data-testid="tab-all-markets"] .ag-center-cols-container .ag-row'
+table_row_selector = '[data-testid="tab-open-markets"] .ag-center-cols-container .ag-row'
 trading_mode_col = '[col-id="tradingMode"]'
 state_col = '[col-id="state"]'
 item_value = "item-value"
@@ -37,7 +36,7 @@ market_name = "BTC:DAI_2023"
 
 
 @pytest.mark.usefixtures("simple_market", "risk_accepted")
-def test_price_monitoring(simple_market, vega: VegaService, page: Page):
+def test_price_monitoring(simple_market, vega: VegaService, page: Page):    
     page.goto(f"/#/markets/all")
     expect(page.locator(table_row_selector).locator(trading_mode_col)).to_have_text(
         "Opening auction"

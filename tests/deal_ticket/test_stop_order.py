@@ -193,7 +193,6 @@ def test_submit_stop_limit_order_cancel(continuous_market, vega: VegaService, pa
     page.get_by_test_id(order_price).type("99")
     page.get_by_test_id(order_size).type("1")
     
-    page.get_by_test_id(expire).click()
     page.get_by_test_id(submit_stop_order).click()
     page.get_by_test_id(stop_orders_tab).click()
 

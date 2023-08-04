@@ -84,6 +84,7 @@ def test_submit_stop_order_rejected(continuous_market, vega: VegaService, page: 
     vega.wait_for_total_catchup()
     page.get_by_test_id(close_toast).click()
 
+    page.get_by_role(row_table).locator(market_name_col).nth(1).is_visible()
     expect((page.get_by_role(row_table).locator(market_name_col)).nth(1)).to_have_text("BTC:DAI_2023")
     expect((page.get_by_role(row_table).locator(trigger_col)).nth(1)).to_have_text("Mark > 103.00")
     expect((page.get_by_role(row_table).locator(expiresAt_col)).nth(1)).to_have_text("")
@@ -135,6 +136,7 @@ def test_submit_stop_market_order_triggered(continuous_market, vega: VegaService
     page.wait_for_selector('[data-testid="toast-close"]', state='visible')
     page.get_by_test_id(close_toast).click()
 
+    page.get_by_role(row_table).locator(market_name_col).nth(1).is_visible()
     expect((page.get_by_role(row_table).locator(market_name_col)).nth(1)).to_have_text("BTC:DAI_2023")
     expect((page.get_by_role(row_table).locator(trigger_col)).nth(1)).to_have_text("Mark > 103.00")
     expect((page.get_by_role(row_table).locator(expiresAt_col)).nth(1)).to_have_text("")
@@ -182,6 +184,7 @@ def test_submit_stop_limit_order_pending(continuous_market, vega: VegaService, p
     page.wait_for_selector('[data-testid="toast-close"]', state='visible')
     page.get_by_test_id(close_toast).click()
 
+    page.get_by_role(row_table).locator(market_name_col).nth(1).is_visible()
     expect((page.get_by_role(row_table).locator(market_name_col)).nth(1)).to_have_text("BTC:DAI_2023")
     expect((page.get_by_role(row_table).locator(trigger_col)).nth(1)).to_have_text("Mark < 102.00")
     expect((page.get_by_role(row_table).locator(expiresAt_col)).nth(1)).to_have_text("")

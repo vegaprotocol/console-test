@@ -55,7 +55,6 @@ def test_margin_and_fees_estimations(continuous_market, vega: VegaService, page:
     order = submit_order(vega, "Key 1", market_id, "SIDE_BUY", 400, 38329483272398.838)
     vega.forward("10s")
     vega.wait_for_total_catchup()
-    #page.wait_for_selector('[data-testid="deal-ticket-warning-margin"]', state='visible')
     expect(page.get_by_test_id(margin_required)).to_have_text(
         "Margin required897,716,007,278,879.50 - 897,716,007,278,895.20 tDAI "
     )

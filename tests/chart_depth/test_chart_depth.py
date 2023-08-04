@@ -11,5 +11,7 @@ def test_see_market_depth_chart(continuous_market, vega, page: Page):
 
     # Check if the 'Depth' tab and the depth chart are visible
     # 6006-DEPC-001
+
     expect(page.get_by_test_id("tab-depth")).to_be_visible()
     expect(page.locator(".depth-chart-module_canvas__260De").first).to_be_visible()
+

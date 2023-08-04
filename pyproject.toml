@@ -17,3 +17,6 @@ pytest-xdist = "^3.3.1"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[pytest]
+timeout = 300

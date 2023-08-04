@@ -64,16 +64,16 @@ def test_margin_and_fees_estimations(continuous_market, vega: VegaService, page:
 
     # cancel order and verify that warning margin disappeared
     vega.cancel_order("Key 1", market_id, order)
-    vega.wait_for_total_catchup()
     vega.forward("10s")
+    vega.wait_for_total_catchup()
     expect(page.get_by_test_id("deal-ticket-warning-auction")).to_contain_text(
         "Any orders placed now will not trade until the auction ends"
     )
 
     # add order at the current price so that it is possible to change the status to price monitoring
     submit_order(vega, "Key 1", market_id, "SIDE_SELL", 1, 110)
-    vega.wait_for_total_catchup()
     vega.forward("10s")
+    vega.wait_for_total_catchup()
     expect(page.get_by_test_id(margin_required)).to_have_text(
         "Margin required1,684.36688 - 1,700.53688 tDAI"
     )

@@ -55,13 +55,7 @@ def page_with_trace(vega, request, browser: Browser):
         with context.new_page() as page:
             yield page
         trace_path = os.path.join("traces", request.node.name + "trace.zip")
-        try:
-            if request.node.rep_call.failed:
-                context.tracing.stop(path=trace_path)
-        except AttributeError:
-            context.tracing.stop(path=trace_path)
-        else:
-            context.tracing.stop()
+        context.tracing.stop(path=trace_path)
 
 
 # Setup window._env_ variables. Note: This is named `page` so that the `page` argument
@@ -121,7 +115,8 @@ def auth(vega, page_with_trace):
 # Set 'risk accepted' flag, so that the risk dialog doesn't show up
 @pytest.fixture(scope="function")
 def risk_accepted(page_with_trace):
-    script = "localStorage.setItem('vega_risk_accepted', 'true');"
+    script = "localStorage.setItem('vega_risk_accepted', 'true'); localStorage.setItem('vega_onboarding_viewed', 'true');"
+
     page_with_trace.add_init_script(script)
 
 

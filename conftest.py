@@ -121,7 +121,8 @@ def auth(vega, page_with_trace):
 # Set 'risk accepted' flag, so that the risk dialog doesn't show up
 @pytest.fixture(scope="function")
 def risk_accepted(page_with_trace):
-    script = "localStorage.setItem('vega_risk_accepted', 'true');"
+    script = "localStorage.setItem('vega_risk_accepted', 'true'); localStorage.setItem('vega_onboarding_viewed', 'true');"
+
     page_with_trace.add_init_script(script)
 
 

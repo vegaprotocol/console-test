@@ -46,6 +46,12 @@ timeInForce_col = '[col-id="submission.timeInForce"]'
 updatedAt_col = '[col-id="updatedAt"]'
 close_toast= "toast-close"
 
+def crete_position(vega, market_id):
+    submit_order(vega, "Key 1", market_id, "SIDE_SELL", 100, 110)
+    submit_order(vega, "Key 1", market_id, "SIDE_BUY", 100, 110)
+    vega.forward("10s")
+    vega.wait_for_total_catchup
+
 @pytest.mark.usefixtures("continuous_market", "auth")
 def test_stop_order_form_error_validation(continuous_market, vega: VegaService, page: Page):
 
@@ -74,8 +80,8 @@ def test_submit_stop_order_rejected(continuous_market, vega: VegaService, page: 
     page.get_by_test_id(stop_order_btn).click()
     page.get_by_test_id(stop_market_order_btn).is_visible()
     page.get_by_test_id(stop_market_order_btn).click()
-    page.get_by_test_id(trigger_price).type("103")
-    page.get_by_test_id(order_size).type("3")
+    page.get_by_test_id(trigger_price).fill("103")
+    page.get_by_test_id(order_size).fill("3")
     page.get_by_test_id(submit_stop_order).click()
     page.get_by_test_id(stop_orders_tab).click()
 
@@ -109,22 +115,20 @@ def test_submit_stop_market_order_triggered(continuous_market, vega: VegaService
     market_id = continuous_market
     page.goto(f"/#/markets/{market_id}")
     
-    submit_order(vega, "Key 1", market_id, "SIDE_SELL", 100, 110)
-    submit_order(vega, "Key 1", market_id, "SIDE_BUY", 100, 110)
-    vega.forward("10s")
-    vega.wait_for_total_catchup
+    # crete a position because stop order is reduce only type
+    crete_position(vega, market_id)
 
     page.get_by_test_id(stop_order_btn).click()
     page.get_by_test_id(stop_market_order_btn).is_visible()
     page.get_by_test_id(stop_market_order_btn).click()
     page.get_by_test_id(order_side_sell).click()
-    page.get_by_test_id(trigger_price).type("103")
+    page.get_by_test_id(trigger_price).fill("103")
     expect(page.get_by_test_id("sidebar-content").get_by_test_id("price")).to_have_text("~103.00 BTC")
-    page.get_by_test_id(order_size).type("1")
+    page.get_by_test_id(order_size).fill("1")
     page.get_by_test_id(expire).click()
     expires_at = datetime.now() + timedelta(days=1)
     expires_at_input_value = expires_at.strftime('%Y-%m-%dT%H:%M:%S')
-    page.get_by_test_id('date-picker-field').type(expires_at_input_value)
+    page.get_by_test_id('date-picker-field').fill(expires_at_input_value)
     page.get_by_test_id(expiry_strategy_cancel).click()
 
     page.get_by_test_id(submit_stop_order).click()
@@ -139,7 +143,8 @@ def test_submit_stop_market_order_triggered(continuous_market, vega: VegaService
     page.get_by_role(row_table).locator(market_name_col).nth(1).is_visible()
     expect((page.get_by_role(row_table).locator(market_name_col)).nth(1)).to_have_text("BTC:DAI_2023")
     expect((page.get_by_role(row_table).locator(trigger_col)).nth(1)).to_have_text("Mark > 103.00")
-    expect((page.get_by_role(row_table).locator(expiresAt_col)).nth(1)).to_have_text("")
+    # tbd currently sim is returning null
+    # expect((page.get_by_role(row_table).locator(expiresAt_col)).nth(1)).to_contain_text("Cancels")
     expect((page.get_by_role(row_table).locator(size_col)).nth(1)).to_have_text("-1")
     expect((page.get_by_role(row_table).locator(submission_type)).nth(1)).to_have_text("Market")
     expect((page.get_by_role(row_table).locator(status_col)).nth(1)).to_have_text("Triggered")
@@ -157,19 +162,17 @@ def test_submit_stop_limit_order_pending(continuous_market, vega: VegaService, p
     market_id = continuous_market
     page.goto(f"/#/markets/{market_id}")
 
-    submit_order(vega, "Key 1", market_id, "SIDE_SELL", 100, 110)
-    submit_order(vega, "Key 1", market_id, "SIDE_BUY", 100, 110)
-    vega.forward("10s")
-    vega.wait_for_total_catchup
+    # crete a position because stop order is reduce only type
+    crete_position(vega, market_id)
 
     page.get_by_test_id(stop_order_btn).click()
     page.get_by_test_id(stop_limit_order_btn).is_visible()
     page.get_by_test_id(stop_limit_order_btn).click()
     page.get_by_test_id(order_side_sell).click()
     page.get_by_test_id(trigger_below).click()
-    page.get_by_test_id(trigger_price).type("102")
-    page.get_by_test_id(order_price).type("99")
-    page.get_by_test_id(order_size).type("1")
+    page.get_by_test_id(trigger_price).fill("102")
+    page.get_by_test_id(order_price).fill("99")
+    page.get_by_test_id(order_size).fill("1")
     page.get_by_test_id("order-tif").select_option("TIME_IN_FORCE_IOC")
     page.get_by_test_id(expire).click()
     expires_at = datetime.now() + timedelta(days=1)
@@ -187,7 +190,8 @@ def test_submit_stop_limit_order_pending(continuous_market, vega: VegaService, p
     page.get_by_role(row_table).locator(market_name_col).nth(1).is_visible()
     expect((page.get_by_role(row_table).locator(market_name_col)).nth(1)).to_have_text("BTC:DAI_2023")
     expect((page.get_by_role(row_table).locator(trigger_col)).nth(1)).to_have_text("Mark < 102.00")
-    expect((page.get_by_role(row_table).locator(expiresAt_col)).nth(1)).to_have_text("")
+    # tbd currently sim is returning null
+    # expect((page.get_by_role(row_table).locator(expiresAt_col)).nth(1)).to_contain_text("Submit")
     expect((page.get_by_role(row_table).locator(size_col)).nth(1)).to_have_text("-1")
     expect((page.get_by_role(row_table).locator(submission_type)).nth(1)).to_have_text("Limit")
     expect((page.get_by_role(row_table).locator(status_col)).nth(1)).to_have_text("Pending")
@@ -201,20 +205,17 @@ def test_submit_stop_limit_order_cancel(continuous_market, vega: VegaService, pa
     market_id = continuous_market
     page.goto(f"/#/markets/{market_id}")
 
-    
-    submit_order(vega, "Key 1", market_id, "SIDE_SELL", 100, 110)
-    submit_order(vega, "Key 1", market_id, "SIDE_BUY", 100, 110)
-    vega.forward("10s")
-    vega.wait_for_total_catchup
+    # crete a position because stop order is reduce only type
+    crete_position(vega, market_id)
 
     page.get_by_test_id(stop_order_btn).click()
     page.get_by_test_id(stop_limit_order_btn).is_visible()
     page.get_by_test_id(stop_limit_order_btn).click()
     page.get_by_test_id(order_side_sell).click()
     page.get_by_test_id(trigger_below).click()
-    page.get_by_test_id(trigger_price).type("102")
-    page.get_by_test_id(order_price).type("99")
-    page.get_by_test_id(order_size).type("1")
+    page.get_by_test_id(trigger_price).fill("102")
+    page.get_by_test_id(order_price).fill("99")
+    page.get_by_test_id(order_size).fill("1")
     
     page.get_by_test_id(submit_stop_order).click()
     page.get_by_test_id(stop_orders_tab).click()

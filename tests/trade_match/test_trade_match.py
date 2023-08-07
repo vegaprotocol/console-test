@@ -40,7 +40,6 @@ def test_trade_match_table(opening_auction_market: str, vega: VegaService, page:
     )
     vega.forward("60s")
     vega.wait_for_total_catchup()
-    vega.wait_fn(1)
 
     # Positions
     page.get_by_test_id("Positions").click()
@@ -55,7 +54,8 @@ def test_trade_match_table(opening_auction_market: str, vega: VegaService, page:
         + "0.0"
         + "43.94338"
         + "1.50"
-        + "0.00"
+        + "0.00",
+        timeout=20000,
     )
 
     # Open

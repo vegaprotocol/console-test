@@ -206,7 +206,7 @@ def test_submit_stop_limit_order_cancel(continuous_market, vega: VegaService, pa
     page.goto(f"/#/markets/{market_id}")
 
     # crete a position because stop order is reduce only type
-    crete_position(vega, market_id)
+    create_position(vega, market_id)
 
     page.get_by_test_id(stop_order_btn).click()
     page.get_by_test_id(stop_limit_order_btn).is_visible()

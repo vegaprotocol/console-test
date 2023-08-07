@@ -5,3 +5,4 @@ node_modules/
 *.pyc
 .pytest_cache
 traces/
+.DS_Store

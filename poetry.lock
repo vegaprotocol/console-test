@@ -586,7 +586,7 @@ profile = ["pytest-profiling", "snakeviz"]
 type = "git"
 url = "https://github.com/vegaprotocol/vega-market-sim.git"
 reference = "HEAD"
-resolved_reference = "b0ad1edc7e19959c01d53e2995ffee1773b6c241"
+resolved_reference = "0bc171ffaff95883f84d3598697e33943f4e64ab"
 
 [[package]]
 name = "websocket-client"

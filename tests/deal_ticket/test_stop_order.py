@@ -115,7 +115,7 @@ def test_submit_stop_market_order_triggered(continuous_market, vega: VegaService
     market_id = continuous_market
     page.goto(f"/#/markets/{market_id}")
     
-    # crete a position because stop order is reduce only type
+    # create a position because stop order is reduce only type
     create_position(vega, market_id)
 
     page.get_by_test_id(stop_order_btn).click()

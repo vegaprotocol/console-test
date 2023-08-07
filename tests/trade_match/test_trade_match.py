@@ -7,24 +7,6 @@ from actions.vega import submit_multiple_orders
 
 @pytest.mark.usefixtures("opening_auction_market", "auth")
 def test_trade_match_table(opening_auction_market: str, vega: VegaService, page: Page):
-    positions_button = page.get_by_test_id("Positions")
-    open_button = page.get_by_test_id("Open")
-    closed_button = page.get_by_test_id("Closed")
-    rejected_button = page.get_by_test_id("Rejected")
-    all_button = page.get_by_test_id("All")
-    stop_orders_button = page.get_by_test_id("Stop orders")
-    fills_button = page.get_by_test_id("Fills")
-    collateral_button = page.get_by_test_id("Collateral")
-
-    positions_tab = page.get_by_test_id("tab-positions")
-    open_tab = page.get_by_test_id("tab-open-orders")
-    closed_tab = page.get_by_test_id("tab-closed-orders")
-    rejected_tab = page.get_by_test_id("tab-rejected-orders")
-    all_tab = page.get_by_test_id("tab-orders")
-    stop_orders_tab = page.get_by_test_id("tab-stop-orders")
-    fills_tab = page.get_by_test_id("tab-fills")
-    collateral_tab = page.get_by_test_id("tab-accounts")
-
     row_locator = ".ag-center-cols-container .ag-row"
 
     page.goto(f"/#/markets/{opening_auction_market}")
@@ -58,10 +40,11 @@ def test_trade_match_table(opening_auction_market: str, vega: VegaService, page:
     )
     vega.forward("60s")
     vega.wait_for_total_catchup()
+    vega.wait_fn(1)
 
     # Positions
-    positions_button.click()
-    expect(positions_tab.locator(row_locator)).to_contain_text(
+    page.get_by_test_id("Positions").click()
+    expect(page.get_by_test_id("tab-positions").locator(row_locator)).to_contain_text(
         "BTC:DAI_2023"
         + "426.00"
         + "-4"
@@ -76,8 +59,8 @@ def test_trade_match_table(opening_auction_market: str, vega: VegaService, page:
     )
 
     # Open
-    open_button.click()
-    rows = open_tab.locator(row_locator).all()
+    page.get_by_test_id("Open").click()
+    rows = page.get_by_test_id("tab-open-orders").locator(row_locator).all()
     expect(rows[0]).to_contain_text(
         "BTC:DAI_2023" + "0" + "-1" + "Limit" + "Active" + "150.00" + "GTC"
     )
@@ -89,8 +72,8 @@ def test_trade_match_table(opening_auction_market: str, vega: VegaService, page:
     )
 
     # Closed
-    closed_button.click()
-    rows = closed_tab.locator(row_locator).all()
+    page.get_by_test_id("Closed").click()
+    rows = page.get_by_test_id("tab-closed-orders").locator(row_locator).all()
     expect(rows[0]).to_contain_text(
         "BTC:DAI_2023" + "5" + "-5" + "Limit" + "Filled" + "95.00" + "GTC"
     )
@@ -102,8 +85,10 @@ def test_trade_match_table(opening_auction_market: str, vega: VegaService, page:
     )
 
     # Rejected
-    rejected_button.click()
-    expect(rejected_tab.locator(row_locator)).to_contain_text(
+    page.get_by_test_id("Rejected").click()
+    expect(
+        page.get_by_test_id("tab-rejected-orders").locator(row_locator)
+    ).to_contain_text(
         "BTC:DAI_2023"
         + "0"
         + "+1"
@@ -114,8 +99,8 @@ def test_trade_match_table(opening_auction_market: str, vega: VegaService, page:
     )
 
     # All
-    all_button.click()
-    rows = all_tab.locator(row_locator).all()
+    page.get_by_test_id("All").click()
+    rows = page.get_by_test_id("tab-orders").locator(row_locator).all()
     expect(rows[0]).to_contain_text(
         "BTC:DAI_2023" + "0" + "-1" + "Limit" + "Active" + "150.00" + "GTC"
     )
@@ -145,13 +130,15 @@ def test_trade_match_table(opening_auction_market: str, vega: VegaService, page:
     )
 
     # Stop Orders
-    stop_orders_button.click()
-    expect(stop_orders_tab).to_be_visible()
-    expect(stop_orders_tab.locator(row_locator)).to_be_visible(visible=False)
+    page.get_by_test_id("Stop orders").click()
+    expect(page.get_by_test_id("tab-stop-orders")).to_be_visible()
+    expect(page.get_by_test_id("tab-stop-orders").locator(row_locator)).to_be_visible(
+        visible=False
+    )
 
     # Fills
-    fills_button.click()
-    rows = fills_tab.locator(row_locator).all()
+    page.get_by_test_id("Fills").click()
+    rows = page.get_by_test_id("tab-fills").locator(row_locator).all()
     expect(rows[0]).to_contain_text(
         "BTC:DAI_2023"
         + "-5"
@@ -168,7 +155,7 @@ def test_trade_match_table(opening_auction_market: str, vega: VegaService, page:
     )
 
     # Collateral
-    collateral_button.click()
-    expect(collateral_tab.locator(".ag-floating-top-viewport .ag-row")).to_contain_text(
-        "tDAI" + "43.94338" + "0.00%" + "999,904.04037" + "999,947.98375"
-    )
+    page.get_by_test_id("Collateral").click()
+    expect(
+        page.get_by_test_id("tab-accounts").locator(".ag-floating-top-viewport .ag-row")
+    ).to_contain_text("tDAI" + "43.94338" + "0.00%" + "999,904.04037" + "999,947.98375")

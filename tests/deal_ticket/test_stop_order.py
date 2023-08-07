@@ -298,9 +298,3 @@ def test_stop_limit_order_form_validation(continuous_market, vega: VegaService, 
     expect(page.get_by_test_id(order_size)).to_be_empty
     page.get_by_test_id(order_price).click()
     expect(page.get_by_test_id(order_price)).to_be_empty()
-
-
-
-    
- 
- 

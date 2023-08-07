@@ -40,22 +40,21 @@ def test_trade_match_table(opening_auction_market: str, vega: VegaService, page:
     )
     vega.forward("60s")
     vega.wait_for_total_catchup()
-
+    page.reload()
     # Positions
     page.get_by_test_id("Positions").click()
     expect(page.get_by_test_id("tab-positions").locator(row_locator)).to_contain_text(
         "BTC:DAI_2023"
         + "426.00"
         + "-4"
-        + "-"
-        + "237,005.6825 - 237,230.49968"
+        + "106.50"
+        + "237,007.10401 - 237,231.92254"
         + "tDAI"
         + "106.50"
         + "0.0"
         + "43.94338"
         + "1.50"
         + "0.00",
-        timeout=20000,
     )
 
     # Open

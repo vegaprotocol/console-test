@@ -53,7 +53,7 @@ def create_position(vega: VegaService, market_id):
     vega.wait_for_total_catchup
 
 @pytest.mark.usefixtures("continuous_market", "auth")
-def test_stop_order_form_error_validation(continuous_market, vega: VegaService, page: Page):
+def test_stop_order_form_error_validation(continuous_market, page: Page):
 
     # 7002-SORD-032 
 

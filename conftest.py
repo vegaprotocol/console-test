@@ -49,7 +49,8 @@ def vega():
 @pytest.fixture(scope="function", autouse=True)
 def page_with_trace(vega, request, browser: Browser):
     with browser.new_context(
-        base_url=f"http://localhost:{vega.console_port}"
+        viewport={"width": 1920, "height": 1080},
+        base_url=f"http://localhost:{vega.console_port}",
     ) as context:
         context.tracing.start(screenshots=True, snapshots=True, sources=True)
         with context.new_page() as page:

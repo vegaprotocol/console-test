@@ -74,7 +74,7 @@ def test_iceberg_open_order(continuous_market,vega: VegaService, page: Page):
      vega.forward("10s")
      vega.wait_for_total_catchup()
 
-     page.wait_for_selector(".ag-center-cols-container .ag-row")     
+     page.wait_for_selector(".ag-center-cols-container .ag-row")   
      expect(page.locator(".ag-center-cols-container .ag-row [col-id='openVolume']")).to_have_text("-98")
      page.get_by_test_id("Open").click()
      page.wait_for_selector(".ag-center-cols-container .ag-row")   
@@ -101,3 +101,38 @@ def test_iceberg_open_order(continuous_market,vega: VegaService, page: Page):
      expect(page.locator('[data-testid="tab-closed-orders"] .ag-center-cols-container .ag-row [col-id=\'status\']').first).to_have_text("Filled")
      expect(page.locator('[id^="cell-price-"]').nth(2)).to_have_text("101.00")
      expect(page.locator('[id^="cell-size-"]').nth(2)).to_have_text("3")
+
+
+@pytest.mark.usefixtures("continuous_market", "auth")
+def test_iceberg_order_details_are_correctly_displayed(continuous_market, vega: VegaService, page: Page):
+    page.goto(f"/#/markets/{continuous_market}")
+    submit_order(vega, "Key 1", vega.all_markets()[0].id, "SIDE_SELL", 102, 101,2, 1)
+    page.get_by_test_id("Open").click()
+    page.get_by_test_id('icon-kebab').click()
+    page.get_by_test_id('view-order').click()
+    page.pause()
+    verify_order_label(page, 'order-iceberg-order-label', 'Iceberg order')
+    verify_order_value(page, 'order-iceberg-order-value', 'Yes')
+    
+    verify_order_label(page, 'order-iceberg-order-peak-size-label', 'Peak size')
+    verify_order_value(page, 'order-iceberg-order-peak-size-value', '-2')
+    
+    verify_order_label(page, 'order-iceberg-order-minimum-visible-size-label', 'Minimum size')
+    verify_order_value(page, 'order-iceberg-order-minimum-visible-size-value', '-1')
+    
+    verify_order_label(page, 'order-iceberg-order-reserved-remaining-label', 'Reserved remaining')
+    verify_order_value(page, 'order-iceberg-order-reserved-remaining-value', '-1')
+
+    
+def verify_order_label(page: Page, test_id: str, expected_text: str):
+    element = page.get_by_test_id(test_id)
+    expect(element).to_be_visible()
+    expect(element).to_have_text(expected_text)
+
+
+def verify_order_value(page: Page, test_id: str, expected_text: str):
+    element = page.get_by_test_id(test_id)
+    expect(element).to_be_visible()
+    expect(element).to_have_text(expected_text)
+
+    

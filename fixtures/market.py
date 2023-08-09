@@ -76,10 +76,30 @@ def setup_simple_market(vega: VegaService, approve_proposal=True):
     )
 
     vega.forward("10s")
+    vega.wait_fn(10)
     vega.wait_for_total_catchup()
 
     return market_id
 
+def setup_simple_successor_market(vega: VegaService, parent_market_id, tdai_id, market_name, approve_proposal=True):
+    
+    market_id = vega.create_simple_market(
+        market_name,
+        proposal_key=MM_WALLET.name,
+        settlement_asset_id=tdai_id,
+        termination_key=TERMINATE_WALLET.name,
+        market_decimals=5,
+        approve_proposal=approve_proposal,
+        forward_time_to_enactment=approve_proposal,
+        parent_market_id=parent_market_id,
+        parent_market_insurance_pool_fraction=0.5
+    )
+
+    vega.forward("10s")
+    vega.wait_fn(10)
+    vega.wait_for_total_catchup()
+
+    return market_id
 
 def setup_opening_auction_market(vega: VegaService, market_id: str = None):
     if market_id is None or market_id not in vega.all_markets():

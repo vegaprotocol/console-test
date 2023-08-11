@@ -1,7 +1,9 @@
+import time
 import docker
 import pytest
 import os
 import json
+import logging
 
 from vega_sim.null_service import VegaServiceNull
 from playwright.sync_api import Browser, Page
@@ -14,11 +16,19 @@ from fixtures.market import (
 
 docker_client = docker.from_env()
 
+# Setup logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(message)s",
+    handlers=[
+        logging.StreamHandler()
+    ]
+)
 
 # Start VegaServiceNull and start up docker container for website
 @pytest.fixture(scope="function", autouse=True)
 def vega():
-    print("\nStarting VegaServiceNull")
+    logging.info("\nStarting VegaServiceNull")
     with VegaServiceNull(
         run_with_console=False,
         launch_graphql=False,
@@ -28,10 +38,24 @@ def vega():
         transactions_per_block=1000,
     ) as vega:
         # docker setup
-        container = docker_client.containers.run(
-            container_name, detach=True, ports={"80/tcp": vega.console_port}
-        )
-        print(f"Container {container.id} started")
+        attempts = 0
+        while attempts < 3:
+            try:
+                logging.info(f"Starting container '{container_name}' at port {vega.console_port}")
+                container = docker_client.containers.run(
+                    container_name, detach=True, ports={"80/tcp": vega.console_port}
+                )
+                logging.info(f"Container {container.id} started with console_port {vega.console_port}")
+                break
+            except docker.errors.APIError as e:
+                attempts += 1
+                logging.info(f"An error occurred while starting the container (attempt {attempts}/3): {e}")
+                if(attempts == 3):
+                    logging.error(f"Container '{container_name}' failed to start. Exiting.")
+                    raise e
+                else:
+                    time.sleep(0.5)
+                    continue
 
         yield vega
 

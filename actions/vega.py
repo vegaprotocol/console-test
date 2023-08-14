@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 from vega_sim.service import VegaService
 
 
@@ -9,6 +9,8 @@ def submit_order(
     side: str,
     volume: float,
     price: float,
+    peak_size: Optional[float] = None,
+    minimum_visible_size: Optional[float] = None,
 ):
     return vega.submit_order(
         trading_key=wallet_name,
@@ -18,6 +20,8 @@ def submit_order(
         side=side,
         volume=volume,
         price=price,
+        peak_size=peak_size,
+        minimum_visible_size=minimum_visible_size,
     )
 
 

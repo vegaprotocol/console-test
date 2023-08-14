@@ -13,7 +13,7 @@ order_details = [
     ('order-remaining-label', 'Remaining', 'order-remaining-value', '-2'),
     ('order-status-label', 'Status', 'order-status-value', 'Active'),
     ('order-id-label', 'Order ID', 'order-id-value', '^.{10}\u2026.+Copy$', True),
-    ('order-created-label', 'Created', 'order-created-value', '^\d{2}/\d{2}/\d{4}, \d{2}:\d{2}:\d{2}$', True),
+    ('order-created-label', 'Created', 'order-created-value', '^\d{1,2}/\d{1,2}/\d{4}, \d{1,2}:\d{2}:\d{2} (AM|PM)$', True),
     ('order-time-in-force-label', 'Time in force', 'order-time-in-force-value', "Good 'til Cancelled (GTC)")
 ]
 

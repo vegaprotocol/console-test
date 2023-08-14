@@ -26,7 +26,7 @@ def verify_order_value(page: Page, test_id: str, expected_text: str, is_regex: b
     element = page.get_by_test_id(test_id)
     expect(element).to_be_visible()
     if is_regex:
-        actual_text = element.text_content()  # placeholder, replace with the appropriate method to get text
+        actual_text = element.text_content()
         assert re.match(expected_text, actual_text), f"Expected {expected_text}, but got {actual_text}"
     else:
         expect(element).to_have_text(expected_text)

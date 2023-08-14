@@ -54,7 +54,7 @@ label_value_tooltip_pairs = [
  
 ]
 
-def test_tooltip(page: Page, index: int, test_id: str, tooltip: str):
+def tooltip(page: Page, index: int, test_id: str, tooltip: str):
     page.locator(f"data-testid={index}_{test_id}").hover()
     expect(page.locator('[role="tooltip"]').locator('div')).to_have_text(tooltip)
     page.get_by_test_id("dialog-title").click()
@@ -81,10 +81,10 @@ def test_asset_details(page: Page):
             expect(page.locator(f"[data-testid='{index}_value']")).to_have_text(value)
 
         if label_tooltip:
-            test_tooltip(page, index, 'label', label_tooltip)
+            tooltip(page, index, 'label', label_tooltip)
 
         if value_tooltip:
-            test_tooltip(page, index, 'value', value_tooltip)
+            tooltip(page, index, 'value', value_tooltip)
 
     page.get_by_test_id("dialog-close").click()
     assert not page.query_selector("dialog-content")

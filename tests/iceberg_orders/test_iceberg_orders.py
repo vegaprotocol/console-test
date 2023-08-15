@@ -74,7 +74,7 @@ def test_iceberg_open_order(continuous_market,vega: VegaService, page: Page):
      vega.forward("10s")
      vega.wait_for_total_catchup()
 
-     page.wait_for_selector(".ag-center-cols-container .ag-row")     
+     page.wait_for_selector(".ag-center-cols-container .ag-row")   
      expect(page.locator(".ag-center-cols-container .ag-row [col-id='openVolume']")).to_have_text("-98")
      page.get_by_test_id("Open").click()
      page.wait_for_selector(".ag-center-cols-container .ag-row")   
@@ -101,3 +101,16 @@ def test_iceberg_open_order(continuous_market,vega: VegaService, page: Page):
      expect(page.locator('[data-testid="tab-closed-orders"] .ag-center-cols-container .ag-row [col-id=\'status\']').first).to_have_text("Filled")
      expect(page.locator('[id^="cell-price-"]').nth(2)).to_have_text("101.00")
      expect(page.locator('[id^="cell-size-"]').nth(2)).to_have_text("3")
+    
+def verify_order_label(page: Page, test_id: str, expected_text: str):
+    element = page.get_by_test_id(test_id)
+    expect(element).to_be_visible()
+    expect(element).to_have_text(expected_text)
+
+
+def verify_order_value(page: Page, test_id: str, expected_text: str):
+    element = page.get_by_test_id(test_id)
+    expect(element).to_be_visible()
+    expect(element).to_have_text(expected_text)
+
+    

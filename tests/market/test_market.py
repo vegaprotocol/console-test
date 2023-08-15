@@ -47,10 +47,9 @@ def test_price_monitoring(simple_market, vega: VegaService, page: Page):
     result = page.get_by_text(market_name)
     result.first.click()
     page.get_by_test_id(market_trading_mode).get_by_text("Opening auction").hover()
-    expect(page.get_by_test_id("opening-auction-sub-status").first).to_have_text(
-        "Opening auction: Not enough liquidity to open"
-    )
-
+    expect(page.get_by_test_id("opening-auction-sub-status").first).to_have_text("Opening auction: Not enough liquidity to open")
+    print(page.get_by_test_id("opening-auction-sub-status").inner_text)
+    page.pause()
     vega.submit_liquidity(
         key_name=MM_WALLET.name,
         market_id=simple_market,

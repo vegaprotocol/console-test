@@ -142,8 +142,7 @@ def test_submit_stop_market_order_triggered(continuous_market, vega: VegaService
     page.get_by_role(row_table).locator(market_name_col).nth(1).is_visible()
     expect((page.get_by_role(row_table).locator(market_name_col)).nth(1)).to_have_text("BTC:DAI_2023")
     expect((page.get_by_role(row_table).locator(trigger_col)).nth(1)).to_have_text("Mark > 103.00")
-    # tbd currently sim is returning null
-    # expect((page.get_by_role(row_table).locator(expiresAt_col)).nth(1)).to_contain_text("Cancels")
+    expect((page.get_by_role(row_table).locator(expiresAt_col)).nth(1)).to_contain_text("Cancels")
     expect((page.get_by_role(row_table).locator(size_col)).nth(1)).to_have_text("-1")
     expect((page.get_by_role(row_table).locator(submission_type)).nth(1)).to_have_text("Market")
     expect((page.get_by_role(row_table).locator(status_col)).nth(1)).to_have_text("Triggered")
@@ -189,8 +188,7 @@ def test_submit_stop_limit_order_pending(continuous_market, vega: VegaService, p
     page.get_by_role(row_table).locator(market_name_col).nth(1).is_visible()
     expect((page.get_by_role(row_table).locator(market_name_col)).nth(1)).to_have_text("BTC:DAI_2023")
     expect((page.get_by_role(row_table).locator(trigger_col)).nth(1)).to_have_text("Mark < 102.00")
-    # tbd currently sim is returning null
-    # expect((page.get_by_role(row_table).locator(expiresAt_col)).nth(1)).to_contain_text("Submit")
+    expect((page.get_by_role(row_table).locator(expiresAt_col)).nth(1)).to_contain_text("Submit")
     expect((page.get_by_role(row_table).locator(size_col)).nth(1)).to_have_text("-1")
     expect((page.get_by_role(row_table).locator(submission_type)).nth(1)).to_have_text("Limit")
     expect((page.get_by_role(row_table).locator(status_col)).nth(1)).to_have_text("Pending")

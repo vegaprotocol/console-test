@@ -73,7 +73,7 @@ def wait_for_service(url, timeout=60):
             if time.time() - start_time > timeout:
                 raise TimeoutError(f"Timed out waiting for service at {url}")
 
-
+@pytest.mark.test_on_pr
 @pytest.mark.usefixtures("continuous_market", "auth")
 def test_pnl_loss_portfolio(continuous_market, vega:VegaService, page: Page):    
     page.set_viewport_size({"width":1748, "height":977})
@@ -100,7 +100,7 @@ def test_pnl_loss_portfolio(continuous_market, vega:VegaService, page: Page):
     check_pnl_color_value(realised_pnl, 'rgb(236, 0, 60)', '-8.00')
     check_pnl_color_value(unrealised_pnl, 'rgb(0, 0, 0)', '0.00')
 
-
+@pytest.mark.test_on_pr
 @pytest.mark.usefixtures("continuous_market", "auth")
 def test_pnl_profit_portfolio(continuous_market, vega:VegaService, page: Page):
     page.set_viewport_size({"width":1748, "height":977})
@@ -126,7 +126,8 @@ def test_pnl_profit_portfolio(continuous_market, vega:VegaService, page: Page):
     wait_for_graphql_response(page, 'EstimatePosition')
     check_pnl_color_value(realised_pnl, 'rgb(1, 145, 75)', '8.00')
     check_pnl_color_value(unrealised_pnl, 'rgb(0, 0, 0)', '0.00')
- 
+
+@pytest.mark.test_on_pr 
 @pytest.mark.usefixtures("continuous_market", "auth")
 def test_pnl_neutral_portfolio(continuous_market, vega:VegaService, page: Page):
     page.set_viewport_size({"width":1748, "height":977})
@@ -191,6 +192,7 @@ def test_pnl_profit_trading(continuous_market, vega:VegaService, page: Page):
     check_pnl_color_value(realised_pnl, 'rgb(1, 145, 75)', '8.00')
     check_pnl_color_value(unrealised_pnl, 'rgb(0, 0, 0)', '0.00')
 
+@pytest.mark.test_on_pr
 @pytest.mark.usefixtures("continuous_market", "auth")
 def test_pnl_neutral_trading(continuous_market, vega:VegaService, page: Page):
     page.set_viewport_size({"width":1748, "height":977})

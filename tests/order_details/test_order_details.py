@@ -30,7 +30,8 @@ def verify_order_value(page: Page, test_id: str, expected_text: str, is_regex: b
         assert re.match(expected_text, actual_text), f"Expected {expected_text}, but got {actual_text}"
     else:
         expect(element).to_have_text(expected_text)
-
+        
+@pytest.mark.test_on_pr
 @pytest.mark.usefixtures("continuous_market", "auth")
 def test_order_details_are_correctly_displayed(continuous_market, vega: VegaService, page: Page):
     page.goto(f"/#/markets/{continuous_market}")

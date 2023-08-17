@@ -122,8 +122,13 @@ def risk_accepted(page_with_trace):
 
 
 @pytest.fixture(scope="function")
-def simple_market(vega):
-    return setup_simple_market(vega)
+def simple_market(vega, request):
+    kwargs = {}
+    if hasattr(request, 'param'):
+        kwargs.update(request.param)
+    return setup_simple_market(vega, **kwargs)
+
+
 
 
 @pytest.fixture(scope="function")

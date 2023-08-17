@@ -91,7 +91,7 @@ def test_submit_stop_order_rejected(continuous_market, vega: VegaService, page: 
     page.get_by_test_id(close_toast).click()
 
     page.get_by_role(row_table).locator(market_name_col).nth(1).is_visible()
-    expect((page.get_by_role(row_table).locator(market_name_col)).nth(1)).to_have_text("BTC:DAI_2023")
+    expect((page.get_by_role(row_table).locator(market_name_col)).nth(1)).to_have_text("BTC:DAI_2023Futr")
     expect((page.get_by_role(row_table).locator(trigger_col)).nth(1)).to_have_text("Mark > 103.00")
     expect((page.get_by_role(row_table).locator(expiresAt_col)).nth(1)).to_have_text("")
     expect((page.get_by_role(row_table).locator(size_col)).nth(1)).to_have_text("+3")
@@ -140,7 +140,7 @@ def test_submit_stop_market_order_triggered(continuous_market, vega: VegaService
     page.get_by_test_id(close_toast).click()
 
     page.get_by_role(row_table).locator(market_name_col).nth(1).is_visible()
-    expect((page.get_by_role(row_table).locator(market_name_col)).nth(1)).to_have_text("BTC:DAI_2023")
+    expect((page.get_by_role(row_table).locator(market_name_col)).nth(1)).to_have_text("BTC:DAI_2023Futr")
     expect((page.get_by_role(row_table).locator(trigger_col)).nth(1)).to_have_text("Mark > 103.00")
     expect((page.get_by_role(row_table).locator(expiresAt_col)).nth(1)).to_contain_text("Cancels")
     expect((page.get_by_role(row_table).locator(size_col)).nth(1)).to_have_text("-1")
@@ -186,7 +186,7 @@ def test_submit_stop_limit_order_pending(continuous_market, vega: VegaService, p
     page.get_by_test_id(close_toast).click()
 
     page.get_by_role(row_table).locator(market_name_col).nth(1).is_visible()
-    expect((page.get_by_role(row_table).locator(market_name_col)).nth(1)).to_have_text("BTC:DAI_2023")
+    expect((page.get_by_role(row_table).locator(market_name_col)).nth(1)).to_have_text("BTC:DAI_2023Futr")
     expect((page.get_by_role(row_table).locator(trigger_col)).nth(1)).to_have_text("Mark < 102.00")
     expect((page.get_by_role(row_table).locator(expiresAt_col)).nth(1)).to_contain_text("Submit")
     expect((page.get_by_role(row_table).locator(size_col)).nth(1)).to_have_text("-1")

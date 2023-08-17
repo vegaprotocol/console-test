@@ -44,7 +44,7 @@ def test_trade_match_table(opening_auction_market: str, vega: VegaService, page:
     # Positions
     page.get_by_test_id("Positions").click()
     expect(page.get_by_test_id("tab-positions").locator(row_locator)).to_contain_text(
-        "BTC:DAI_2023"
+        "BTC:DAI_2023Futr"
         + "426.00"
         + "-4"
         + "-"
@@ -61,26 +61,26 @@ def test_trade_match_table(opening_auction_market: str, vega: VegaService, page:
     page.get_by_test_id("Open").click()
     rows = page.get_by_test_id("tab-open-orders").locator(row_locator).all()
     expect(rows[0]).to_contain_text(
-        "BTC:DAI_2023" + "0" + "-1" + "Limit" + "Active" + "150.00" + "GTC"
+        "BTC:DAI_2023Futr" + "0" + "-1" + "Limit" + "Active" + "150.00" + "GTC"
     )
     expect(rows[1]).to_contain_text(
-        "BTC:DAI_2023" + "0" + "+1" + "Limit" + "Active" + "50.00" + "GTC"
+        "BTC:DAI_2023Futr" + "0" + "+1" + "Limit" + "Active" + "50.00" + "GTC"
     )
     expect(rows[2]).to_contain_text(
-        "BTC:DAI_2023" + "1" + "+5" + "Limit" + "Active" + "105.00" + "GTC"
+        "BTC:DAI_2023Futr" + "1" + "+5" + "Limit" + "Active" + "105.00" + "GTC"
     )
 
     # Closed
     page.get_by_test_id("Closed").click()
     rows = page.get_by_test_id("tab-closed-orders").locator(row_locator).all()
     expect(rows[0]).to_contain_text(
-        "BTC:DAI_2023" + "5" + "-5" + "Limit" + "Filled" + "95.00" + "GTC"
+        "BTC:DAI_2023Futr" + "5" + "-5" + "Limit" + "Filled" + "95.00" + "GTC"
     )
     expect(rows[1]).to_contain_text(
-        "BTC:DAI_2023" + "5" + "-5" + "Limit" + "Filled" + "90.00" + "GTC"
+        "BTC:DAI_2023Futr" + "5" + "-5" + "Limit" + "Filled" + "90.00" + "GTC"
     )
     expect(rows[2]).to_contain_text(
-        "BTC:DAI_2023" + "5" + "+5" + "Limit" + "Filled" + "110.00" + "GTC"
+        "BTC:DAI_2023Futr" + "5" + "+5" + "Limit" + "Filled" + "110.00" + "GTC"
     )
 
     # Rejected
@@ -88,7 +88,7 @@ def test_trade_match_table(opening_auction_market: str, vega: VegaService, page:
     expect(
         page.get_by_test_id("tab-rejected-orders").locator(row_locator)
     ).to_contain_text(
-        "BTC:DAI_2023"
+        "BTC:DAI_2023Futr"
         + "0"
         + "+1"
         + "Limit"
@@ -101,16 +101,16 @@ def test_trade_match_table(opening_auction_market: str, vega: VegaService, page:
     page.get_by_test_id("All").click()
     rows = page.get_by_test_id("tab-orders").locator(row_locator).all()
     expect(rows[0]).to_contain_text(
-        "BTC:DAI_2023" + "0" + "-1" + "Limit" + "Active" + "150.00" + "GTC"
+        "BTC:DAI_2023Futr" + "0" + "-1" + "Limit" + "Active" + "150.00" + "GTC"
     )
     expect(rows[1]).to_contain_text(
-        "BTC:DAI_2023" + "5" + "-5" + "Limit" + "Filled" + "95.00" + "GTC"
+        "BTC:DAI_2023Futr" + "5" + "-5" + "Limit" + "Filled" + "95.00" + "GTC"
     )
     expect(rows[2]).to_contain_text(
-        "BTC:DAI_2023" + "5" + "-5" + "Limit" + "Filled" + "90.00" + "GTC"
+        "BTC:DAI_2023Futr" + "5" + "-5" + "Limit" + "Filled" + "90.00" + "GTC"
     )
     expect(rows[3]).to_contain_text(
-        "BTC:DAI_2023"
+        "BTC:DAI_2023Futr"
         + "0"
         + "+1"
         + "Limit"
@@ -119,13 +119,13 @@ def test_trade_match_table(opening_auction_market: str, vega: VegaService, page:
         + "GTC"
     )
     expect(rows[4]).to_contain_text(
-        "BTC:DAI_2023" + "0" + "+1" + "Limit" + "Active" + "50.00" + "GTC"
+        "BTC:DAI_2023Futr" + "0" + "+1" + "Limit" + "Active" + "50.00" + "GTC"
     )
     expect(rows[5]).to_contain_text(
-        "BTC:DAI_2023" + "1" + "+5" + "Limit" + "Active" + "105.00" + "GTC"
+        "BTC:DAI_2023Futr" + "1" + "+5" + "Limit" + "Active" + "105.00" + "GTC"
     )
     expect(rows[6]).to_contain_text(
-        "BTC:DAI_2023" + "5" + "+5" + "Limit" + "Filled" + "110.00" + "GTC"
+        "BTC:DAI_2023Futr" + "5" + "+5" + "Limit" + "Filled" + "110.00" + "GTC"
     )
 
     # Stop Orders
@@ -139,7 +139,7 @@ def test_trade_match_table(opening_auction_market: str, vega: VegaService, page:
     page.get_by_test_id("Fills").click()
     rows = page.get_by_test_id("tab-fills").locator(row_locator).all()
     expect(rows[0]).to_contain_text(
-        "BTC:DAI_2023"
+        "BTC:DAI_2023Futr"
         + "-5"
         + "106.50 tDAI"
         + "532.50 tDAI"
@@ -147,10 +147,10 @@ def test_trade_match_table(opening_auction_market: str, vega: VegaService, page:
         + "53.51625 tDAI"
     )
     expect(rows[1]).to_contain_text(
-        "BTC:DAI_2023" + "+1" + "105.00 tDAI" + "105.00 tDAI" + "-" + "0.00 tDAI"
+        "BTC:DAI_2023Futr" + "+1" + "105.00 tDAI" + "105.00 tDAI" + "-" + "0.00 tDAI"
     )
     expect(rows[2]).to_contain_text(
-        "BTC:DAI_2023" + "+5" + "105.00 tDAI" + "525.00 tDAI" + "-" + "0.00 tDAI"
+        "BTC:DAI_2023Futr" + "+5" + "105.00 tDAI" + "525.00 tDAI" + "-" + "0.00 tDAI"
     )
 
     # Collateral

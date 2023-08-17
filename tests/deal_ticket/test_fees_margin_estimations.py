@@ -16,7 +16,7 @@ margin_required = "deal-ticket-fee-margin-required"
 item_value = "item-value"
 market_trading_mode = "market-trading-mode"
 
-@pytest.mark.test_on_pr
+@pytest.mark.critical
 @pytest.mark.usefixtures("continuous_market", "auth")
 def test_margin_and_fees_estimations(continuous_market, vega: VegaService, page: Page):
     # setup continuous trading market with one user buy trade

@@ -20,7 +20,7 @@ def hover_and_assert_tooltip(page, element_text):
     element.hover()
     expect(page.get_by_role("tooltip")).to_be_visible()
 
-@pytest.mark.test_on_pr
+@pytest.mark.critical
 @pytest.mark.usefixtures("continuous_market", "auth")
 def test_iceberg_submit(continuous_market,vega: VegaService,   page: Page):
     page.goto(f"/#/markets/{continuous_market}")
@@ -66,7 +66,7 @@ def test_iceberg_validations(continuous_market,  page: Page):
     expect(page.get_by_test_id('deal-ticket-minimum-error-message-size-limit')).to_be_visible()
     expect(page.get_by_test_id('deal-ticket-minimum-error-message-size-limit')).to_have_text('Minimum visible size cannot be lower than 1')
 
-@pytest.mark.test_on_pr
+@pytest.mark.critical
 @pytest.mark.usefixtures("continuous_market", "auth")
 def test_iceberg_open_order(continuous_market,vega: VegaService, page: Page):
      page.goto(f"/#/markets/{continuous_market}")

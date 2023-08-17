@@ -61,7 +61,7 @@ def wait_for_graphql_response(page, query_name, timeout=5000):
     # Unregister the route handler
     page.unroute("**", handle_response)
 
-@pytest.mark.test_on_pr
+@pytest.mark.critical
 @pytest.mark.usefixtures("continuous_market", "auth")
 def test_limit_order_new_trade_top_of_list(continuous_market, vega, page):
     submit_order(vega, "Key 1", continuous_market, "SIDE_BUY", 1, 110)

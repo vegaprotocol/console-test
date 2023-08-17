@@ -76,7 +76,7 @@ def submit_order(vega, wallet_name, market_id, side, volume, price):
         price=price,
     )
 
-@pytest.mark.test_on_pr
+@pytest.mark.critical
 @pytest.mark.usefixtures("opening_auction_market", "auth")
 def test_limit_order_trade_open_order(
     opening_auction_market, vega: VegaService, page: Page
@@ -106,7 +106,7 @@ def test_limit_order_trade_open_order(
     print("Assert Open orders:")
     verify_data_grid(page, "Open", expected_open_order)
 
-@pytest.mark.test_on_pr
+@pytest.mark.critical
 @pytest.mark.usefixtures("continuous_market", "auth")
 def test_limit_order_trade_open_position(continuous_market, page: Page):
     page.goto(f"/#/markets/{continuous_market}")

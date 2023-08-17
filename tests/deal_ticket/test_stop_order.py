@@ -52,7 +52,7 @@ def create_position(vega: VegaService, market_id):
     vega.forward("10s")
     vega.wait_for_total_catchup
 
-@pytest.mark.test_on_pr
+@pytest.mark.critical
 @pytest.mark.usefixtures("continuous_market", "auth")
 def test_stop_order_form_error_validation(continuous_market, page: Page):
 
@@ -72,7 +72,7 @@ def test_stop_order_form_error_validation(continuous_market, page: Page):
     page.get_by_test_id(order_price).fill("0.0000001")
     expect(page.get_by_test_id("stop-order-error-message-price")).to_have_text("Price cannot be lower than 0.00001")
 
-@pytest.mark.test_on_pr
+@pytest.mark.critical
 @pytest.mark.usefixtures("continuous_market", "auth")
 def test_submit_stop_order_rejected(continuous_market, vega: VegaService, page: Page):
 
@@ -103,7 +103,7 @@ def test_submit_stop_order_rejected(continuous_market, vega: VegaService, page: 
     expect((page.get_by_role(row_table).locator(timeInForce_col)).nth(1)).to_have_text("FOK")
     expect((page.get_by_role(row_table).locator(updatedAt_col)).nth(1)).not_to_be_empty()
 
-@pytest.mark.test_on_pr
+@pytest.mark.critical
 @pytest.mark.usefixtures("continuous_market", "auth")
 def test_submit_stop_market_order_triggered(continuous_market, vega: VegaService, page: Page):
     # 7002-SORD-071
@@ -152,7 +152,7 @@ def test_submit_stop_market_order_triggered(continuous_market, vega: VegaService
     expect((page.get_by_role(row_table).locator(timeInForce_col)).nth(1)).to_have_text("FOK")
     expect((page.get_by_role(row_table).locator(updatedAt_col)).nth(1)).not_to_be_empty()
 
-@pytest.mark.test_on_pr
+@pytest.mark.critical
 @pytest.mark.usefixtures("continuous_market", "auth")
 def test_submit_stop_limit_order_pending(continuous_market, vega: VegaService, page: Page):
     # 7002-SORD-071
@@ -199,7 +199,7 @@ def test_submit_stop_limit_order_pending(continuous_market, vega: VegaService, p
     expect((page.get_by_role(row_table).locator(timeInForce_col)).nth(1)).to_have_text("IOC")
     expect((page.get_by_role(row_table).locator(updatedAt_col)).nth(1)).not_to_be_empty()
 
-@pytest.mark.test_on_pr
+@pytest.mark.critical
 @pytest.mark.usefixtures("continuous_market", "auth")
 def test_submit_stop_limit_order_cancel(continuous_market, vega: VegaService, page: Page):
 

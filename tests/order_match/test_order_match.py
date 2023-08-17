@@ -135,8 +135,6 @@ def test_limit_order_trade_open_position(continuous_market, page: Page):
     # 7004-POSI-001
     # 7004-POSI-002
 
-    page.pause()
-
     market = table.locator("[col-id='marketCode']")
     expect(market.get_by_test_id(primary_id)).to_have_text(position["market_code"])
     expect(market.get_by_test_id(secondary_id)).to_have_text(position["settlement_asset"] + position["product_type"])
@@ -157,16 +155,11 @@ def test_limit_order_trade_open_position(continuous_market, page: Page):
     expect(liquidation.get_by_test_id("liquidation-price")).to_have_text(position["liquidation"])
     liquidation.hover()
 
-    page.pause()
-
     realisedPNL = table.locator("[col-id='realisedPNL']")
     expect(realisedPNL).to_have_text(position["realised_pnl"])
 
     unrealisedPNL = table.locator("[col-id='unrealisedPNL']")
     expect(unrealisedPNL).to_have_text(position["unrealised_pnl"])
-
-    page.pause()
-
 
 
 @pytest.mark.usefixtures("continuous_market", "auth")

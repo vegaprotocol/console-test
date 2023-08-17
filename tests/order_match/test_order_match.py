@@ -153,7 +153,6 @@ def test_limit_order_trade_open_position(continuous_market, page: Page):
 
     liquidation = table.locator("[col-id='liquidationPrice']")
     expect(liquidation.get_by_test_id("liquidation-price")).to_have_text(position["liquidation"])
-    liquidation.hover()
 
     realisedPNL = table.locator("[col-id='realisedPNL']")
     expect(realisedPNL).to_have_text(position["realised_pnl"])

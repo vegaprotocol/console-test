@@ -75,13 +75,14 @@ def test_iceberg_open_order(continuous_market,vega: VegaService, page: Page):
      vega.wait_for_total_catchup()
 
      page.wait_for_selector(".ag-center-cols-container .ag-row")   
-     expect(page.locator(".ag-center-cols-container .ag-row [col-id='openVolume']")).to_have_text("-98")
+     expect(page.locator(".ag-center-cols-container .ag-row [col-id='openVolume'] [data-testid='stack-cell-primary']")).to_have_text("-98")
      page.get_by_test_id("Open").click()
      page.wait_for_selector(".ag-center-cols-container .ag-row")   
      
+     
      expect(page.locator(".ag-center-cols-container .ag-row [col-id='remaining']")).to_have_text("99")
      expect(page.locator(".ag-center-cols-container .ag-row [col-id='size']")).to_have_text("-102")
-     expect(page.locator(".ag-center-cols-container .ag-row [col-id='type']")).to_have_text("Limit (Iceberg)")
+     expect(page.locator(".ag-center-cols-container .ag-row [col-id='type'] ")).to_have_text("Limit (Iceberg)")
      expect(page.locator(".ag-center-cols-container .ag-row [col-id='status']")).to_have_text("Active")
      expect(page.get_by_test_id("price-10100000")).to_be_visible
      expect(page.get_by_test_id("ask-vol-10100000")).to_have_text("3")

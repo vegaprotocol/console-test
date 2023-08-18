@@ -5,11 +5,10 @@ from vega_sim.service import VegaService
 from actions.vega import submit_multiple_orders
 
 
+
 @pytest.mark.usefixtures("opening_auction_market", "auth")
 def test_trade_match_table(opening_auction_market: str, vega: VegaService, page: Page):
     row_locator = ".ag-center-cols-container .ag-row"
-
-    page.goto(f"/#/markets/{opening_auction_market}")
 
     submit_multiple_orders(
         vega,
@@ -47,18 +46,16 @@ def test_trade_match_table(opening_auction_market: str, vega: VegaService, page:
         "settlement_asset": "tDAI",
         "product_type": "Futr",
         "size": "-4",
-        "notional": "420.00",
-        "average_entry_price": "-",
-        "mark_price": "-",
+        "notional": "426.00",
+        "average_entry_price": "106.50",
+        "mark_price": "106.50",
         "margin": "43.94338",
         "leverage": "1.0x",
-        "liquidation": "237,005.6825",
+        "liquidation": "237,007.10401",
         "realised_pnl": "1.50",
         "unrealised_pnl": "0.00",
     }
-
-    page.get_by_test_id("Positions").click()
-
+    page.goto(f"/#/markets/{opening_auction_market}")
     primary_id = "stack-cell-primary"
     secondary_id = "stack-cell-secondary" 
 
@@ -68,18 +65,17 @@ def test_trade_match_table(opening_auction_market: str, vega: VegaService, page:
     market = table.locator("[col-id='marketCode']")
     expect(market.get_by_test_id(primary_id)).to_have_text(position["market_code"])
     expect(market.get_by_test_id(secondary_id)).to_have_text(position["settlement_asset"] + position["product_type"])
-     
     size_and_notional = table.locator("[col-id='openVolume']")
     expect(size_and_notional.get_by_test_id(primary_id)).to_have_text(position["size"])
     expect(size_and_notional.get_by_test_id(secondary_id)).to_have_text(position["notional"])
 
     entry_and_mark = table.locator("[col-id='markPrice']")
-    expect(entry_and_mark).to_have_text(position["average_entry_price"])
+    expect(entry_and_mark.get_by_test_id(primary_id)).to_have_text(position["average_entry_price"])
+    expect(entry_and_mark.get_by_test_id(secondary_id)).to_have_text(position["mark_price"])
 
     margin_and_leverage = table.locator("[col-id='margin']")
     expect(margin_and_leverage.get_by_test_id(primary_id)).to_have_text(position["margin"])
     expect(margin_and_leverage.get_by_test_id(secondary_id)).to_have_text(position["leverage"])
-
     liquidation = table.locator("[col-id='liquidationPrice']")
     expect(liquidation.get_by_test_id("liquidation-price")).to_have_text(position["liquidation"])
 

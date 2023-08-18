@@ -56,6 +56,8 @@ def test_trade_match_table(opening_auction_market: str, vega: VegaService, page:
         "unrealised_pnl": "0.00",
     }
     page.goto(f"/#/markets/{opening_auction_market}")
+     # 7004-POSI-001
+    # 7004-POSI-002
     primary_id = "stack-cell-primary"
     secondary_id = "stack-cell-secondary" 
 

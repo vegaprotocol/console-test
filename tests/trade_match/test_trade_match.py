@@ -43,6 +43,8 @@ def test_trade_match_table(opening_auction_market: str, vega: VegaService, page:
 
     # Positions
     page.get_by_test_id("Positions").click()
+     # 7004-POSI-001
+    # 7004-POSI-002
     expect(page.get_by_test_id("tab-positions").locator(row_locator)).to_contain_text(
         "BTC:DAI_2023Futr"
         + "426.00"

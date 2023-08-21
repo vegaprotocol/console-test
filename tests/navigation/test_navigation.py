@@ -1,33 +1,24 @@
 import pytest
-from playwright.sync_api import Page, expect
-from vega_sim.service import VegaService
-
-# These tests need to be skipped until the new navigation is merged
-skip_reason = (
-    "awaiting merge of https://github.com/vegaprotocol/frontend-monorepo/pull/4375"
-)
+from playwright.sync_api import Page, expect, Locator
 
 
 @pytest.mark.usefixtures("risk_accepted")
-@pytest.mark.skip(reason=skip_reason)
-def test_network_switcher(vega: VegaService, page: Page):
-    setup(vega, page)
+def test_network_switcher(page: Page):
+    page.goto("/#/disclaimer")
     navbar = page.locator('nav[aria-label="Main"]')
     assert_network_switcher(navbar)
 
 
 @pytest.mark.usefixtures("risk_accepted")
-@pytest.mark.skip(reason=skip_reason)
-def test_navbar_pages(vega: VegaService, page: Page):
-    setup(vega, page)
+def test_navbar_pages(page: Page):
+    page.goto("/#/disclaimer")
     navbar = page.locator('nav[aria-label="Main"]')
     assert_links(navbar)
 
 
 @pytest.mark.usefixtures("risk_accepted")
-@pytest.mark.skip(reason=skip_reason)
-def test_navigation_mobile(vega: VegaService, page: Page):
-    setup(vega, page)
+def test_navigation_mobile(page: Page):
+    page.goto("/#/disclaimer")
     page.set_viewport_size({"width": 800, "height": 1040})
     navbar = page.locator('nav[aria-label="Main"]')
 
@@ -51,11 +42,7 @@ def test_navigation_mobile(vega: VegaService, page: Page):
     # endregion
 
 
-def setup(vega, page):
-    page.goto(f"http://localhost:{vega.console_port}/#/disclaimer")
-
-
-def assert_links(container):
+def assert_links(container: Locator):
     pages = [
         {"name": "Markets", "href": "#/markets/all"},
         {"name": "Trading", "href": "#/markets/"},
@@ -91,7 +78,7 @@ def assert_links(container):
             expect(link).to_have_attribute("href", page_href)
 
 
-def assert_network_switcher(container):
+def assert_network_switcher(container: Locator):
     network_switcher_trigger = container.get_by_test_id(
         "navbar-network-switcher-trigger"
     )

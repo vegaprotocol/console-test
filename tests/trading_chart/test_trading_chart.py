@@ -1,4 +1,5 @@
 import pytest
+import re
 from collections import namedtuple
 from playwright.sync_api import Page, expect
 from vega_sim.service import VegaService
@@ -17,15 +18,19 @@ def test_trading_chart(continuous_market, vega: VegaService, page: Page):
     vega.forward("10s")
     vega.wait_for_total_catchup()
     
+   
     # Check interval options and select '15m'
     interval = "button[aria-haspopup='menu']:has-text('Interval:')"
     valid_intervals = ['1m', '5m', '15m', '1H', '6H', '1D']
+    #6004-CHAR-001
     check_menu_items(page, interval, valid_intervals, '1m')
     page.click("button[aria-haspopup='menu']:has-text('Interval:')")
     page.click(f"div[role='menuitemradio']:text-is('15m')")
     # Check chart views and select 
     chart = "[aria-label$='chart icon']"
     valid_chart_views = ['Mountain', 'Candlestick', 'Line', 'OHLC']
+    #6004-CHAR-002
+    #6004-CHAR-003
     check_menu_items(page, chart, valid_chart_views, 'Candlestick')
 
     # Check study info
@@ -42,6 +47,14 @@ def test_trading_chart(continuous_market, vega: VegaService, page: Page):
     page.click(".pane__close-button-wrapper")
     info_items = page.query_selector_all(".plot-area")
     assert (len(info_items)) == 1
+    #6004-CHAR-005
+    #6004-CHAR-006
+    #6004-CHAR-007
+    #6004-CHAR-042
+    #6004-CHAR-045
+    #6004-CHAR-047
+    #6004-CHAR-049
+    #6004-CHAR-051
     check_menu_item_checkbox(page, "Studies", study_info)
     page.get_by_text("Studies").click(force=True)
 
@@ -53,7 +66,29 @@ def test_trading_chart(continuous_market, vega: VegaService, page: Page):
         InfoItem("Moving average", "Moving average: 106.90000"),
         InfoItem("Price monitoring bounds", "Price Monitoring Bounds 1: Min 83.11038Max 138.66685Reference 107.50000")
     ]
+    #6004-CHAR-004
+    #6004-CHAR-008
+    #6004-CHAR-009
+    #6004-CHAR-034
+    #6004-CHAR-037
+    #6004-CHAR-039
+    #6004-CHAR-041
     check_menu_item_checkbox(page, "Overlays", overlay_info)
+
+ # Check chart info
+    # 6004-CHAR-010
+    expected_date_regex = r"^\d{2}:\d{2} \d{2} [A-Za-z]{3} \d{4}$"
+    expected_ohlc = "O 101.50000H 101.50000L 101.50000C 101.50000Change −6.00000(−5.58%)"
+    indicator_info_locator = page.locator(".indicator-info-wrapper").nth(0)
+    texts = indicator_info_locator.all_text_contents()
+    combined_text = ''.join(texts)
+    actual_date = combined_text[:-67]
+    actual_ohlc = combined_text[-67:] 
+    print(actual_date)
+    print(actual_ohlc)
+    assert re.match(expected_date_regex, actual_date)
+    assert actual_ohlc == expected_ohlc
+
 
 def check_menu_items(page, trigger_selector, valid_texts, click_item=None):
     page.click(trigger_selector, force=True)

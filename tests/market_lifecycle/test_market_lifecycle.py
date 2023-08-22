@@ -17,7 +17,7 @@ TERMINATE_WALLET = WalletConfig("FJMKnwfZdd48C8NqvYrG", "bY3DxwtsCstMIIZdNpKs")
 wallets = [MM_WALLET, MM_WALLET2, TERMINATE_WALLET]
 
 
-@pytest.mark.usefixtures("proposed_market", "risk_accepted")
+@pytest.mark.usefixtures("vega", "page", "proposed_market", "risk_accepted")
 def test_market_lifecycle(proposed_market, vega: VegaService, page: Page):
     trading_mode = page.get_by_test_id("market-trading-mode").get_by_test_id(
         "item-value"

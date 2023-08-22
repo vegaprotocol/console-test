@@ -4,6 +4,7 @@ from collections import namedtuple
 from playwright.sync_api import Page, expect
 from vega_sim.service import VegaService
 from actions.vega import submit_order
+from conftest import init_page, init_vega
 
 
 # Wallet Configurations
@@ -14,7 +15,9 @@ TERMINATE_WALLET = WalletConfig("FJMKnwfZdd48C8NqvYrG", "bY3DxwtsCstMIIZdNpKs")
 
 wallets = [MM_WALLET, MM_WALLET2, TERMINATE_WALLET]
 
-table_row_selector = '[data-testid="tab-open-markets"] .ag-center-cols-container .ag-row'
+table_row_selector = (
+    '[data-testid="tab-open-markets"] .ag-center-cols-container .ag-row'
+)
 trading_mode_col = '[col-id="tradingMode"]'
 state_col = '[col-id="state"]'
 item_value = "item-value"
@@ -35,8 +38,8 @@ initial_spread: float = 0.1
 market_name = "BTC:DAI_2023"
 
 
-@pytest.mark.usefixtures("simple_market", "risk_accepted")
-def test_price_monitoring(simple_market, vega: VegaService, page: Page):    
+@pytest.mark.usefixtures("vega", "page", "simple_market", "risk_accepted")
+def test_price_monitoring(simple_market, vega: VegaService, page: Page):
     page.goto(f"/#/markets/all")
     expect(page.locator(table_row_selector).locator(trading_mode_col)).to_have_text(
         "Opening auction"
@@ -47,7 +50,9 @@ def test_price_monitoring(simple_market, vega: VegaService, page: Page):
     result = page.get_by_text(market_name)
     result.first.click()
     page.get_by_test_id(market_trading_mode).get_by_text("Opening auction").hover()
-    expect(page.get_by_test_id("opening-auction-sub-status").first).to_have_text("Opening auction: Not enough liquidity to open")
+    expect(page.get_by_test_id("opening-auction-sub-status").first).to_have_text(
+        "Opening auction: Not enough liquidity to open"
+    )
     print(page.get_by_test_id("opening-auction-sub-status").inner_text)
     vega.submit_liquidity(
         key_name=MM_WALLET.name,

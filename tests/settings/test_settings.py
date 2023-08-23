@@ -12,11 +12,13 @@ def test_share_usage_data(page: Page):
     telemetry_switch.click()
     expect(telemetry_switch).to_have_attribute("data-state", "checked")
     page.reload()
+    page.get_by_test_id("Settings").click()
     expect(telemetry_switch).to_have_attribute("data-state", "checked")
 
     telemetry_switch.click()
     expect(telemetry_switch).to_have_attribute("data-state", "unchecked")
     page.reload()
+    page.get_by_test_id("Settings").click()
     expect(telemetry_switch).to_have_attribute("data-state", "unchecked")
 
 

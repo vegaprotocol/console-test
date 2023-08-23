@@ -18,11 +18,7 @@ def test_trading_chart(continuous_market, vega: VegaService, page: Page):
     vega.forward("10s")
     vega.wait_for_total_catchup()
    
-     # Check interval options and select '15m'
-    interval = "button[aria-haspopup='menu']:has-text('Interval:')"
-    valid_intervals = ['1m', '5m', '15m', '1H', '6H', '1D']
-    #6004-CHAR-001
-    check_menu_items(page, interval, valid_intervals, '1m')
+    
     page.click("button[aria-haspopup='menu']:has-text('Interval:')")
     page.click(f"div[role='menuitemradio']:text-is('15m')")
     page.wait_for_selector(".indicator-info-wrapper:visible")
@@ -93,8 +89,12 @@ def test_trading_chart(continuous_market, vega: VegaService, page: Page):
     print(actual_ohlc)
     assert re.match(expected_date_regex, actual_date)
     assert actual_ohlc == expected_ohlc
-
-   
+     # Check interval options and select '15m'
+    interval = "button[aria-haspopup='menu']:has-text('Interval:')"
+    valid_intervals = ['1m', '5m', '15m', '1H', '6H', '1D']
+    #6004-CHAR-001
+    page.click("button[aria-haspopup='menu']:has-text('Interval:')", force=True)
+    check_menu_items(page, interval, valid_intervals, '1m')
 
 
 def check_menu_items(page, trigger_selector, valid_texts, click_item=None):

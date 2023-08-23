@@ -41,19 +41,6 @@ def wait_for_graphql_response(page, query_name, timeout=5000):
     # Unregister the route handler
     page.unroute("**", handle_response)
 
-def submit_order(vega, wallet_name, market_id, side, volume, price):
-    vega.submit_order(
-        trading_key=wallet_name,
-        market_id=market_id,
-        time_in_force="TIME_IN_FORCE_GTC",
-        order_type="TYPE_LIMIT",
-        side=side,
-        volume=volume,
-        price=price,
-    )
-    vega.forward("10s")
-    vega.wait_for_total_catchup()
-
 def check_pnl_color_value(element, expected_color, expected_value):
     color = element.evaluate('element => getComputedStyle(element).color')
     value = element.inner_text()

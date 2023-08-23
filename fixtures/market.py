@@ -17,7 +17,7 @@ mint_amount: float = 10e5
 market_name = "BTC:DAI_2023"
 
 
-def setup_simple_market(vega: VegaService, approve_proposal=True):
+def setup_simple_market(vega: VegaService, approve_proposal=True, custom_market_name=market_name, custom_asset_name="tDAI", custom_asset_symbol="tDAI"):
     for wallet in wallets:
         vega.create_key(wallet.name)
 
@@ -35,15 +35,15 @@ def setup_simple_market(vega: VegaService, approve_proposal=True):
 
     vega.create_asset(
         MM_WALLET.name,
-        name="tDAI",
-        symbol="tDAI",
+        name=custom_asset_name,
+        symbol=custom_asset_symbol,
         decimals=5,
         max_faucet_amount=1e10,
     )
 
     vega.wait_for_total_catchup()
-    tdai_id = vega.find_asset_id(symbol="tDAI")
-    print("TDAI: ", tdai_id)
+    tdai_id = vega.find_asset_id(symbol=custom_asset_symbol)
+    print(custom_asset_name, tdai_id)
 
     vega.mint(
         "Key 1",
@@ -66,7 +66,7 @@ def setup_simple_market(vega: VegaService, approve_proposal=True):
     vega.wait_for_total_catchup()
 
     market_id = vega.create_simple_market(
-        market_name,
+        custom_market_name, 
         proposal_key=MM_WALLET.name,
         settlement_asset_id=tdai_id,
         termination_key=TERMINATE_WALLET.name,

@@ -2,6 +2,8 @@ import docker
 import pytest
 import os
 import json
+import requests
+import time
 
 from vega_sim.null_service import VegaServiceNull
 from playwright.sync_api import Browser, Page
@@ -62,7 +64,7 @@ def page_with_trace(vega, request, browser: Browser):
 # Setup window._env_ variables. Note: This is named `page` so that the `page` argument
 # tests can be used normally.
 @pytest.fixture(scope="function", autouse=True)
-def page(vega, page_with_trace: Page):
+def page(vega: VegaServiceNull, page_with_trace: Page):
     # Set window._env_ so built docker image data uses datanode from vega market sim
     env = json.dumps(
         {
@@ -72,6 +74,21 @@ def page(vega, page_with_trace: Page):
     )
     window_env = f"window._env_ = Object.assign({{}}, window._env_, {env})"
     page_with_trace.add_init_script(script=window_env)
+
+    # Wait for the console to be up and running before any tests are run
+    attempts = 0
+    while attempts < 100:
+        try:
+            code = requests.get(f"http://localhost:{vega.console_port}/").status_code
+            if code == 200:
+                break
+        except requests.exceptions.ConnectionError as e:
+            attempts += 1
+            if attempts < 100:
+                time.sleep(0.1)
+                continue
+            else:
+                raise e
 
     # Just pass on the main page object
     return page_with_trace
@@ -122,8 +139,11 @@ def risk_accepted(page_with_trace):
 
 
 @pytest.fixture(scope="function")
-def simple_market(vega):
-    return setup_simple_market(vega)
+def simple_market(vega, request):
+    kwargs = {}
+    if hasattr(request, "param"):
+        kwargs.update(request.param)
+    return setup_simple_market(vega, **kwargs)
 
 
 @pytest.fixture(scope="function")

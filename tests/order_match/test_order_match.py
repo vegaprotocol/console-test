@@ -110,23 +110,55 @@ def test_limit_order_trade_open_order(
 @pytest.mark.usefixtures("continuous_market", "auth")
 def test_limit_order_trade_open_position(continuous_market, page: Page):
     page.goto(f"/#/markets/{continuous_market}")
-    # Assert that Position exists - Will fail if the order is incorrect.
-    expected_position = [
-        "BTC:DAI_2023",
-        "107.50",
-        "+1",
-        "107.50",
-        "0.00",
-        "tDAI",
-        "107.50",
-        "0.0",
-        "8.50269",
-        "0.00",
-        "0.00",
-    ]
+
+    primary_id = "stack-cell-primary"
+    secondary_id = "stack-cell-secondary"
+
+    position = {
+        "market_code": "BTC:DAI_2023",
+        "settlement_asset": "tDAI",
+        "product_type": "Futr",
+        "size": "+1",
+        "notional": "107.50",
+        "average_entry_price": "107.50",
+        "mark_price": "107.50",
+        "margin": "8.50269",
+        "leverage": "1.0x",
+        "liquidation": "0.00",
+        "realised_pnl": "0.00",
+        "unrealised_pnl": "0.00",
+    }
+    
+    tab = page.get_by_test_id("tab-positions")
+    table = tab.locator(".ag-center-cols-container")
+
     # 7004-POSI-001
     # 7004-POSI-002
-    verify_data_grid(page, "Positions", expected_position)
+
+    market = table.locator("[col-id='marketCode']")
+    expect(market.get_by_test_id(primary_id)).to_have_text(position["market_code"])
+    expect(market.get_by_test_id(secondary_id)).to_have_text(position["settlement_asset"] + position["product_type"])
+     
+    size_and_notional = table.locator("[col-id='openVolume']")
+    expect(size_and_notional.get_by_test_id(primary_id)).to_have_text(position["size"])
+    expect(size_and_notional.get_by_test_id(secondary_id)).to_have_text(position["notional"])
+
+    entry_and_mark = table.locator("[col-id='markPrice']")
+    expect(entry_and_mark.get_by_test_id(primary_id)).to_have_text(position["average_entry_price"])
+    expect(entry_and_mark.get_by_test_id(secondary_id)).to_have_text(position["mark_price"])
+
+    margin_and_leverage = table.locator("[col-id='margin']")
+    expect(margin_and_leverage.get_by_test_id(primary_id)).to_have_text(position["margin"])
+    expect(margin_and_leverage.get_by_test_id(secondary_id)).to_have_text(position["leverage"])
+
+    liquidation = table.locator("[col-id='liquidationPrice']")
+    expect(liquidation.get_by_test_id("liquidation-price")).to_have_text(position["liquidation"])
+
+    realisedPNL = table.locator("[col-id='realisedPNL']")
+    expect(realisedPNL).to_have_text(position["realised_pnl"])
+
+    unrealisedPNL = table.locator("[col-id='unrealisedPNL']")
+    expect(unrealisedPNL).to_have_text(position["unrealised_pnl"])
 
 
 @pytest.mark.usefixtures("continuous_market", "auth")

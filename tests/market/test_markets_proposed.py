@@ -22,7 +22,7 @@ col_market_id = '[col-id="market"] [data-testid="market-code"]'
 
 
 @pytest.mark.usefixtures("proposed_market", "risk_accepted")
-def test_market_lifecycle(proposed_market, vega: VegaService, page: Page):
+def test_can_see_table_headers(proposed_market, vega: VegaService, page: Page):
 
     # setup market in proposed step, without liquidity provided
     market_id = proposed_market

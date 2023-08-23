@@ -118,6 +118,7 @@ def test_submit_stop_order_rejected(continuous_market, vega: VegaService, page: 
     page.get_by_test_id(stop_orders_tab).click() 
     wait_for_graphql_response(page, "stopOrders")
     page.get_by_test_id(close_toast).click()
+    expect(page.get_by_text("Loading...")).not_to_be_visible()
     page.get_by_role(row_table).locator(market_name_col).nth(1).is_visible()
     expect((page.get_by_role(row_table).locator(market_name_col)).nth(1)).to_have_text(
         "BTC:DAI_2023Futr"
@@ -182,6 +183,7 @@ def test_submit_stop_market_order_triggered(
     page.wait_for_selector('[data-testid="toast-close"]', state="visible")
     page.get_by_test_id(close_toast).click()
     wait_for_graphql_response(page, "stopOrders")
+    expect(page.get_by_text("Loading...")).not_to_be_visible()
     page.get_by_role(row_table).locator(market_name_col).nth(1).is_visible()
     expect((page.get_by_role(row_table).locator(market_name_col)).nth(1)).to_have_text(
         "BTC:DAI_2023Futr"
@@ -241,8 +243,8 @@ def test_submit_stop_limit_order_pending(
     vega.forward("10s")
     vega.wait_for_total_catchup()
     page.get_by_test_id(stop_orders_tab).click()
-
     wait_for_graphql_response(page, "stopOrders")
+    expect(page.get_by_text("Loading...")).not_to_be_visible()
     page.wait_for_selector('[data-testid="toast-close"]', state="visible")
     page.get_by_test_id(close_toast).click()
 
@@ -300,14 +302,14 @@ def test_submit_stop_limit_order_cancel(
     page.get_by_test_id(stop_orders_tab).click()
 
     wait_for_graphql_response(page, "stopOrders")
-    page.get_by_test_id(close_toast).click()
+    expect(page.get_by_text("Loading...")).not_to_be_visible()
+    page.get_by_test_id(close_toast).first.click()
 
     page.get_by_test_id(cancel).click()
     vega.wait_fn(1)
     vega.forward("10s")
     vega.wait_for_total_catchup()
-    wait_for_graphql_response(page, "stopOrders")
-    page.get_by_test_id(close_toast).click()
+    page.get_by_test_id(close_toast).first.click()
 
     expect(
         (page.get_by_role(row_table).locator('[col-id="status"]')).nth(1)

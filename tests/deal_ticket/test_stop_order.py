@@ -112,11 +112,10 @@ def test_submit_stop_order_rejected(continuous_market, vega: VegaService, page: 
     page.get_by_test_id(trigger_price).fill("103")
     page.get_by_test_id(order_size).fill("3")
     page.get_by_test_id(submit_stop_order).click()
-    page.get_by_test_id(stop_orders_tab).click()
-
     vega.wait_fn(1)
     vega.forward("10s")
     vega.wait_for_total_catchup()
+    page.get_by_test_id(stop_orders_tab).click() 
     wait_for_graphql_response(page, "stopOrders")
     page.get_by_test_id(close_toast).click()
     page.get_by_role(row_table).locator(market_name_col).nth(1).is_visible()
@@ -238,11 +237,11 @@ def test_submit_stop_limit_order_pending(
     expires_at_input_value = expires_at.strftime("%Y-%m-%dT%H:%M:%S")
     page.get_by_test_id("date-picker-field").fill(expires_at_input_value)
     page.get_by_test_id(submit_stop_order).click()
-    page.get_by_test_id(stop_orders_tab).click()
-
     vega.wait_fn(1)
     vega.forward("10s")
     vega.wait_for_total_catchup()
+    page.get_by_test_id(stop_orders_tab).click()
+
     wait_for_graphql_response(page, "stopOrders")
     page.wait_for_selector('[data-testid="toast-close"]', state="visible")
     page.get_by_test_id(close_toast).click()
@@ -295,11 +294,11 @@ def test_submit_stop_limit_order_cancel(
     page.get_by_test_id(order_size).fill("1")
 
     page.get_by_test_id(submit_stop_order).click()
-    page.get_by_test_id(stop_orders_tab).click()
-
     vega.wait_fn(1)
     vega.forward("10s")
     vega.wait_for_total_catchup()
+    page.get_by_test_id(stop_orders_tab).click()
+
     wait_for_graphql_response(page, "stopOrders")
     page.get_by_test_id(close_toast).click()
 

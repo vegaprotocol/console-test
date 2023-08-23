@@ -2,6 +2,13 @@ import pytest
 import re
 from playwright.sync_api import expect
 from actions.vega import submit_order
+from conftest import init_vega
+
+
+@pytest.fixture(scope="module")
+def vega():
+    with init_vega() as vega:
+        yield vega
 
 
 # Could be turned into a helper function in the future.
@@ -62,7 +69,7 @@ def wait_for_graphql_response(page, query_name, timeout=5000):
     page.unroute("**", handle_response)
 
 
-@pytest.mark.usefixtures("continuous_market", "auth")
+@pytest.mark.usefixtures("page", "continuous_market", "auth")
 def test_limit_order_new_trade_top_of_list(continuous_market, vega, page):
     submit_order(vega, "Key 1", continuous_market, "SIDE_BUY", 1, 110)
     page.goto(f"/#/markets/{continuous_market}")
@@ -85,8 +92,8 @@ def test_limit_order_new_trade_top_of_list(continuous_market, vega, page):
     verify_data_grid(page, "Trades", expected_trade)
 
 
-@pytest.mark.usefixtures("continuous_market", "auth")
-def test_price_copied_to_deal_ticket(continuous_market, vega, page):
+@pytest.mark.usefixtures("page", "continuous_market", "auth")
+def test_price_copied_to_deal_ticket(continuous_market, page):
     page.goto(f"/#/markets/{continuous_market}")
     page.get_by_test_id("Trades").click()
     wait_for_graphql_response(page, "Trades")

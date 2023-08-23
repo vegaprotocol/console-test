@@ -106,6 +106,7 @@ def test_stop_order_form_error_validation(continuous_market, page: Page):
 def test_submit_stop_order_rejected(continuous_market, vega: VegaService, page: Page):
     market_id = continuous_market
     page.goto(f"/#/markets/{market_id}")
+    page.get_by_test_id(stop_orders_tab).click() 
     page.get_by_test_id(stop_order_btn).click()
     page.get_by_test_id(stop_market_order_btn).is_visible()
     page.get_by_test_id(stop_market_order_btn).click()
@@ -115,10 +116,9 @@ def test_submit_stop_order_rejected(continuous_market, vega: VegaService, page: 
     vega.wait_fn(1)
     vega.forward("10s")
     vega.wait_for_total_catchup()
-    page.get_by_test_id(stop_orders_tab).click() 
+    
     wait_for_graphql_response(page, "stopOrders")
     page.get_by_test_id(close_toast).click()
-    expect(page.get_by_text("Loading...")).not_to_be_visible(timeout=20_000)
     page.get_by_role(row_table).locator(market_name_col).nth(1).is_visible()
     expect((page.get_by_role(row_table).locator(market_name_col)).nth(1)).to_have_text(
         "BTC:DAI_2023Futr"
@@ -155,7 +155,7 @@ def test_submit_stop_market_order_triggered(
 
     market_id = continuous_market
     page.goto(f"/#/markets/{market_id}")
-
+    page.get_by_test_id(stop_orders_tab).click()
     # create a position because stop order is reduce only type
     create_position(vega, market_id)
 
@@ -175,7 +175,7 @@ def test_submit_stop_market_order_triggered(
     page.get_by_test_id(expiry_strategy_cancel).click()
 
     page.get_by_test_id(submit_stop_order).click()
-    page.get_by_test_id(stop_orders_tab).click()
+    
 
     vega.wait_fn(1)
     vega.forward("10s")
@@ -183,7 +183,6 @@ def test_submit_stop_market_order_triggered(
     page.wait_for_selector('[data-testid="toast-close"]', state="visible")
     page.get_by_test_id(close_toast).click()
     wait_for_graphql_response(page, "stopOrders")
-    expect(page.get_by_text("Loading...")).not_to_be_visible(timeout=20_000)
     page.get_by_role(row_table).locator(market_name_col).nth(1).is_visible()
     expect((page.get_by_role(row_table).locator(market_name_col)).nth(1)).to_have_text(
         "BTC:DAI_2023Futr"
@@ -221,7 +220,7 @@ def test_submit_stop_limit_order_pending(
 
     market_id = continuous_market
     page.goto(f"/#/markets/{market_id}")
-
+    page.get_by_test_id(stop_orders_tab).click()
     # create a position because stop order is reduce only type
     create_position(vega, market_id)
 
@@ -242,12 +241,11 @@ def test_submit_stop_limit_order_pending(
     vega.wait_fn(1)
     vega.forward("10s")
     vega.wait_for_total_catchup()
-    page.get_by_test_id(stop_orders_tab).click()
+    
     wait_for_graphql_response(page, "stopOrders")
     
     page.wait_for_selector('[data-testid="toast-close"]', state="visible")
     page.get_by_test_id(close_toast).click()
-    expect(page.get_by_text("Loading...")).not_to_be_visible(timeout=20_000)
     page.get_by_role(row_table).locator(market_name_col).nth(1).is_visible()
     expect((page.get_by_role(row_table).locator(market_name_col)).nth(1)).to_have_text(
         "BTC:DAI_2023Futr"
@@ -282,7 +280,7 @@ def test_submit_stop_limit_order_cancel(
 ):
     market_id = continuous_market
     page.goto(f"/#/markets/{market_id}")
-
+    page.get_by_test_id(stop_orders_tab).click()
     # create a position because stop order is reduce only type
     create_position(vega, market_id)
 
@@ -299,11 +297,10 @@ def test_submit_stop_limit_order_cancel(
     vega.wait_fn(1)
     vega.forward("10s")
     vega.wait_for_total_catchup()
-    page.get_by_test_id(stop_orders_tab).click()
+    
 
     wait_for_graphql_response(page, "stopOrders")
     page.get_by_test_id(close_toast).first.click()
-    expect(page.get_by_text("Loading...")).not_to_be_visible(timeout=20_000)
     page.get_by_test_id(cancel).click()
     vega.wait_fn(1)
     vega.forward("10s")

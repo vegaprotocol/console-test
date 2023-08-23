@@ -53,7 +53,7 @@ jobs:
     #  ----- run tests. -----
     #----------------------------------------------
     - name: Run tests
-      run:  poetry run pytest -s --numprocesses auto
+      run:  poetry run pytest -s --numprocesses auto --dist loadfile
     #----------------------------------------------
     #  -----  upload traces  -----
     #----------------------------------------------

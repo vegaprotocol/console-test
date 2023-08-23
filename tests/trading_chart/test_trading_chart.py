@@ -17,15 +17,15 @@ def test_trading_chart(continuous_market, vega: VegaService, page: Page):
     submit_order(vega, "mm2", continuous_market, "SIDE_SELL", 1, 101.50000)
     vega.forward("10s")
     vega.wait_for_total_catchup()
-    
    
-    # Check interval options and select '15m'
+     # Check interval options and select '15m'
     interval = "button[aria-haspopup='menu']:has-text('Interval:')"
     valid_intervals = ['1m', '5m', '15m', '1H', '6H', '1D']
     #6004-CHAR-001
     check_menu_items(page, interval, valid_intervals, '1m')
     page.click("button[aria-haspopup='menu']:has-text('Interval:')")
     page.click(f"div[role='menuitemradio']:text-is('15m')")
+    page.wait_for_selector(".indicator-info-wrapper:visible")
     # Check chart views and select 
     chart = "[aria-label$='chart icon']"
     valid_chart_views = ['Mountain', 'Candlestick', 'Line', 'OHLC']
@@ -44,8 +44,11 @@ def test_trading_chart(continuous_market, vega: VegaService, page: Page):
     """Preparation steps to check study info on the page."""
     element = page.locator(".plot-area-interaction").nth(1)
     element.hover()
+
     page.click(".pane__close-button-wrapper")
+    
     info_items = page.query_selector_all(".plot-area")
+    
     assert (len(info_items)) == 1
     #6004-CHAR-005
     #6004-CHAR-006
@@ -55,8 +58,10 @@ def test_trading_chart(continuous_market, vega: VegaService, page: Page):
     #6004-CHAR-047
     #6004-CHAR-049
     #6004-CHAR-051
+    page.mouse.wheel(0, 10)
     check_menu_item_checkbox(page, "Studies", study_info)
     page.get_by_text("Studies").click(force=True)
+    
 
     # Check overlay info
     overlay_info = [
@@ -89,10 +94,11 @@ def test_trading_chart(continuous_market, vega: VegaService, page: Page):
     assert re.match(expected_date_regex, actual_date)
     assert actual_ohlc == expected_ohlc
 
+   
+
 
 def check_menu_items(page, trigger_selector, valid_texts, click_item=None):
     page.click(trigger_selector, force=True)
-    
     items = page.locator("div[role='menuitemradio']").all()
     assert len(items) == len(valid_texts), f"Expected {len(valid_texts)} items but found {len(items)} items."
 

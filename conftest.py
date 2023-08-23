@@ -20,9 +20,11 @@ docker_client = docker.from_env()
 
 # Start VegaServiceNull and start up docker container for website
 @contextmanager
-def init_vega(request):
-    default_seconds = 1  # or whatever default value you'd like
-    seconds_per_block = request.param if hasattr(request, 'param') else default_seconds
+def init_vega(request=None):
+    default_seconds = 1
+    seconds_per_block = default_seconds
+    if request and hasattr(request, 'param'):
+        seconds_per_block = request.param
 
     print("\nStarting VegaServiceNull")
     with VegaServiceNull(

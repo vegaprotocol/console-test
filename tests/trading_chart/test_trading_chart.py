@@ -1,7 +1,7 @@
 import pytest
 import re
 from collections import namedtuple
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page
 from vega_sim.service import VegaService
 from actions.vega import submit_order
 

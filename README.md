@@ -45,7 +45,7 @@ poetry run pytest -k "order_match" -s
 
 ## Running Tests in Parallel
 
-If you want to run tests in parallel, use the --numprocesses auto option:
+If you want to run tests in parallel, use the --numprocesses auto option. --dist loadfile makes sure that there are no multiple runners assigned to single test file:
 ```bash
-poetry run pytest -s --headed --numprocesses auto
+poetry run pytest -s --headed --numprocesses auto --dist loadfile
 ```

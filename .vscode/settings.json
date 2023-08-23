@@ -1,9 +1,9 @@
 {
   "[python]": {
-    "editor.defaultFormatter": "ms-python.python"
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true
   },
-  "python.formatting.provider": "none",
-  "python.testing.pytestArgs": [
+    "python.testing.pytestArgs": [
     "tests"
   ],
   "python.testing.unittestEnabled": false,

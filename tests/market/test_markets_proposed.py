@@ -128,7 +128,6 @@ def test_can_drag_and_drop_columns(proposed_market, vega: VegaService, page: Pag
     )
     page.goto(f"/#/markets/all")
     page.click('[data-testid="Proposed markets"]')
-    page.pause()
     col_market = page.locator('[col-id="market"]').first
     col_vote = page.locator('[col-id="voting"]').first
     col_market.drag_to(col_vote)

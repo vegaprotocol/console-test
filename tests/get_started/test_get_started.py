@@ -68,6 +68,8 @@ def test_browser_wallet_installed_deal_ticket(simple_market, page: Page):
 @pytest.mark.usefixtures("page")
 def test_get_started_browse_all(vega: VegaService, page: Page):
     page.goto("/")
+    expect(page.get_by_test_id("welcome-dialog")).to_be_visible()
+    expect(page.get_by_text("Get the Vega Wallet").first).to_be_visible()
     page.get_by_test_id("browse-markets-button").click()
     expect(page).to_have_url(f"http://localhost:{vega.console_port}/#/markets/all")
     assert page.evaluate("localStorage.getItem('vega_onboarding_viewed')") == "true"

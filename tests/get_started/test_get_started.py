@@ -1,5 +1,6 @@
 import pytest
 from playwright.sync_api import expect, Page
+import re
 from vega_sim.service import VegaService
 from fixtures.market import setup_simple_market
 from conftest import init_vega
@@ -21,9 +22,9 @@ def simple_market(vega: VegaService):
 def test_get_started_dialog(page: Page):
     page.goto(f"/#/disclaimer")
     expect(page.get_by_test_id("welcome-dialog")).to_be_visible()
-    expect(page.get_by_test_id("get-started-button")).to_be_visible()
-    page.get_by_test_id("get-started-button").click()
-    expect(page.get_by_test_id("connector-jsonRpc")).to_be_visible()
+    expect(page.get_by_text("Get the Vega Wallet")).to_be_visible()
+    page.get_by_test_id("browse-markets-button").click()
+    expect(page).to_have_url(re.compile(".*/markets/all"))
 
 
 @pytest.mark.usefixtures("page", "risk_accepted")

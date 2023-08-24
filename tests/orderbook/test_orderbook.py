@@ -5,6 +5,8 @@ from playwright.sync_api import Page, expect
 from vega_sim.service import VegaService
 from typing import List
 from actions.vega import submit_liquidity, submit_multiple_orders
+from conftest import init_vega
+from fixtures.market import setup_simple_market
 
 # Defined namedtuples
 WalletConfig = namedtuple("WalletConfig", ["name", "passphrase"])
@@ -14,10 +16,15 @@ MM_WALLET = WalletConfig("mm", "pin")
 MM_WALLET2 = WalletConfig("mm2", "pin2")
 
 
-@pytest.fixture()
-@pytest.mark.usefixtures("simple_market")
-def setup_market(simple_market, vega: VegaService):
-    market_id = simple_market
+@pytest.fixture(scope="module")
+def vega():
+    with init_vega() as vega:
+        yield vega
+
+
+@pytest.fixture(scope="module")
+def setup_market(vega):
+    market_id = setup_simple_market(vega)
     submit_liquidity(vega, MM_WALLET.name, market_id)
     submit_multiple_orders(
         vega,
@@ -73,7 +80,7 @@ def verify_prices_descending(page: Page):
     assert prices == sorted(prices, reverse=True)
 
 
-@pytest.mark.usefixtures("risk_accepted")
+@pytest.mark.usefixtures("page", "risk_accepted")
 def test_orderbook_grid_content(setup_market, page: Page):
     # 6003-ORDB-001
     # 6003-ORDB-002
@@ -90,7 +97,7 @@ def test_orderbook_grid_content(setup_market, page: Page):
     verify_prices_descending(page)
 
 
-@pytest.mark.usefixtures("risk_accepted")
+@pytest.mark.usefixtures("page", "risk_accepted")
 def test_orderbook_resolution_change(setup_market, page: Page):
     # 6003-ORDB-008
     orderbook_content_0_00 = [
@@ -133,7 +140,7 @@ def test_orderbook_resolution_change(setup_market, page: Page):
         verify_orderbook_grid(page, resolution[1])
 
 
-@pytest.mark.usefixtures("risk_accepted")
+@pytest.mark.usefixtures("page", "risk_accepted")
 def test_orderbook_price_size_copy(setup_market, page: Page):
     # 6003-ORDB-009
     prices = page.get_by_test_id("tab-orderbook").locator('[data-testid^="price-"]')

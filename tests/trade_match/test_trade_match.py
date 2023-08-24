@@ -5,8 +5,7 @@ from vega_sim.service import VegaService
 from actions.vega import submit_multiple_orders
 
 
-
-@pytest.mark.usefixtures("opening_auction_market", "auth")
+@pytest.mark.usefixtures("page", "vega", "opening_auction_market", "auth", "risk_accepted")
 def test_trade_match_table(opening_auction_market: str, vega: VegaService, page: Page):
     row_locator = ".ag-center-cols-container .ag-row"
 
@@ -56,37 +55,50 @@ def test_trade_match_table(opening_auction_market: str, vega: VegaService, page:
         "unrealised_pnl": "0.00",
     }
     page.goto(f"/#/markets/{opening_auction_market}")
-     # 7004-POSI-001
+    # 7004-POSI-001
     # 7004-POSI-002
     primary_id = "stack-cell-primary"
-    secondary_id = "stack-cell-secondary" 
+    secondary_id = "stack-cell-secondary"
 
     tab = page.get_by_test_id("tab-positions")
     table = tab.locator(".ag-center-cols-container")
 
     market = table.locator("[col-id='marketCode']")
     expect(market.get_by_test_id(primary_id)).to_have_text(position["market_code"])
-    expect(market.get_by_test_id(secondary_id)).to_have_text(position["settlement_asset"] + position["product_type"])
+    expect(market.get_by_test_id(secondary_id)).to_have_text(
+        position["settlement_asset"] + position["product_type"]
+    )
     size_and_notional = table.locator("[col-id='openVolume']")
     expect(size_and_notional.get_by_test_id(primary_id)).to_have_text(position["size"])
-    expect(size_and_notional.get_by_test_id(secondary_id)).to_have_text(position["notional"])
+    expect(size_and_notional.get_by_test_id(secondary_id)).to_have_text(
+        position["notional"]
+    )
 
     entry_and_mark = table.locator("[col-id='markPrice']")
-    expect(entry_and_mark.get_by_test_id(primary_id)).to_have_text(position["average_entry_price"])
-    expect(entry_and_mark.get_by_test_id(secondary_id)).to_have_text(position["mark_price"])
+    expect(entry_and_mark.get_by_test_id(primary_id)).to_have_text(
+        position["average_entry_price"]
+    )
+    expect(entry_and_mark.get_by_test_id(secondary_id)).to_have_text(
+        position["mark_price"]
+    )
 
     margin_and_leverage = table.locator("[col-id='margin']")
-    expect(margin_and_leverage.get_by_test_id(primary_id)).to_have_text(position["margin"])
-    expect(margin_and_leverage.get_by_test_id(secondary_id)).to_have_text(position["leverage"])
+    expect(margin_and_leverage.get_by_test_id(primary_id)).to_have_text(
+        position["margin"]
+    )
+    expect(margin_and_leverage.get_by_test_id(secondary_id)).to_have_text(
+        position["leverage"]
+    )
     liquidation = table.locator("[col-id='liquidationPrice']")
-    expect(liquidation.get_by_test_id("liquidation-price")).to_have_text(position["liquidation"])
+    expect(liquidation.get_by_test_id("liquidation-price")).to_have_text(
+        position["liquidation"]
+    )
 
     realisedPNL = table.locator("[col-id='realisedPNL']")
     expect(realisedPNL).to_have_text(position["realised_pnl"])
 
     unrealisedPNL = table.locator("[col-id='unrealisedPNL']")
     expect(unrealisedPNL).to_have_text(position["unrealised_pnl"])
-    
 
     # Open
     page.get_by_test_id("Open").click()

@@ -1,6 +1,21 @@
 import pytest
 from playwright.sync_api import Page, expect, Locator
 
+from conftest import init_page, init_vega
+
+
+@pytest.fixture(scope="module")
+def vega():
+    with init_vega() as vega:
+        yield vega
+
+
+# we can reuse single page instance in all tests
+@pytest.fixture(scope="module")
+def page(vega, browser, request):
+    with init_page(vega, browser, request) as page:
+        yield page
+
 
 @pytest.mark.usefixtures("risk_accepted")
 def test_network_switcher(page: Page):

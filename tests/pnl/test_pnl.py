@@ -45,7 +45,7 @@ def check_pnl_color_value(element, expected_color, expected_value):
     assert value == expected_value, f"Unexpected value: {value}"
 
 
-@pytest.mark.usefixtures("vega", "page", "continuous_market", "auth")
+@pytest.mark.usefixtures("vega", "page", "continuous_market", "auth", "risk_accepted")
 def test_pnl_loss_portfolio(continuous_market, vega: VegaService, page: Page):
     page.set_viewport_size({"width": 1748, "height": 977})
     submit_order(vega, "Key 1", continuous_market, "SIDE_BUY", 1, 104.50000)
@@ -75,7 +75,7 @@ def test_pnl_loss_portfolio(continuous_market, vega: VegaService, page: Page):
     check_pnl_color_value(unrealised_pnl, "rgb(0, 0, 0)", "0.00")
 
 
-@pytest.mark.usefixtures("vega", "page", "continuous_market", "auth")
+@pytest.mark.usefixtures("vega", "page", "continuous_market", "auth", "risk_accepted")
 def test_pnl_profit_portfolio(continuous_market, vega: VegaService, page: Page):
     page.set_viewport_size({"width": 1748, "height": 977})
     submit_order(vega, "Key 1", continuous_market, "SIDE_BUY", 1, 104.50000)
@@ -103,7 +103,7 @@ def test_pnl_profit_portfolio(continuous_market, vega: VegaService, page: Page):
     check_pnl_color_value(unrealised_pnl, "rgb(0, 0, 0)", "0.00")
 
 
-@pytest.mark.usefixtures("vega", "page", "continuous_market", "auth")
+@pytest.mark.usefixtures("vega", "page", "continuous_market", "auth", "risk_accepted")
 def test_pnl_neutral_portfolio(continuous_market, vega: VegaService, page: Page):
     page.set_viewport_size({"width": 1748, "height": 977})
     page.goto(f"http://localhost:{vega.console_port}/#/markets/{continuous_market}")
@@ -127,7 +127,7 @@ def test_pnl_neutral_portfolio(continuous_market, vega: VegaService, page: Page)
     check_pnl_color_value(unrealised_pnl, "rgb(0, 0, 0)", "0.00")
 
 
-@pytest.mark.usefixtures("vega", "page", "continuous_market", "auth")
+@pytest.mark.usefixtures("vega", "page", "continuous_market", "auth", "risk_accepted")
 def test_pnl_loss_trading(continuous_market, vega: VegaService, page: Page):
     submit_order(vega, "Key 1", continuous_market, "SIDE_BUY", 1, 104.50000)
     page.set_viewport_size({"width": 1748, "height": 977})
@@ -152,7 +152,7 @@ def test_pnl_loss_trading(continuous_market, vega: VegaService, page: Page):
     check_pnl_color_value(unrealised_pnl, "rgb(0, 0, 0)", "0.00")
 
 
-@pytest.mark.usefixtures("vega", "page", "continuous_market", "auth")
+@pytest.mark.usefixtures("vega", "page", "continuous_market", "auth", "risk_accepted")
 def test_pnl_profit_trading(continuous_market, vega: VegaService, page: Page):
     submit_order(vega, "Key 1", continuous_market, "SIDE_BUY", 1, 104.50000)
     page.set_viewport_size({"width": 1748, "height": 977})
@@ -181,7 +181,7 @@ def test_pnl_profit_trading(continuous_market, vega: VegaService, page: Page):
     check_pnl_color_value(unrealised_pnl, "rgb(0, 0, 0)", "0.00")
 
 
-@pytest.mark.usefixtures("vega", "page", "continuous_market", "auth")
+@pytest.mark.usefixtures("vega", "page", "continuous_market", "auth", "risk_accepted")
 def test_pnl_neutral_trading(continuous_market, vega: VegaService, page: Page):
     page.set_viewport_size({"width": 1748, "height": 977})
     page.goto(f"http://localhost:{vega.console_port}/#/markets/{continuous_market}")

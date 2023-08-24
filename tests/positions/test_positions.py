@@ -6,7 +6,7 @@ from fixtures.market import (
 )
 
 
-@pytest.mark.usefixtures("risk_accepted", "auth")
+@pytest.mark.usefixtures("risk_accepted", "auth", "risk_accepted")
 def test_closed_market_position(vega: VegaService, page: Page):
     market_id = setup_continuous_market(vega)
 

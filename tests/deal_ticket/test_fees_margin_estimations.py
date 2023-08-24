@@ -17,7 +17,7 @@ item_value = "item-value"
 market_trading_mode = "market-trading-mode"
 
 
-@pytest.mark.usefixtures("page", "vega", "continuous_market", "auth")
+@pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_margin_and_fees_estimations(continuous_market, vega: VegaService, page: Page):
     # setup continuous trading market with one user buy trade
     market_id = continuous_market

@@ -60,7 +60,7 @@ def tooltip(page: Page, index: int, test_id: str, tooltip: str):
     page.get_by_test_id("dialog-title").click()
 
 
-@pytest.mark.usefixtures("page", "continuous_market", "auth")
+@pytest.mark.usefixtures("page", "continuous_market", "auth", "risk_accepted")
 def test_asset_details(page: Page):
     page.goto("/#/portfolio")
     page.locator('[data-testid="tab-collateral"] >> text=tDAI').click()

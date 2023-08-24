@@ -49,7 +49,7 @@ def verify_order_value(
         expect(element).to_have_text(expected_text)
 
 
-@pytest.mark.usefixtures("vega", "page", "continuous_market", "auth")
+@pytest.mark.usefixtures("vega", "page", "continuous_market", "auth", "risk_accepted")
 def test_order_details_are_correctly_displayed(
     continuous_market, vega: VegaService, page: Page
 ):

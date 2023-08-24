@@ -53,7 +53,7 @@ def create_position(vega: VegaService, market_id):
     vega.wait_for_total_catchup
 
 
-@pytest.mark.usefixtures("page", "continuous_market", "auth")
+@pytest.mark.usefixtures("page", "continuous_market", "auth", "risk_accepted")
 def test_stop_order_form_error_validation(continuous_market, page: Page):
     # 7002-SORD-032
 
@@ -78,7 +78,7 @@ def test_stop_order_form_error_validation(continuous_market, page: Page):
     )
 
 
-@pytest.mark.usefixtures("page", "vega", "continuous_market", "auth")
+@pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_submit_stop_order_rejected(continuous_market, vega: VegaService, page: Page):
     market_id = continuous_market
     page.goto(f"/#/markets/{market_id}")
@@ -120,7 +120,7 @@ def test_submit_stop_order_rejected(continuous_market, vega: VegaService, page: 
     ).not_to_be_empty()
 
 
-@pytest.mark.usefixtures("page", "vega", "continuous_market", "auth")
+@pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_submit_stop_market_order_triggered(
     continuous_market, vega: VegaService, page: Page
 ):
@@ -186,7 +186,7 @@ def test_submit_stop_market_order_triggered(
     ).not_to_be_empty()
 
 
-@pytest.mark.usefixtures("continuous_market", "auth")
+@pytest.mark.usefixtures("continuous_market", "auth", "risk_accepted")
 def test_submit_stop_limit_order_pending(
     continuous_market, vega: VegaService, page: Page
 ):
@@ -251,7 +251,7 @@ def test_submit_stop_limit_order_pending(
     ).not_to_be_empty()
 
 
-@pytest.mark.usefixtures("continuous_market", "auth")
+@pytest.mark.usefixtures("continuous_market", "auth", "risk_accepted")
 def test_submit_stop_limit_order_cancel(
     continuous_market, vega: VegaService, page: Page
 ):
@@ -289,7 +289,7 @@ def test_submit_stop_limit_order_cancel(
     ).to_have_text("Cancelled")
 
 
-@pytest.mark.usefixtures("continuous_market", "auth")
+@pytest.mark.usefixtures("continuous_market", "auth", "risk_accepted")
 def test_stop_market_order_form_validation(continuous_market, page: Page):
     # 7002-SORD-052
     # 7002-SORD-055
@@ -326,7 +326,7 @@ def test_stop_market_order_form_validation(continuous_market, page: Page):
     expect(page.get_by_test_id(order_price)).not_to_be_visible()
 
 
-@pytest.mark.usefixtures("continuous_market", "auth")
+@pytest.mark.usefixtures("continuous_market", "auth", "risk_accepted")
 def test_stop_limit_order_form_validation(continuous_market, page: Page):
     # 7002-SORD-020
     # 7002-SORD-021

@@ -279,7 +279,7 @@ def test_submit_stop_limit_order_cancel(
     page.get_by_test_id(close_toast).click()
 
     page.get_by_test_id(cancel).click()
-    vega.wait_fn(10)
+    vega.wait_fn(1)
     vega.forward("10s")
     vega.wait_for_total_catchup()
     page.get_by_test_id(close_toast).click()

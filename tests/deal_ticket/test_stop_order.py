@@ -154,7 +154,7 @@ def test_submit_stop_market_order_triggered(
 
     page.get_by_test_id(submit_stop_order).click()
     page.get_by_test_id(stop_orders_tab).click()
-    vega.wait_fn(10)
+    vega.wait_fn(1)
     vega.forward("10s")
     vega.wait_for_total_catchup()
     page.wait_for_selector('[data-testid="toast-close"]', state="visible")

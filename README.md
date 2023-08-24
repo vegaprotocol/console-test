@@ -21,7 +21,7 @@
     ```
 1. **Download the necessary binaries: Run the following command within your Python environment (use force so that the binaries are overwritten):
     ```bash
-    python -m vega_sim.tools.load_binaries --force
+    python -m vega_sim.tools.load_binaries --force --latest
     ```
 1. **Pull the docker image of the trading app**:
    You can pull the image you want to test, for example:

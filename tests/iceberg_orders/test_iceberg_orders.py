@@ -22,9 +22,10 @@ def hover_and_assert_tooltip(page, element_text):
     expect(page.get_by_role("tooltip")).to_be_visible()
 
 
-@pytest.mark.usefixtures("page", "vega", "continuous_market", "auth")
+@pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_iceberg_submit(continuous_market, vega: VegaService, page: Page):
     page.goto(f"/#/markets/{continuous_market}")
+    page.pause()
     page.get_by_test_id("iceberg").click()
     page.get_by_test_id("order-peak-size").fill("2")
     page.get_by_test_id("order-minimum-size").fill("1")

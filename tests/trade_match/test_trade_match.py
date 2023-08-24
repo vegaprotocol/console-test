@@ -5,7 +5,7 @@ from vega_sim.service import VegaService
 from actions.vega import submit_multiple_orders
 
 
-@pytest.mark.usefixtures("page", "vega", "opening_auction_market", "auth")
+@pytest.mark.usefixtures("page", "vega", "opening_auction_market", "auth", "risk_accepted")
 def test_trade_match_table(opening_auction_market: str, vega: VegaService, page: Page):
     row_locator = ".ag-center-cols-container .ag-row"
 

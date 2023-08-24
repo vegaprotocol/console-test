@@ -20,7 +20,12 @@ docker_client = docker.from_env()
 
 # Start VegaServiceNull and start up docker container for website
 @contextmanager
-def init_vega():
+def init_vega(request=None):
+    default_seconds = 1
+    seconds_per_block = default_seconds
+    if request and hasattr(request, 'param'):
+        seconds_per_block = request.param
+
     print("\nStarting VegaServiceNull")
     with VegaServiceNull(
         run_with_console=False,
@@ -29,6 +34,7 @@ def init_vega():
         use_full_vega_wallet=True,
         store_transactions=True,
         transactions_per_block=1000,
+        seconds_per_block=seconds_per_block 
     ) as vega:
         try:
             container = docker_client.containers.run(
@@ -88,10 +94,10 @@ def init_page(vega: VegaServiceNull, browser: Browser, request: pytest.FixtureRe
 
 
 # default vega & page fixtures with function scope (refreshed at each test) that can be used in tests
-# separate fixtures may be defined in tests if we prefere different scope
+# separate fixtures may be defined in tests if we prefer different scope
 @pytest.fixture
-def vega():
-    with init_vega() as vega:
+def vega(request):
+    with init_vega(request) as vega:
         yield vega
 
 

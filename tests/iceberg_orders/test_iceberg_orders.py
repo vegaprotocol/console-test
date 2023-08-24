@@ -25,7 +25,6 @@ def hover_and_assert_tooltip(page, element_text):
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_iceberg_submit(continuous_market, vega: VegaService, page: Page):
     page.goto(f"/#/markets/{continuous_market}")
-    page.pause()
     page.get_by_test_id("iceberg").click()
     page.get_by_test_id("order-peak-size").fill("2")
     page.get_by_test_id("order-minimum-size").fill("1")
@@ -45,7 +44,7 @@ def test_iceberg_submit(continuous_market, vega: VegaService, page: Page):
     )
 
 
-@pytest.mark.usefixtures("page", "continuous_market", "auth")
+@pytest.mark.usefixtures("page", "continuous_market", "auth", "risk_accepted")
 def test_iceberg_tooltips(continuous_market, page: Page):
     page.goto(f"/#/markets/{continuous_market}")
     hover_and_assert_tooltip(page, "Iceberg")
@@ -54,7 +53,7 @@ def test_iceberg_tooltips(continuous_market, page: Page):
     hover_and_assert_tooltip(page, "Minimum size")
 
 
-@pytest.mark.usefixtures("page", "continuous_market", "auth")
+@pytest.mark.usefixtures("page", "continuous_market", "auth", "risk_accepted")
 def test_iceberg_validations(continuous_market, page: Page):
     page.goto(f"/#/markets/{continuous_market}")
     page.get_by_test_id("iceberg").click()
@@ -94,7 +93,7 @@ def test_iceberg_validations(continuous_market, page: Page):
     ).to_have_text("Minimum visible size cannot be lower than 1")
 
 
-@pytest.mark.usefixtures("vega", "page", "continuous_market", "auth")
+@pytest.mark.usefixtures("vega", "page", "continuous_market", "auth", "risk_accepted")
 def test_iceberg_open_order(continuous_market, vega: VegaService, page: Page):
     page.goto(f"/#/markets/{continuous_market}")
 

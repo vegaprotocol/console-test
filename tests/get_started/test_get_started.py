@@ -17,16 +17,6 @@ def vega():
 def simple_market(vega: VegaService):
     return setup_simple_market(vega)
 
-
-@pytest.mark.usefixtures("page")
-def test_get_started_dialog(page: Page):
-    page.goto(f"/#/disclaimer")
-    expect(page.get_by_test_id("welcome-dialog")).to_be_visible()
-    expect(page.get_by_text("Get the Vega Wallet")).to_be_visible()
-    page.get_by_test_id("browse-markets-button").click()
-    expect(page).to_have_url(re.compile(".*/markets/all"))
-
-
 @pytest.mark.usefixtures("page", "risk_accepted")
 def test_get_started_seen_already(simple_market, page: Page):
     page.goto(f"/#/markets/{simple_market}")
@@ -51,11 +41,9 @@ def test_browser_wallet_installed(simple_market, page: Page):
 @pytest.mark.usefixtures("page", "risk_accepted")
 def test_get_started_deal_ticket(simple_market, page: Page):
     page.goto(f"/#/markets/{simple_market}")
-    locator = page.get_by_test_id("get-started-button")
-    page.wait_for_selector('[data-testid="get-started-banner"]', state="attached")
-    expect(page.get_by_test_id("get-started-banner")).to_be_visible
-    expect(locator).to_be_enabled
-    expect(locator).to_have_text("Get started")
+    expect(page.get_by_test_id("order-connect-wallet")).to_be_visible
+    expect(page.get_by_test_id("order-connect-wallet")).to_be_enabled
+    expect(page.get_by_test_id("order-connect-wallet")).to_have_text("Connect wallet")
 
 
 @pytest.mark.usefixtures("page", "risk_accepted")
@@ -69,9 +57,10 @@ def test_browser_wallet_installed_deal_ticket(simple_market, page: Page):
 @pytest.mark.usefixtures("page")
 def test_get_started_browse_all(vega: VegaService, page: Page):
     page.goto("/")
+    expect(page.get_by_test_id("welcome-dialog")).to_be_visible()
+    expect(page.get_by_text("Get the Vega Wallet")).to_be_visible()
     page.get_by_test_id("browse-markets-button").click()
     expect(page).to_have_url(f"http://localhost:{vega.console_port}/#/markets/all")
-    assert page.evaluate("localStorage.getItem('vega_onboarding_viewed')") == "true"
 
 
 @pytest.mark.usefixtures("page", "auth")

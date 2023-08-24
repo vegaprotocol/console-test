@@ -178,7 +178,6 @@ def test_submit_stop_market_order_triggered(
     page.get_by_test_id(expiry_strategy_cancel).click()
 
     page.get_by_test_id(submit_stop_order).click()
-    
 
     vega.wait_fn(1)
     vega.forward("10s")

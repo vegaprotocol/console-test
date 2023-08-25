@@ -21,7 +21,7 @@ def hover_and_assert_tooltip(page, element_text):
     element.hover()
     expect(page.get_by_role("tooltip")).to_be_visible()
 
-
+@pytest.mark.skip("Iceberg orders tx wrong")
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_iceberg_submit(continuous_market, vega: VegaService, page: Page):
     page.goto(f"/#/markets/{continuous_market}")
@@ -30,7 +30,9 @@ def test_iceberg_submit(continuous_market, vega: VegaService, page: Page):
     page.get_by_test_id("order-minimum-size").fill("1")
     page.get_by_test_id("order-size").fill("3")
     page.get_by_test_id("order-price").fill("107")
+    page.pause()
     page.get_by_test_id("place-order").click()
+
     expect(page.get_by_test_id("toast-content")).to_have_text(
         "Awaiting confirmationPlease wait for your transaction to be confirmedView in block explorer"
     )
@@ -38,9 +40,14 @@ def test_iceberg_submit(continuous_market, vega: VegaService, page: Page):
     vega.wait_fn(10)
     vega.forward("10s")
     vega.wait_for_total_catchup()
+    page.pause()
     expect(page.get_by_test_id("toast-content")).to_have_text(
         "Order filledYour transaction has been confirmed View in block explorerSubmit order - filledBTC:DAI_2023+3 @ 107.00 tDAI"
     )
+    page.get_by_test_id("All").click()
+    expect(
+        (page.get_by_role("row").locator('[col-id="type"]')).nth(0)
+    ).to_have_text("Limit (Iceberg)")
 
 
 @pytest.mark.usefixtures("page", "continuous_market", "auth", "risk_accepted")

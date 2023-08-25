@@ -86,6 +86,7 @@ def test_submit_stop_order_oco_rejected(continuous_market, vega: VegaService, pa
     market_id = continuous_market
     page.goto(f"/#/markets/{market_id}")
     page.get_by_test_id(stop_orders_tab).click() 
+    wait_for_graphql_response(page, "stopOrders")
     page.get_by_test_id(stop_order_btn).click()
     page.get_by_test_id(stop_market_order_btn).is_visible()
     page.get_by_test_id(stop_market_order_btn).click()
@@ -104,8 +105,8 @@ def test_submit_stop_order_oco_rejected(continuous_market, vega: VegaService, pa
     vega.forward("10s")
     vega.wait_for_total_catchup()
     
-    wait_for_graphql_response(page, "stopOrders")
     page.get_by_test_id(close_toast).click()
+    wait_for_graphql_response(page, "stopOrders")
     page.get_by_role(row_table).locator(market_name_col).nth(1).is_visible()
 
     expect((page.get_by_role(row_table).locator(market_name_col)).nth(1)).to_have_text(

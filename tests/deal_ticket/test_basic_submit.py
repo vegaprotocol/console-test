@@ -47,12 +47,13 @@ def test_limit_sell_order(continuous_market, vega: VegaService, page: Page):
     page.get_by_test_id(order_size).fill("10")
     page.get_by_test_id(order_price).fill("100")
     page.get_by_test_id(order_side_sell).click()
+    page.get_by_test_id(tif).select_option("Good for Normal (GFN)")
     page.get_by_test_id(place_order).click()
     vega.wait_fn(1)
     vega.forward("10s")
     vega.wait_for_total_catchup()
     page.get_by_test_id("All").click()
-    expect(page.get_by_role("row").nth(2)).to_contain_text("BTC:DAI_2023Futr10-10LimitFilled100.00GTC")
+    expect(page.get_by_role("row").nth(2)).to_contain_text("BTC:DAI_2023Futr10-10LimitFilled100.00GFN")
 
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_market_sell_order(continuous_market, vega: VegaService, page: Page):
@@ -72,6 +73,7 @@ def test_market_buy_order(continuous_market, vega: VegaService, page: Page):
     page.goto(f"/#/markets/{continuous_market}")
     page.get_by_test_id(market_order).click()
     page.get_by_test_id(order_size).fill("10")
+    page.get_by_test_id(tif).select_option("Fill or Kill (FOK)")
     page.get_by_test_id(place_order).click()
     vega.wait_fn(1)
     vega.forward("10s")
@@ -80,5 +82,5 @@ def test_market_buy_order(continuous_market, vega: VegaService, page: Page):
     # 7002-SORD-010
     # 0003-WTXN-012
     # 0003-WTXN-003
-    expect(page.get_by_role("row").nth(2)).to_contain_text("BTC:DAI_2023Futr10+10MarketFilled-IOC")
+    expect(page.get_by_role("row").nth(2)).to_contain_text("BTC:DAI_2023Futr10+10MarketFilled-FOK")
 

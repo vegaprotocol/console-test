@@ -67,7 +67,7 @@ def test_redirect_default_market(continuous_market, vega: VegaService, page: Pag
     expect(page).to_have_url(
         f"http://localhost:{vega.console_port}/#/markets/{continuous_market}"
     )
-@pytest.mark.usefixtures("page","vega")
+@pytest.mark.usefixtures("page",)
 def test_get_started_interactive(vega: VegaService, page: Page):
     page.goto("/")
     expect(page.get_by_test_id("order-connect-wallet")).to_be_visible

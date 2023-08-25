@@ -1,11 +1,8 @@
 import pytest
 from playwright.sync_api import expect, Page
-import json
 from vega_sim.service import VegaService
 from fixtures.market import setup_simple_market
 from conftest import init_vega
-from collections import namedtuple
-from actions.vega import submit_order
 
 
 @pytest.fixture(scope="module")
@@ -22,8 +19,6 @@ def simple_market(vega: VegaService):
 @pytest.mark.usefixtures("page", "risk_accepted")
 def test_get_started_seen_already(simple_market, page: Page):
     page.goto(f"/#/markets/{simple_market}")
-    expect(page.get_by_test_id("order-connect-wallet")).to_be_visible
-    expect(page.get_by_test_id("order-connect-wallet")).to_be_enabled
     locator = page.get_by_test_id("connect-vega-wallet")
     page.wait_for_selector('[data-testid="connect-vega-wallet"]', state="attached")
     expect(locator).to_be_enabled

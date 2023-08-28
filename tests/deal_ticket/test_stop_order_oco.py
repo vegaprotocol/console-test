@@ -48,6 +48,7 @@ trigger_direction_fallsBelow_oco = "triggerDirection-fallsBelow-oco"
 oco = "oco"
 trigger_price_oco = "triggerPrice-oco"
 order_size_oco = "order-size-oco"
+order_limit_price_oco = "order-price-oco"
 
 def wait_for_graphql_response(page, query_name, timeout=5000):
     response_data = {}
@@ -79,7 +80,6 @@ def create_position(vega: VegaService, market_id):
     submit_order(vega, "Key 1", market_id, "SIDE_BUY", 100, 110)
     vega.forward("10s")
     vega.wait_for_total_catchup
-
 
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_submit_stop_order_oco_rejected(continuous_market, vega: VegaService, page: Page):
@@ -153,4 +153,154 @@ def test_submit_stop_order_oco_rejected(continuous_market, vega: VegaService, pa
         (page.get_by_role(row_table).locator(updatedAt_col)).nth(2)
     ).not_to_be_empty()
 
+@pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
+def test_submit_stop_oco_market_order_triggered(continuous_market, vega: VegaService, page: Page):
+    market_id = continuous_market
+    page.goto(f"/#/markets/{market_id}")
+    page.get_by_test_id(stop_orders_tab).click()
+    create_position(vega, market_id)
+    wait_for_graphql_response(page, "stopOrders")
+    page.get_by_test_id(stop_order_btn).click()
+    page.get_by_test_id(stop_market_order_btn).is_visible()
+    page.get_by_test_id(stop_market_order_btn).click()
+    page.get_by_test_id(order_side_sell).click()
+    page.get_by_test_id(trigger_price).fill("103")
+    page.get_by_test_id(order_size).fill("3")
+    
+    expect(page.get_by_test_id("stop-order-warning-message-trigger-price")).to_have_text("Stop order will be triggered immediately")
+    
+    page.get_by_test_id(oco).click()
+    expect(page.get_by_test_id(trigger_direction_fallsBelow_oco)).to_be_checked
+    
+    page.get_by_test_id(trigger_price_oco).fill("102")
+    page.get_by_test_id(order_size_oco).fill("2")
+    page.get_by_test_id(submit_stop_order).click()
+    vega.wait_fn(1)
+    vega.forward("10s")
+    vega.wait_for_total_catchup()
+    
+    page.get_by_test_id(close_toast).click()
+    wait_for_graphql_response(page, "stopOrders")
+    page.get_by_role(row_table).locator(market_name_col).nth(1).is_visible()
 
+    expect((page.get_by_role(row_table).locator(market_name_col)).nth(1)).to_have_text(
+        "BTC:DAI_2023Futr"
+    )
+    expect((page.get_by_role(row_table).locator(trigger_col)).nth(1)).to_have_text(
+        "Mark < 102.00"
+    )
+    expect((page.get_by_role(row_table).locator(expiresAt_col)).nth(1)).to_have_text("")
+    expect((page.get_by_role(row_table).locator(size_col)).nth(1)).to_have_text("+2")
+    expect((page.get_by_role(row_table).locator(submission_type)).nth(1)).to_have_text(
+        "Market"
+    )
+    expect((page.get_by_role(row_table).locator(status_col)).nth(1)).to_have_text(
+        "StoppedOCO"
+    )
+    expect((page.get_by_role(row_table).locator(price_col)).nth(1)).to_have_text("-")
+    expect((page.get_by_role(row_table).locator(timeInForce_col)).nth(1)).to_have_text(
+        "FOK"
+    )
+    expect(
+        (page.get_by_role(row_table).locator(updatedAt_col)).nth(1)
+    ).not_to_be_empty()
+
+    expect((page.get_by_role(row_table).locator(market_name_col)).nth(2)).to_have_text(
+        "BTC:DAI_2023Futr"
+    )
+    expect((page.get_by_role(row_table).locator(trigger_col)).nth(2)).to_have_text(
+        "Mark > 103.00"
+    )
+    expect((page.get_by_role(row_table).locator(expiresAt_col)).nth(2)).to_have_text("")
+    expect((page.get_by_role(row_table).locator(size_col)).nth(2)).to_have_text("+3")
+    expect((page.get_by_role(row_table).locator(submission_type)).nth(2)).to_have_text(
+        "Market"
+    )
+    expect((page.get_by_role(row_table).locator(status_col)).nth(2)).to_have_text(
+        "TriggeredOCO"
+    )
+    expect((page.get_by_role(row_table).locator(price_col)).nth(2)).to_have_text("-")
+    expect((page.get_by_role(row_table).locator(timeInForce_col)).nth(2)).to_have_text(
+        "FOK"
+    )
+    expect(
+        (page.get_by_role(row_table).locator(updatedAt_col)).nth(2)
+    ).not_to_be_empty()
+
+
+@pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
+def test_submit_stop_oco_market_order_pending(continuous_market, vega: VegaService, page: Page):
+    market_id = continuous_market
+    page.goto(f"/#/markets/{market_id}")
+    page.get_by_test_id(stop_orders_tab).click()
+    create_position(vega, market_id)
+    wait_for_graphql_response(page, "stopOrders")
+    page.get_by_test_id(stop_order_btn).click()
+    page.get_by_test_id(stop_market_order_btn).is_visible()
+    page.get_by_test_id(stop_market_order_btn).click()
+    page.get_by_test_id(order_side_sell).click()
+    page.get_by_test_id(trigger_below).click()
+    page.get_by_test_id(trigger_price).fill("102")
+    page.get_by_test_id(order_size).fill("3")
+    page.get_by_test_id(oco).click()
+    expect(page.get_by_test_id(trigger_direction_fallsBelow_oco)).to_be_checked
+    page.get_by_test_id(trigger_price_oco).fill("104")
+    page.get_by_test_id(order_size_oco).fill("2")
+    page.get_by_test_id(submit_stop_order).click()
+    vega.wait_fn(1)
+    vega.forward("10s")
+    vega.wait_for_total_catchup()
+    
+    page.get_by_test_id(close_toast).click()
+    wait_for_graphql_response(page, "stopOrders")
+    page.get_by_role(row_table).locator(market_name_col).nth(1).is_visible()
+
+    expect((page.get_by_role(row_table).locator(status_col)).nth(1)).to_have_text(
+        "PendingOCO"
+    )
+
+    expect((page.get_by_role(row_table).locator(status_col)).nth(2)).to_have_text(
+        "PendingOCO"
+    )
+
+@pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
+def test_submit_stop_oco_limit_order_pending(continuous_market, vega: VegaService, page: Page):
+    market_id = continuous_market
+    page.goto(f"/#/markets/{market_id}")
+    page.get_by_test_id(stop_orders_tab).click()
+    create_position(vega, market_id)
+    wait_for_graphql_response(page, "stopOrders")
+    page.get_by_test_id(stop_order_btn).click()
+    page.get_by_test_id(stop_limit_order_btn).is_visible()
+    page.get_by_test_id(stop_limit_order_btn).click()
+    page.get_by_test_id(order_side_sell).click()
+    page.get_by_test_id(trigger_below).click()
+    page.get_by_test_id(trigger_price).fill("102")
+    page.get_by_test_id(order_size).fill("3")
+    page.get_by_test_id(order_price).fill("103")
+    page.get_by_test_id(oco).click()
+    expect(page.get_by_test_id(trigger_direction_fallsBelow_oco)).to_be_checked
+    page.get_by_test_id(trigger_price_oco).fill("104")
+    page.get_by_test_id(order_size_oco).fill("2")
+    page.get_by_test_id(order_limit_price_oco).fill("99")
+    page.get_by_test_id(submit_stop_order).click()
+    vega.wait_fn(1)
+    vega.forward("10s")
+    vega.wait_for_total_catchup()
+    
+    page.get_by_test_id(close_toast).click()
+    wait_for_graphql_response(page, "stopOrders")
+    page.get_by_role(row_table).locator(market_name_col).nth(1).is_visible()
+
+    expect((page.get_by_role(row_table).locator(submission_type)).nth(1)).to_have_text(
+        "Limit"
+    )
+    expect((page.get_by_role(row_table).locator(submission_type)).nth(2)).to_have_text(
+        "Limit"
+    )
+    expect((page.get_by_role(row_table).locator(price_col)).nth(1)).to_have_text(
+        "103.00"
+    )
+    expect((page.get_by_role(row_table).locator(price_col)).nth(2)).to_have_text(
+        "99.00"
+    )

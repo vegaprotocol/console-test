@@ -6,7 +6,7 @@ from fixtures.market import (
 )
 
 
-@pytest.mark.usefixtures("continuous_market", "auth", "risk_accepted")
+@pytest.mark.usefixtures("auth", "risk_accepted")
 def test_closed_market_position(vega: VegaService, page: Page):
     market_id = setup_continuous_market(vega)
 
@@ -17,7 +17,6 @@ def test_closed_market_position(vega: VegaService, page: Page):
     )
     vega.forward("10s")
     vega.wait_for_total_catchup()
-    
     page.goto(f"/#/markets/{market_id}")
     expect(page.locator(".ag-overlay-panel")).to_have_text("No positions")
     page.get_by_test_id("open-transfer").click()

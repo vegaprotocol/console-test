@@ -17,7 +17,13 @@ mint_amount: float = 10e5
 market_name = "BTC:DAI_2023"
 
 
-def setup_simple_market(vega: VegaService, approve_proposal=True, custom_market_name=market_name, custom_asset_name="tDAI", custom_asset_symbol="tDAI"):
+def setup_simple_market(
+    vega: VegaService,
+    approve_proposal=True,
+    custom_market_name=market_name,
+    custom_asset_name="tDAI",
+    custom_asset_symbol="tDAI",
+):
     for wallet in wallets:
         vega.create_key(wallet.name)
 
@@ -66,7 +72,7 @@ def setup_simple_market(vega: VegaService, approve_proposal=True, custom_market_
     vega.wait_for_total_catchup()
 
     market_id = vega.create_simple_market(
-        custom_market_name, 
+        custom_market_name,
         proposal_key=MM_WALLET.name,
         settlement_asset_id=tdai_id,
         termination_key=TERMINATE_WALLET.name,
@@ -81,8 +87,10 @@ def setup_simple_market(vega: VegaService, approve_proposal=True, custom_market_
 
     return market_id
 
-def setup_simple_successor_market(vega: VegaService, parent_market_id, tdai_id, market_name, approve_proposal=True):
-    
+
+def setup_simple_successor_market(
+    vega: VegaService, parent_market_id, tdai_id, market_name, approve_proposal=True
+):
     market_id = vega.create_simple_market(
         market_name,
         proposal_key=MM_WALLET.name,
@@ -92,7 +100,7 @@ def setup_simple_successor_market(vega: VegaService, parent_market_id, tdai_id, 
         approve_proposal=approve_proposal,
         forward_time_to_enactment=approve_proposal,
         parent_market_id=parent_market_id,
-        parent_market_insurance_pool_fraction=0.5
+        parent_market_insurance_pool_fraction=0.5,
     )
 
     vega.forward("10s")
@@ -101,9 +109,10 @@ def setup_simple_successor_market(vega: VegaService, parent_market_id, tdai_id, 
 
     return market_id
 
-def setup_opening_auction_market(vega: VegaService, market_id: str = None):
+
+def setup_opening_auction_market(vega: VegaService, market_id: str = None, **kwargs):
     if market_id is None or market_id not in vega.all_markets():
-        market_id = setup_simple_market(vega)
+        market_id = setup_simple_market(vega, **kwargs)
 
     submit_liquidity(vega, MM_WALLET.name, market_id)
     submit_multiple_orders(
@@ -119,9 +128,9 @@ def setup_opening_auction_market(vega: VegaService, market_id: str = None):
     return market_id
 
 
-def setup_continuous_market(vega: VegaService, market_id: str = None):
+def setup_continuous_market(vega: VegaService, market_id: str = None, **kwargs):
     if market_id is None or market_id not in vega.all_markets():
-        market_id = setup_opening_auction_market(vega)
+        market_id = setup_opening_auction_market(vega, **kwargs)
 
     submit_order(vega, "Key 1", market_id, "SIDE_BUY", 1, 110)
     vega.forward("10s")

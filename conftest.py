@@ -31,6 +31,8 @@ def pytest_configure(config):
     if worker_id is not None:
         log_dir = os.path.join(os.getcwd(), "logs")
         log_name = f"tests_{worker_id}.log"
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
         logging.basicConfig(
             format=config.getini("log_file_format"),
             datefmt=config.getini("log_file_date_format"),

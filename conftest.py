@@ -18,7 +18,7 @@ from fixtures.market import (
 
 import sys
 
-# Workaround for current xdist issue with capturing logs from multiple workers
+# Workaround for current xdist issue with displaying live logs from multiple workers
 # https://github.com/pytest-dev/pytest-xdist/issues/402
 sys.stdout = sys.stderr
 

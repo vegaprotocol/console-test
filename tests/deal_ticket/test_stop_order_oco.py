@@ -393,7 +393,7 @@ def test_stop_limit_order_oco_form_validation(continuous_market, page: Page):
     expect(
         page.get_by_test_id("sidebar-content").get_by_text("Trigger").last
     ).to_be_visible()
-     # 7002-SORD-090
+     # 7002-SORD-099
     expect(page.locator('[for="triggerDirection-risesAbove-oco"]')).to_have_text(
         "Rises above"
     )

@@ -26,6 +26,19 @@ docker_client = docker.from_env()
 logger = logging.getLogger()
 
 
+def pytest_configure(config):
+    worker_id = os.environ.get("PYTEST_XDIST_WORKER")
+    if worker_id is not None:
+        log_dir = os.path.join(os.getcwd(), "logs")
+        log_name = f"tests_{worker_id}.log"
+        logging.basicConfig(
+            format=config.getini("log_file_format"),
+            datefmt=config.getini("log_file_date_format"),
+            filename=os.path.join(log_dir, log_name),
+            level=config.getini("log_file_level"),
+        )
+
+
 # Start VegaServiceNull and start up docker container for website
 @contextmanager
 def init_vega(request=None):

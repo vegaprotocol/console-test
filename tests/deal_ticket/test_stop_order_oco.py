@@ -46,6 +46,7 @@ timeInForce_col = '[col-id="submission.timeInForce"]'
 updatedAt_col = '[col-id="updatedAt"]'
 close_toast = "toast-close"
 trigger_direction_fallsBelow_oco = "triggerDirection-fallsBelow-oco"
+trigger_direction_fallsAbove_oco = "triggerDirection-fallsAbove-oco"
 oco = "oco"
 trigger_price_oco = "triggerPrice-oco"
 order_size_oco = "order-size-oco"
@@ -83,7 +84,7 @@ def create_position(vega: VegaService, market_id):
     vega.wait_for_total_catchup
 
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
-def test_submit_stop_order_oco_rejected(continuous_market, vega: VegaService, page: Page):
+def test_submit_stop_order_market_oco_rejected(continuous_market, vega: VegaService, page: Page):
     market_id = continuous_market
     page.goto(f"/#/markets/{market_id}")
     page.get_by_test_id(stop_orders_tab).click() 
@@ -96,9 +97,11 @@ def test_submit_stop_order_oco_rejected(continuous_market, vega: VegaService, pa
     
     expect(page.get_by_test_id("stop-order-warning-message-trigger-price")).to_have_text("Stop order will be triggered immediately")
     
+    # 7002-SORD-082
     page.get_by_test_id(oco).click()
+    # 7002-SORD-085
     expect(page.get_by_test_id(trigger_direction_fallsBelow_oco)).to_be_checked
-    
+    # 7002-SORD-086
     page.get_by_test_id(trigger_price_oco).fill("102")
     page.get_by_test_id(order_size_oco).fill("3")
     page.get_by_test_id(submit_stop_order).click()
@@ -116,6 +119,7 @@ def test_submit_stop_order_oco_rejected(continuous_market, vega: VegaService, pa
     
     expect((page.get_by_role(row_table).locator(expiresAt_col)).nth(1)).to_have_text("")
     expect((page.get_by_role(row_table).locator(size_col)).nth(1)).to_have_text("+3")
+    # 7002-SORD-083
     expect((page.get_by_role(row_table).locator(submission_type)).nth(1)).to_have_text(
         "Market"
     )
@@ -149,7 +153,7 @@ def test_submit_stop_order_oco_rejected(continuous_market, vega: VegaService, pa
     expect(
         (page.get_by_role(row_table).locator(updatedAt_col)).nth(2)
     ).not_to_be_empty()
-
+    # 7002-SORD-084
     trigger_price_list = page.locator(".ag-center-cols-container").locator(trigger_col).all_inner_texts()
     trigger_value_list = ["Mark < 102.00", "Mark > 103.00"]
     assert trigger_price_list.sort() == trigger_value_list.sort()
@@ -278,9 +282,11 @@ def test_submit_stop_oco_limit_order_pending(continuous_market, vega: VegaServic
     page.get_by_test_id(order_size).fill("3")
     page.get_by_test_id(order_price).fill("103")
     page.get_by_test_id(oco).click()
+    # 7002-SORD-090
     expect(page.get_by_test_id(trigger_direction_fallsBelow_oco)).to_be_checked
     page.get_by_test_id(trigger_price_oco).fill("120")
     page.get_by_test_id(order_size_oco).fill("2")
+    # 7002-SORD-089
     page.get_by_test_id(order_limit_price_oco).fill("99")
     page.get_by_test_id(submit_stop_order).click()
     vega.wait_fn(1)
@@ -290,6 +296,7 @@ def test_submit_stop_oco_limit_order_pending(continuous_market, vega: VegaServic
     page.get_by_test_id(close_toast).click()
     wait_for_graphql_response(page, "stopOrders")
     page.get_by_role(row_table).locator(market_name_col).nth(1).is_visible()
+
     expect((page.get_by_role(row_table).locator(submission_type)).nth(1)).to_have_text(
         "Limit"
     )
@@ -300,6 +307,11 @@ def test_submit_stop_oco_limit_order_pending(continuous_market, vega: VegaServic
     price = page.locator(".ag-center-cols-container").locator(price_col).all_inner_texts()
     prices = ["103.00", "99.00"]
     assert price.sort() == prices.sort()
+
+    # 7002-SORD-091
+    trigger_price_list = page.locator(".ag-center-cols-container").locator(trigger_col).all_inner_texts()
+    trigger_value_list = ["Limit < 102.00", "Limit > 103.00"]
+    assert trigger_price_list.sort() == trigger_value_list.sort()
 
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_submit_stop_oco_limit_order_cancel(continuous_market, vega: VegaService, page: Page):
@@ -317,11 +329,13 @@ def test_submit_stop_oco_limit_order_cancel(continuous_market, vega: VegaService
     page.get_by_test_id(order_size).fill("3")
     page.get_by_test_id(order_price).fill("103")
     page.get_by_test_id(oco).click()
-    expect(page.get_by_test_id(trigger_direction_fallsBelow_oco)).to_be_checked
+    # 7002-SORD-092
+    expect(page.get_by_test_id(trigger_direction_fallsAbove_oco)).to_be_checked
+    # 7002-SORD-094
     page.get_by_test_id(trigger_price_oco).fill("120")
     page.get_by_test_id(order_size_oco).fill("2")
+    # 7002-SORD-093
     page.get_by_test_id(order_limit_price_oco).fill("99")
-    page.pause()
     page.get_by_test_id(submit_stop_order).click()
     vega.wait_fn(1)
     vega.forward("10s")

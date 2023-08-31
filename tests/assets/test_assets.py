@@ -77,8 +77,9 @@ def test_asset_details(page: Page):
         if label == "ID":
             asset_id_text = page.locator(f"[data-testid='{index}_value']").inner_text()
             assert re.match(
-                r"^[0-9a-f]{64}$", asset_id_text
+            r"^[0-9a-f]{6}\u2026[0-9a-f]{4}$", asset_id_text
             ), f"Expected ID to match pattern but got {asset_id_text}"
+
         else:
             expect(page.locator(f"[data-testid='{index}_label']")).to_have_text(label)
             expect(page.locator(f"[data-testid='{index}_value']")).to_have_text(value)

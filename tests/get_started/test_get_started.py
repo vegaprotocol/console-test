@@ -1,6 +1,5 @@
 import pytest
 from playwright.sync_api import expect, Page
-import re
 from vega_sim.service import VegaService
 from fixtures.market import setup_simple_market
 from conftest import init_vega
@@ -41,8 +40,6 @@ def test_browser_wallet_installed(simple_market, page: Page):
 @pytest.mark.usefixtures("page", "risk_accepted")
 def test_get_started_deal_ticket(simple_market, page: Page):
     page.goto(f"/#/markets/{simple_market}")
-    expect(page.get_by_test_id("order-connect-wallet")).to_be_visible
-    expect(page.get_by_test_id("order-connect-wallet")).to_be_enabled
     expect(page.get_by_test_id("order-connect-wallet")).to_have_text("Connect wallet")
 
 

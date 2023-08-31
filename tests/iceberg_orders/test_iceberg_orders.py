@@ -30,9 +30,8 @@ def test_iceberg_submit(continuous_market, vega: VegaService, page: Page):
     page.get_by_test_id("order-minimum-size").fill("1")
     page.get_by_test_id("order-size").fill("3")
     page.get_by_test_id("order-price").fill("107")
-    page.pause()
     page.get_by_test_id("place-order").click()
-    
+
     expect(page.get_by_test_id("toast-content")).to_have_text(
         "Awaiting confirmationPlease wait for your transaction to be confirmedView in block explorer"
     )

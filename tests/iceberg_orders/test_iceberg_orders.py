@@ -62,40 +62,41 @@ def test_iceberg_validations(continuous_market, page: Page):
     page.get_by_test_id("iceberg").click()
     page.get_by_test_id("place-order").click()
     expect(
-        page.get_by_test_id("deal-ticket-peak-error-message-size-limit")
+        page.get_by_test_id("deal-ticket-peak-error-message")
     ).to_be_visible()
     expect(
-        page.get_by_test_id("deal-ticket-peak-error-message-size-limit")
+        page.get_by_test_id("deal-ticket-peak-error-message")
     ).to_have_text("You need to provide a peak size")
     expect(
-        page.get_by_test_id("deal-ticket-minimum-error-message-size-limit")
+        page.get_by_test_id("deal-ticket-minimum-error-message")
     ).to_be_visible()
     expect(
-        page.get_by_test_id("deal-ticket-minimum-error-message-size-limit")
+        page.get_by_test_id("deal-ticket-minimum-error-message")
     ).to_have_text("You need to provide a minimum visible size")
     page.get_by_test_id("order-peak-size").clear()
     page.get_by_test_id("order-peak-size").type("1")
     page.get_by_test_id("order-minimum-size").clear()
     page.get_by_test_id("order-minimum-size").type("2")
+    page.pause()
     expect(
-        page.get_by_test_id("deal-ticket-peak-error-message-size-limit")
+        page.get_by_test_id("deal-ticket-peak-error-message")
     ).to_be_visible()
     expect(
-        page.get_by_test_id("deal-ticket-peak-error-message-size-limit")
+        page.get_by_test_id("deal-ticket-peak-error-message")
     ).to_have_text("Peak size cannot be greater than the size (0)")
     expect(
-        page.get_by_test_id("deal-ticket-minimum-error-message-size-limit")
+        page.get_by_test_id("deal-ticket-minimum-error-message")
     ).to_be_visible()
     expect(
-        page.get_by_test_id("deal-ticket-minimum-error-message-size-limit")
+        page.get_by_test_id("deal-ticket-minimum-error-message")
     ).to_have_text("Minimum visible size cannot be greater than the peak size (1)")
     page.get_by_test_id("order-minimum-size").clear()
     page.get_by_test_id("order-minimum-size").type("0.1")
     expect(
-        page.get_by_test_id("deal-ticket-minimum-error-message-size-limit")
+        page.get_by_test_id("deal-ticket-minimum-error-message")
     ).to_be_visible()
     expect(
-        page.get_by_test_id("deal-ticket-minimum-error-message-size-limit")
+        page.get_by_test_id("deal-ticket-minimum-error-message")
     ).to_have_text("Minimum visible size cannot be lower than 1")
 
 

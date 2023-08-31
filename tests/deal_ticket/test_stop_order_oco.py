@@ -261,7 +261,6 @@ def test_submit_stop_oco_market_order_pending(continuous_market, vega: VegaServi
     expect((page.get_by_role(row_table).locator(status_col)).nth(1)).to_have_text(
         "PendingOCO"
     )
-
     expect((page.get_by_role(row_table).locator(status_col)).nth(2)).to_have_text(
         "PendingOCO"
     )
@@ -389,7 +388,7 @@ def test_stop_limit_order_oco_form_validation(continuous_market, page: Page):
     page.goto(f"/#/markets/{market_id}")
     page.get_by_test_id(stop_order_btn).click()
     page.get_by_test_id(stop_market_order_btn).is_visible()
-    page.get_by_test_id(stop_market_order_btn).click()
+    page.get_by_test_id(stop_limit_order_btn).click()
     page.get_by_test_id(oco).click()
     expect(
         page.get_by_test_id("sidebar-content").get_by_text("Trigger").last
@@ -409,5 +408,6 @@ def test_stop_limit_order_oco_form_validation(continuous_market, page: Page):
     expect(page.locator('[for="triggerType-trailingPercentOffset-oco"]')).to_have_text(
         "Trailing Percent Offset"
     )
+
     expect(page.locator('[for="order-size-oco"]')).to_have_text("Size")
-    expect(page.locator('[for="order-price-oco"]').last).to_have_text("Price (BTC)")
+    expect(page.locator('[for="order-price-oco"]')).to_have_text("Price (BTC)")

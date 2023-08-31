@@ -1,5 +1,5 @@
 import pytest
-from playwright.sync_api import expect, Page-
+from playwright.sync_api import expect, Page
 import json
 from vega_sim.service import VegaService
 from fixtures.market import setup_simple_market

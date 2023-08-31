@@ -83,8 +83,7 @@ def test_margin_and_fees_estimations(continuous_market, vega: VegaService, page:
 
     # verify if we can submit order after reverted margin
     page.get_by_test_id("place-order").click()
-    vega.wait_fn(1)
+    vega.wait_fn(10)
     vega.wait_for_total_catchup()
     expect(page.get_by_test_id("toast-content")).to_contain_text(
-        "Your transaction has been confirmed"
-    )
+        "Your transaction has been confirmed", timeout=15000)

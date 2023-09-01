@@ -77,7 +77,7 @@ def create_position(vega: VegaService, market_id):
     vega.wait_for_total_catchup
 
 
-
+@pytest.mark.skip("sim version issue")
 @pytest.mark.usefixtures("page", "continuous_market", "auth", "risk_accepted")
 def test_stop_order_form_error_validation(continuous_market, page: Page):
     # 7002-SORD-032
@@ -102,6 +102,7 @@ def test_stop_order_form_error_validation(continuous_market, page: Page):
         "Price cannot be lower than 0.00001"
     )
 
+@pytest.mark.skip("sim version issue")
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_submit_stop_order_rejected(continuous_market, vega: VegaService, page: Page):
     market_id = continuous_market
@@ -143,7 +144,7 @@ def test_submit_stop_order_rejected(continuous_market, vega: VegaService, page: 
     ).not_to_be_empty()
 
 
-
+@pytest.mark.skip("sim version issue")
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_submit_stop_market_order_triggered(
     continuous_market, vega: VegaService, page: Page
@@ -206,6 +207,7 @@ def test_submit_stop_market_order_triggered(
         (page.get_by_role(row_table).locator(updatedAt_col)).nth(1)
     ).not_to_be_empty()
 
+@pytest.mark.skip("sim version issue")
 @pytest.mark.usefixtures("continuous_market", "auth", "risk_accepted")
 def test_submit_stop_limit_order_pending(
     continuous_market, vega: VegaService, page: Page
@@ -269,8 +271,7 @@ def test_submit_stop_limit_order_pending(
         (page.get_by_role(row_table).locator(updatedAt_col)).nth(1)
     ).not_to_be_empty()
 
-
-
+@pytest.mark.skip("sim version issue")
 @pytest.mark.usefixtures("continuous_market", "auth", "risk_accepted")
 def test_submit_stop_limit_order_cancel(
     continuous_market, vega: VegaService, page: Page
@@ -305,7 +306,6 @@ def test_submit_stop_limit_order_cancel(
     expect(
         (page.get_by_role(row_table).locator('[col-id="status"]')).nth(1)
     ).to_have_text("Cancelled")
-
 
 @pytest.mark.usefixtures("continuous_market", "auth", "risk_accepted")
 def test_stop_market_order_form_validation(continuous_market, page: Page):

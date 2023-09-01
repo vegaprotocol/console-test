@@ -152,7 +152,7 @@ def auth(vega: VegaServiceNull, page: Page):
 # Set 'risk accepted' flag, so that the risk dialog doesn't show up
 @pytest.fixture(scope="function")
 def risk_accepted(page: Page):
-    script = "localStorage.setItem('vega_risk_accepted', 'true'); localStorage.setItem('vega_onboarding_viewed', 'true');"
+    script = "localStorage.setItem('vega_risk_accepted', 'true'); localStorage.setItem('vega_onboarding_viewed', 'true'); localStorage.setItem('vega_telemetry_approval', 'false'); localStorage.setItem('vega_telemetry_viewed', 'true');"
     page.add_init_script(script)
 
 

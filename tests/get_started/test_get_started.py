@@ -22,8 +22,12 @@ def simple_market(vega: VegaService):
 @pytest.mark.usefixtures("page",)
 def test_get_started_interactive(vega: VegaService, page: Page):
     page.goto("/")
+    # 0007-FUGS-001
     expect(page.get_by_test_id("order-connect-wallet")).to_be_visible
     expect(page.get_by_test_id("order-connect-wallet")).to_be_enabled
+    # 0007-FUGS-006
+    # 0007-FUGS-002
+    expect(page.locator(".list-none")).to_contain_text("1.Get a Vega wallet2.Connect3.Deposit funds4.Open a position")
      #Assertion no steps complete
     env = json.dumps({
     "vega": "truthy_value"
@@ -143,15 +147,21 @@ def test_get_started_interactive(vega: VegaService, page: Page):
     vega.wait_for_total_catchup()
     #Assert dialog isn't visible
     expect(page.get_by_test_id("welcome-dialog")).not_to_be_visible()
+    page.pause()
 
 @pytest.mark.usefixtures("page", "risk_accepted")
 def test_get_started_seen_already(simple_market, page: Page):
     page.goto(f"/#/markets/{simple_market}")
-    locator = page.get_by_test_id("connect-vega-wallet")
+    get_started_locator = page.get_by_test_id("connect-vega-wallet")
     page.wait_for_selector('[data-testid="connect-vega-wallet"]', state="attached")
-    expect(locator).to_be_enabled
-    expect(locator).to_be_visible
-    expect(locator).to_have_text("Get started")
+    expect(get_started_locator).to_be_enabled
+    expect(get_started_locator).to_be_visible
+    # 0007-FUGS-015
+    expect(get_started_locator).to_have_text("Get started")
+    get_started_locator.click()
+    # 0007-FUGS-007
+    expect(page.get_by_test_id("dialog-content").nth(1)).to_be_visible()
+
 
 
 @pytest.mark.usefixtures("page")
@@ -175,6 +185,7 @@ def test_get_started_deal_ticket(simple_market, page: Page):
 def test_browser_wallet_installed_deal_ticket(simple_market, page: Page):
     page.add_init_script("window.vega = {}")
     page.goto(f"/#/markets/{simple_market}")
+    # 0007-FUGS-013
     page.wait_for_selector('[data-testid="sidebar-content"]', state="visible")
     expect(page.get_by_test_id("get-started-banner")).not_to_be_visible()
 
@@ -183,12 +194,17 @@ def test_browser_wallet_installed_deal_ticket(simple_market, page: Page):
 def test_get_started_browse_all(vega: VegaService, page: Page):
     page.goto("/")
     page.get_by_test_id("browse-markets-button").click()
+    # 0007-FUGS-005
     expect(page).to_have_url(f"http://localhost:{vega.console_port}/#/markets/all")
 
 
-@pytest.mark.usefixtures("page", "auth")
+@pytest.mark.usefixtures("page")
 def test_redirect_default_market(continuous_market, vega: VegaService, page: Page):
     page.goto("/")
+    # 0007-FUGS-012
     expect(page).to_have_url(
         f"http://localhost:{vega.console_port}/#/markets/{continuous_market}"
     )
+    page.get_by_test_id("icon-cross").click()
+    # 0007-FUGS-018
+    expect(page.get_by_test_id("welcome-dialog")).not_to_be_visible()

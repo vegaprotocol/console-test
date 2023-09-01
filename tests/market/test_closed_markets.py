@@ -1,6 +1,7 @@
 import pytest
 import re
 import vega_sim.api.governance as governance
+from vega_sim.service import VegaService
 from playwright.sync_api import Page, expect
 from fixtures.market import setup_continuous_market
 from conftest import init_vega
@@ -22,18 +23,7 @@ def create_settled_market(vega):
     )
     vega.forward("10s")
     vega.wait_for_total_catchup()
-
-@pytest.fixture(scope="class")
-def create_terminated_market(vega):
-    market_id = setup_continuous_market(vega)
-    governance.settle_oracle(
-        wallet=vega.wallet,
-        oracle_name="INVALID_ORACLE",
-        settlement_price=110,
-        key_name="FJMKnwfZdd48C8NqvYrG",
-    )
-    vega.forward("60s")
-    vega.wait_for_total_catchup()
+  
 
 class TestSettledMarket:
     @pytest.mark.usefixtures("risk_accepted", "auth")
@@ -107,17 +97,26 @@ class TestSettledMarket:
         # 6001-MARK-020
         expect(row_selector.locator('[col-id="settlementDate"]')).to_have_text("4 months ago")
 
-class TestTerminatedMarket:
-    @pytest.mark.usefixtures("risk_accepted", "auth")
-    def test_terminated_market_no_settlement_date(self, page: Page, create_terminated_market):
-        page.goto(f"/#/markets/all")
-        page.get_by_test_id("Closed markets").click()
-        row_selector = page.locator('[data-testid="tab-closed-markets"] .ag-center-cols-container .ag-row').first
-        expect(row_selector.locator('[col-id="state"]')).to_have_text("Trading Terminated")
-        expect(row_selector.locator('[col-id="settlementDate"]')).to_have_text("Unknown")
 
-        # TODO Create test for terminated market with settlement date in future
-        # TODO Create test for terminated market with settlement date in past
+@pytest.mark.usefixtures("risk_accepted", "auth")
+def test_terminated_market_no_settlement_date(page: Page, vega: VegaService):
+    setup_continuous_market(vega)
+    governance.settle_oracle(
+    wallet=vega.wallet,
+    oracle_name="INVALID_ORACLE",
+    settlement_price=110,
+    key_name="FJMKnwfZdd48C8NqvYrG",
+    )
+    vega.forward("60s")
+    vega.wait_for_total_catchup()
+    page.goto(f"/#/markets/all")
+    page.get_by_test_id("Closed markets").click()
+    row_selector = page.locator('[data-testid="tab-closed-markets"] .ag-center-cols-container .ag-row').first
+    expect(row_selector.locator('[col-id="state"]')).to_have_text("Trading Terminated")
+    expect(row_selector.locator('[col-id="settlementDate"]')).to_have_text("Unknown")
+
+    # TODO Create test for terminated market with settlement date in future
+    # TODO Create test for terminated market with settlement date in past
 
 @pytest.mark.usefixtures("risk_accepted", "auth")
 def test_no_closed_markets( page: Page):

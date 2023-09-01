@@ -88,7 +88,8 @@ def test_orderbook_grid_content(setup_market, page: Page):
     vega = setup_market[0]
     market_id = setup_market[1]
 
-    # Create a trade between TRADER_A and TRADER_B
+    # Create a so that lastTradePrice is shown in the mid section
+    # of the book
     matching_order = [1, 100]
     submit_order(
         vega,
@@ -231,7 +232,6 @@ def test_orderbook_price_movement(setup_market, page: Page):
 
     vega.forward("10s")
     vega.wait_for_total_catchup()
-    vega.forward("1s")
 
     # 6003-ORDB-013
     expect(book_el.locator('[data-testid=icon-arrow-up]')).to_be_attached()
@@ -251,7 +251,6 @@ def test_orderbook_price_movement(setup_market, page: Page):
 
     vega.forward("10s")
     vega.wait_for_total_catchup()
-    vega.forward("1s")
 
     expect(book_el.locator('[data-testid=icon-arrow-down]')).to_be_attached()
 

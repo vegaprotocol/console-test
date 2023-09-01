@@ -5,7 +5,6 @@ from fixtures.market import (
     setup_continuous_market,
 )
 
-@pytest.mark.skip("failing only on CI requires more investigation")
 @pytest.mark.usefixtures("auth", "risk_accepted")
 def test_closed_market_position(vega: VegaService, page: Page):
     market_id = setup_continuous_market(vega)

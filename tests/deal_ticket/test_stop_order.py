@@ -323,7 +323,7 @@ def test_stop_market_order_form_validation(continuous_market, page: Page):
     page.get_by_test_id(stop_market_order_btn).is_visible()
     page.get_by_test_id(stop_market_order_btn).click()
     expect(
-        page.get_by_test_id("sidebar-content").get_by_text("Trigger")
+        page.get_by_test_id("sidebar-content").get_by_text("Trigger").first
     ).to_be_visible()
     expect(page.locator('[for="triggerDirection-risesAbove"]')).to_have_text(
         "Rises above"
@@ -364,7 +364,7 @@ def test_stop_limit_order_form_validation(continuous_market, page: Page):
     page.get_by_test_id(stop_limit_order_btn).is_visible()
     page.get_by_test_id(stop_limit_order_btn).click()
     expect(
-        page.get_by_test_id("sidebar-content").get_by_text("Trigger")
+        page.get_by_test_id("sidebar-content").get_by_text("Trigger").first
     ).to_be_visible()
     expect(page.locator('[for="triggerDirection-risesAbove"]')).to_have_text(
         "Rises above"
@@ -381,7 +381,7 @@ def test_stop_limit_order_form_validation(continuous_market, page: Page):
         "Trailing Percent Offset"
     )
     expect(page.locator('[for="order-size"]').first).to_have_text("Size")
-    expect(page.locator('[for="order-price"]').last).to_have_text("Price (BTC)")
+    expect(page.locator('[for="order-price"]').last).to_have_text("Price")
     page.get_by_test_id(order_size).click()
     expect(page.get_by_test_id(order_size)).to_be_empty
     page.get_by_test_id(order_price).click()

@@ -249,7 +249,6 @@ def test_submit_stop_oco_market_order_pending(continuous_market, vega: VegaServi
     expect(page.get_by_test_id(trigger_direction_fallsAbove_oco)).to_be_checked
     page.get_by_test_id(trigger_price_oco).fill("120")
     page.get_by_test_id(order_size_oco).fill("2")
-    page.pause()
     page.get_by_test_id(submit_stop_order).click()
     vega.wait_fn(1)
     vega.forward("10s")
@@ -342,7 +341,6 @@ def test_submit_stop_oco_limit_order_cancel(continuous_market, vega: VegaService
     
     page.get_by_test_id(close_toast).click()
     wait_for_graphql_response(page, "stopOrders")
-
     page.get_by_test_id(cancel).first.click()
     vega.wait_fn(1)
     vega.forward("10s")
@@ -410,4 +408,4 @@ def test_stop_limit_order_oco_form_validation(continuous_market, page: Page):
     )
 
     expect(page.locator('[for="order-size-oco"]')).to_have_text("Size")
-    expect(page.locator('[for="order-price-oco"]')).to_have_text("Price (BTC)")
+    expect(page.locator('[for="order-price-oco"]')).to_have_text("Price")

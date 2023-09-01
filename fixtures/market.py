@@ -49,7 +49,7 @@ def setup_simple_market(
 
     vega.wait_for_total_catchup()
     tdai_id = vega.find_asset_id(symbol=custom_asset_symbol)
-    print(custom_asset_name, tdai_id)
+    print(f"Created asset: {custom_asset_symbol}")
 
     vega.mint(
         "Key 1",

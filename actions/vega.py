@@ -1,5 +1,5 @@
 from typing import List, Tuple, Optional
-from vega_sim.service import VegaService
+from vega_sim.service import VegaService, PeggedOrder
 
 
 def submit_order(
@@ -47,4 +47,24 @@ def submit_liquidity(vega: VegaService, wallet_name: str, market_id: str):
         delta_buy=1,
         delta_sell=1,
         is_amendment=False,
+    )
+    vega.submit_order(
+        market_id=market_id,
+        trading_key=wallet_name,
+        side="SIDE_BUY",
+        order_type="TYPE_LIMIT",
+        pegged_order=PeggedOrder(reference="PEGGED_REFERENCE_MID", offset=1),
+        wait=False,
+        time_in_force="TIME_IN_FORCE_GTC",
+        volume=99,
+    )
+    vega.submit_order(
+        market_id=market_id,
+        trading_key=wallet_name,
+        side="SIDE_SELL",
+        order_type="TYPE_LIMIT",
+        pegged_order=PeggedOrder(reference="PEGGED_REFERENCE_MID", offset=1),
+        wait=False,
+        time_in_force="TIME_IN_FORCE_GTC",
+        volume=99,
     )

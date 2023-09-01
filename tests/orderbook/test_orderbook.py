@@ -212,11 +212,12 @@ def test_orderbook_price_movement(setup_market, page: Page):
     market_id = setup_market[1]
 
     page.goto(f"/#/markets/{market_id}")
+    page.locator("[data-testid=Orderbook]").click()
 
     book_el = page.locator("[data-testid=orderbook-grid-element]")
 
     # no arrow shown on load
-    expect(book_el.locator('[data-testid^=icon-arrow-down]')).not_to_be_attached()
+    expect(book_el.locator('[data-testid^=icon-arrow]')).not_to_be_attached()
 
     matching_order_1 = [1, 101]
     submit_order(
@@ -230,11 +231,12 @@ def test_orderbook_price_movement(setup_market, page: Page):
 
     vega.forward("10s")
     vega.wait_for_total_catchup()
+    vega.forward("1s")
 
     # 6003-ORDB-013
-    expect(book_el.get_by_test_id('icon-arrow-up')).to_be_attached()
+    expect(book_el.locator('[data-testid=icon-arrow-up]')).to_be_attached()
     assert (
-        float(page.locator("[data-testid*=last-traded]").text_content()) == matching_order_2[1]
+        float(page.locator("[data-testid*=last-traded]").text_content()) == matching_order_1[1]
     )
 
     matching_order_2 = [1, 99]
@@ -249,8 +251,10 @@ def test_orderbook_price_movement(setup_market, page: Page):
 
     vega.forward("10s")
     vega.wait_for_total_catchup()
+    vega.forward("1s")
 
-    expect(book_el.get_by_test_id('icon-arrow-down')).to_be_attached()
+    expect(book_el.locator('[data-testid=icon-arrow-down]')).to_be_attached()
+
     assert (
         float(page.locator("[data-testid*=last-traded]").text_content()) == matching_order_2[1]
     )

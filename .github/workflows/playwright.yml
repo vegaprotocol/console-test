@@ -43,7 +43,7 @@ jobs:
       #----------------------------------------------
       - name: pull console
         run: |
-          poetry run docker pull vegaprotocol/trading:testnet
+          poetry run docker pull vegaprotocol/trading:develop
       #----------------------------------------------
       #  -----  install playwright. -----
       #----------------------------------------------

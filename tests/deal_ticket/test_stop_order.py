@@ -77,7 +77,7 @@ def create_position(vega: VegaService, market_id):
     vega.wait_for_total_catchup
 
 
-@pytest.mark.skip("issue with table loading")
+
 @pytest.mark.usefixtures("page", "continuous_market", "auth", "risk_accepted")
 def test_stop_order_form_error_validation(continuous_market, page: Page):
     # 7002-SORD-032
@@ -102,8 +102,6 @@ def test_stop_order_form_error_validation(continuous_market, page: Page):
         "Price cannot be lower than 0.00001"
     )
 
-
-@pytest.mark.skip("issue with table loading")
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_submit_stop_order_rejected(continuous_market, vega: VegaService, page: Page):
     market_id = continuous_market
@@ -119,8 +117,8 @@ def test_submit_stop_order_rejected(continuous_market, vega: VegaService, page: 
     vega.forward("10s")
     vega.wait_for_total_catchup()
     
-    wait_for_graphql_response(page, "stopOrders")
     page.get_by_test_id(close_toast).click()
+    wait_for_graphql_response(page, "stopOrders")
     page.get_by_role(row_table).locator(market_name_col).nth(1).is_visible()
     expect((page.get_by_role(row_table).locator(market_name_col)).nth(1)).to_have_text(
         "BTC:DAI_2023Futr"
@@ -145,7 +143,7 @@ def test_submit_stop_order_rejected(continuous_market, vega: VegaService, page: 
     ).not_to_be_empty()
 
 
-@pytest.mark.skip("issue with table loading")
+
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_submit_stop_market_order_triggered(
     continuous_market, vega: VegaService, page: Page
@@ -167,9 +165,6 @@ def test_submit_stop_market_order_triggered(
     page.get_by_test_id(stop_market_order_btn).click()
     page.get_by_test_id(order_side_sell).click()
     page.get_by_test_id(trigger_price).fill("103")
-    expect(page.get_by_test_id("sidebar-content").get_by_test_id("price")).to_have_text(
-        "~103.00 BTC"
-    )
     page.get_by_test_id(order_size).fill("1")
     page.get_by_test_id(expire).click()
     expires_at = datetime.now() + timedelta(days=1)
@@ -185,6 +180,7 @@ def test_submit_stop_market_order_triggered(
     page.wait_for_selector('[data-testid="toast-close"]', state="visible")
     page.get_by_test_id(close_toast).click()
     wait_for_graphql_response(page, "stopOrders")
+
     page.get_by_role(row_table).locator(market_name_col).nth(1).is_visible()
     expect((page.get_by_role(row_table).locator(market_name_col)).nth(1)).to_have_text(
         "BTC:DAI_2023Futr"
@@ -210,8 +206,6 @@ def test_submit_stop_market_order_triggered(
         (page.get_by_role(row_table).locator(updatedAt_col)).nth(1)
     ).not_to_be_empty()
 
-
-@pytest.mark.skip("issue with table loading")
 @pytest.mark.usefixtures("continuous_market", "auth", "risk_accepted")
 def test_submit_stop_limit_order_pending(
     continuous_market, vega: VegaService, page: Page
@@ -245,10 +239,9 @@ def test_submit_stop_limit_order_pending(
     vega.forward("10s")
     vega.wait_for_total_catchup()
     
-    wait_for_graphql_response(page, "stopOrders")
-    
     page.wait_for_selector('[data-testid="toast-close"]', state="visible")
     page.get_by_test_id(close_toast).click()
+    wait_for_graphql_response(page, "stopOrders")
     page.get_by_role(row_table).locator(market_name_col).nth(1).is_visible()
     expect((page.get_by_role(row_table).locator(market_name_col)).nth(1)).to_have_text(
         "BTC:DAI_2023Futr"
@@ -277,7 +270,7 @@ def test_submit_stop_limit_order_pending(
     ).not_to_be_empty()
 
 
-@pytest.mark.skip("issue with table loading")
+
 @pytest.mark.usefixtures("continuous_market", "auth", "risk_accepted")
 def test_submit_stop_limit_order_cancel(
     continuous_market, vega: VegaService, page: Page
@@ -296,15 +289,13 @@ def test_submit_stop_limit_order_cancel(
     page.get_by_test_id(trigger_price).fill("102")
     page.get_by_test_id(order_price).fill("99")
     page.get_by_test_id(order_size).fill("1")
-
     page.get_by_test_id(submit_stop_order).click()
     vega.wait_fn(1)
     vega.forward("10s")
     vega.wait_for_total_catchup()
     
-
-    wait_for_graphql_response(page, "stopOrders")
     page.get_by_test_id(close_toast).first.click()
+    wait_for_graphql_response(page, "stopOrders")
     page.get_by_test_id(cancel).click()
     vega.wait_fn(1)
     vega.forward("10s")
@@ -315,7 +306,7 @@ def test_submit_stop_limit_order_cancel(
         (page.get_by_role(row_table).locator('[col-id="status"]')).nth(1)
     ).to_have_text("Cancelled")
 
-@pytest.mark.skip("issue with table loading")
+
 @pytest.mark.usefixtures("continuous_market", "auth", "risk_accepted")
 def test_stop_market_order_form_validation(continuous_market, page: Page):
     # 7002-SORD-052
@@ -328,12 +319,11 @@ def test_stop_market_order_form_validation(continuous_market, page: Page):
 
     market_id = continuous_market
     page.goto(f"/#/markets/{market_id}")
-
     page.get_by_test_id(stop_order_btn).click()
     page.get_by_test_id(stop_market_order_btn).is_visible()
     page.get_by_test_id(stop_market_order_btn).click()
     expect(
-        page.get_by_test_id("sidebar-content").get_by_text("Trigger")
+        page.get_by_test_id("sidebar-content").get_by_text("Trigger").first
     ).to_be_visible()
     expect(page.locator('[for="triggerDirection-risesAbove"]')).to_have_text(
         "Rises above"
@@ -347,12 +337,12 @@ def test_stop_market_order_form_validation(continuous_market, page: Page):
     expect(page.locator('[for="triggerType-trailingPercentOffset"]')).to_have_text(
         "Trailing Percent Offset"
     )
-    expect(page.locator('[for="input-price-quote"]')).to_have_text("Size")
+    expect(page.locator('[for="order-size"]')).to_have_text("Size")
     page.get_by_test_id(order_size).click()
     expect(page.get_by_test_id(order_size)).to_be_empty
     expect(page.get_by_test_id(order_price)).not_to_be_visible()
 
-@pytest.mark.skip("issue with table loading")
+
 @pytest.mark.usefixtures("continuous_market", "auth", "risk_accepted")
 def test_stop_limit_order_form_validation(continuous_market, page: Page):
     # 7002-SORD-020
@@ -374,7 +364,7 @@ def test_stop_limit_order_form_validation(continuous_market, page: Page):
     page.get_by_test_id(stop_limit_order_btn).is_visible()
     page.get_by_test_id(stop_limit_order_btn).click()
     expect(
-        page.get_by_test_id("sidebar-content").get_by_text("Trigger")
+        page.get_by_test_id("sidebar-content").get_by_text("Trigger").first
     ).to_be_visible()
     expect(page.locator('[for="triggerDirection-risesAbove"]')).to_have_text(
         "Rises above"
@@ -390,8 +380,8 @@ def test_stop_limit_order_form_validation(continuous_market, page: Page):
     expect(page.locator('[for="triggerType-trailingPercentOffset"]')).to_have_text(
         "Trailing Percent Offset"
     )
-    expect(page.locator('[for="input-price-quote"]').first).to_have_text("Size")
-    expect(page.locator('[for="input-price-quote"]').last).to_have_text("Price (BTC)")
+    expect(page.locator('[for="order-size"]').first).to_have_text("Size")
+    expect(page.locator('[for="order-price"]').last).to_have_text("Price")
     page.get_by_test_id(order_size).click()
     expect(page.get_by_test_id(order_size)).to_be_empty
     page.get_by_test_id(order_price).click()

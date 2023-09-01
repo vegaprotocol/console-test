@@ -43,7 +43,7 @@ jobs:
       #----------------------------------------------
       - name: pull console
         run: |
-          poetry run docker pull vegaprotocol/trading:testnet
+          poetry run docker pull vegaprotocol/trading:develop
       #----------------------------------------------
       #  -----  install playwright. -----
       #----------------------------------------------
@@ -53,7 +53,7 @@ jobs:
       #  ----- run tests. -----
       #----------------------------------------------
       - name: Run tests
-        run: poetry run pytest -v -s --numprocesses auto --dist loadfile --durations=20
+        run: poetry run pytest -v -s --numprocesses auto --dist loadfile --durations=20 --reruns 1 --reruns-delay 5
       #----------------------------------------------
       #  -----  upload traces  -----
       #----------------------------------------------

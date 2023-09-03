@@ -143,7 +143,7 @@ def test_orderbook_grid_content(setup_market, page: Page):
 def test_orderbook_resolution_change(setup_market, page: Page):
     market_id = setup_market[1]
     # 6003-ORDB-008
-    orderbook_content_0_00 = [
+    orderbook_content_0_01 = [
         [130.01, 10, 94],
         [130.00, 3, 84],
         [120.00, 7, 81],
@@ -176,7 +176,7 @@ def test_orderbook_resolution_change(setup_market, page: Page):
     ]
 
     resolutions = [
-        ["0.00", orderbook_content_0_00],
+        ["0.01", orderbook_content_0_01],
         ["10", orderbook_content_10],
         ["100", orderbook_content_100],
     ]

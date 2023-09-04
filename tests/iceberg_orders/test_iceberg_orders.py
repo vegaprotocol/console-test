@@ -97,9 +97,6 @@ def test_iceberg_validations(continuous_market, page: Page):
 def test_iceberg_open_order(continuous_market, vega: VegaService, page: Page):
     page.goto(f"/#/markets/{continuous_market}")
 
-    import pdb
-
-    pdb.set_trace()
     submit_order(vega, "Key 1", vega.all_markets()[0].id, "SIDE_SELL", 102, 101, 2, 1)
     vega.forward("10s")
     vega.wait_for_total_catchup()

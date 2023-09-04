@@ -9,6 +9,7 @@ from fixtures.market import setup_simple_market, setup_simple_successor_market
 def successor_market(vega: VegaService):
     parent_market_id = setup_simple_market(vega)
     tdai_id = vega.find_asset_id(symbol="tDAI")
+
     return setup_simple_successor_market(
         vega, parent_market_id, tdai_id, "successor_market"
     )
@@ -18,6 +19,7 @@ def successor_market(vega: VegaService):
 def test_succession_line(page: Page, successor_market):
     page.goto(f"/#/markets/{successor_market}")
     page.get_by_test_id("Info").click()
+
     page.get_by_text("Succession line").click()
 
     expect(page.get_by_test_id("succession-line-item").first).to_contain_text(

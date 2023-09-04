@@ -23,7 +23,6 @@ col_market_id = '[col-id="market"] [data-testid="market-code"]'
 
 @pytest.mark.usefixtures("proposed_market", "risk_accepted")
 def test_can_see_table_headers(proposed_market, vega: VegaService, page: Page):
-
     # setup market in proposed step, without liquidity provided
     market_id = proposed_market
     page.goto(f"/#/markets/{market_id}")
@@ -39,24 +38,25 @@ def test_can_see_table_headers(proposed_market, vega: VegaService, page: Page):
 
     # Test that you can see table headers
     headers = [
-            'Market',
-            'Description',
-            'Settlement asset',
-            'State',
-            'Parent market',
-            'Voting',
-            'Closing date',
-            'Enactment date',
-            '',
-        ]
-    
+        "Market",
+        "Description",
+        "Settlement asset",
+        "State",
+        "Parent market",
+        "Voting",
+        "Closing date",
+        "Enactment date",
+        "",
+    ]
+
     header_elements = page.locator(".ag-header-cell-text")
     for i, header in enumerate(headers):
-            assert header_elements.nth(i).inner_text() == header
-    
+        assert header_elements.nth(i).inner_text() == header
+
+
+@pytest.mark.skip("Skipping as test won't work until SLA console changes released")
 @pytest.mark.usefixtures("proposed_market", "risk_accepted")
 def test_renders_markets_correctly(proposed_market, vega: VegaService, page: Page):
-
     # setup market in proposed step, without liquidity provided
     market_id = proposed_market
     page.goto(f"/#/markets/{market_id}")
@@ -92,26 +92,33 @@ def test_renders_markets_correctly(proposed_market, vega: VegaService, page: Pag
     expect(row.locator('[col-id="closing-date"]')).not_to_be_empty()
 
     # 6001-MARK-057
-    expect(row.locator('[col-id="enactment-date"]')).not_to_be_empty   
+    expect(row.locator('[col-id="enactment-date"]')).not_to_be_empty
 
     # 6001-MARK-058
     page.get_by_test_id("dropdown-menu").click()
     dropdown_content = '[data-testid="proposal-actions-content"]'
-    first_item_link = page.locator(f"{dropdown_content} [role='menuitem']").nth(0).locator('a')
-        
+    first_item_link = (
+        page.locator(f"{dropdown_content} [role='menuitem']").nth(0).locator("a")
+    )
+
     # 6001-MARK-059
-    expected_href = r"^https:\/\/governance\.stagnet1\.vega\.rocks\/proposals\/[a-f0-9]{64}$"
-    assert first_item_link.inner_text() == 'View proposal'    
-    assert re.match(expected_href, first_item_link.get_attribute('href'))
+    expected_href = (
+        r"^https:\/\/governance\.stagnet1\.vega\.rocks\/proposals\/[a-f0-9]{64}$"
+    )
+    assert first_item_link.inner_text() == "View proposal"
+    assert re.match(expected_href, first_item_link.get_attribute("href"))
 
     # 6001-MARK-060
     proposed_markets_tab = page.get_by_test_id("tab-proposed-markets")
     external_links = proposed_markets_tab.get_by_test_id("external-link")
     last_link = external_links.last
-    assert last_link.inner_text() == 'Propose a new market'
-        
-    expected_href = f"https://governance.stagnet1.vega.rocks/proposals/propose/new-market"
-    assert last_link.get_attribute('href') == expected_href
+    assert last_link.inner_text() == "Propose a new market"
+
+    expected_href = (
+        f"https://governance.stagnet1.vega.rocks/proposals/propose/new-market"
+    )
+    assert last_link.get_attribute("href") == expected_href
+
 
 @pytest.mark.usefixtures("proposed_market", "risk_accepted")
 def test_can_drag_and_drop_columns(proposed_market, vega: VegaService, page: Page):
@@ -133,14 +140,15 @@ def test_can_drag_and_drop_columns(proposed_market, vega: VegaService, page: Pag
     col_market.drag_to(col_vote)
 
     # Check the attribute of the dragged element
-    attribute_value = col_market.get_attribute('aria-colindex')
-    assert attribute_value != '1'
+    attribute_value = col_market.get_attribute("aria-colindex")
+    assert attribute_value != "1"
+
 
 @pytest.mark.usefixtures("simple_market", "risk_accepted")
-def test_can_see_no_markets_message(simple_market, vega: VegaService, page: Page):    
+def test_can_see_no_markets_message(simple_market, vega: VegaService, page: Page):
     page.goto(f"/#/markets/all")
     page.get_by_test_id("Proposed markets").click()
 
     # 6001-MARK-061
     tab_proposed_markets = page.locator('[data-testid="tab-proposed-markets"]')
-    assert 'No markets' in tab_proposed_markets.text_content()
+    assert "No markets" in tab_proposed_markets.text_content()

@@ -42,10 +42,6 @@ def submit_liquidity(vega: VegaService, wallet_name: str, market_id: str):
         market_id=market_id,
         commitment_amount=10000,
         fee=0.000,
-        reference_buy="PEGGED_REFERENCE_MID",
-        reference_sell="PEGGED_REFERENCE_MID",
-        delta_buy=1,
-        delta_sell=1,
         is_amendment=False,
     )
     vega.submit_order(

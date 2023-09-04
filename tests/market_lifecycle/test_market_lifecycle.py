@@ -3,7 +3,7 @@ import vega_sim.api.governance as governance
 
 from collections import namedtuple
 from playwright.sync_api import Page, expect
-from vega_sim.service import VegaService
+from vega_sim.service import VegaService, PeggedOrder
 from actions.vega import submit_order
 
 # Defined namedtuples
@@ -53,11 +53,27 @@ def test_market_lifecycle(proposed_market, vega: VegaService, page: Page):
         market_id=market_id,
         commitment_amount=10000,
         fee=0.000,
-        reference_buy="PEGGED_REFERENCE_MID",
-        reference_sell="PEGGED_REFERENCE_MID",
-        delta_buy=1,
-        delta_sell=1,
         is_amendment=False,
+    )
+    vega.submit_order(
+        market_id=market_id,
+        trading_key=MM_WALLET.name,
+        side="SIDE_BUY",
+        order_type="TYPE_LIMIT",
+        pegged_order=PeggedOrder(reference="PEGGED_REFERENCE_MID", offset=1),
+        wait=False,
+        time_in_force="TIME_IN_FORCE_GTC",
+        volume=99,
+    )
+    vega.submit_order(
+        market_id=market_id,
+        trading_key=MM_WALLET.name,
+        side="SIDE_SELL",
+        order_type="TYPE_LIMIT",
+        pegged_order=PeggedOrder(reference="PEGGED_REFERENCE_MID", offset=1),
+        wait=False,
+        time_in_force="TIME_IN_FORCE_GTC",
+        volume=99,
     )
 
     submit_order(vega, MM_WALLET.name, market_id, "SIDE_SELL", 1, 110)

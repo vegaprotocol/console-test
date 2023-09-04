@@ -54,6 +54,17 @@ jobs:
       #----------------------------------------------
       - name: Run tests
         run: poetry run pytest -v -s --numprocesses auto --dist loadfile --durations=20 --reruns 1 --reruns-delay 5
+      
+      #----------------------------------------------
+      #  -----  debug traces  -----
+      #----------------------------------------------
+      
+      - name: List files in current directory
+        run: ls -al
+
+      - name: List files in traces directory
+        run: ls -al ./traces
+      
       #----------------------------------------------
       #  -----  upload traces  -----
       #----------------------------------------------

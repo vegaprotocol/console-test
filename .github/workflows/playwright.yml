@@ -54,7 +54,6 @@ jobs:
       #----------------------------------------------
       - name: Run tests
         run: poetry run pytest -v -s --numprocesses auto --dist loadfile --durations=20 --reruns 1 --reruns-delay 5
-      
       #----------------------------------------------
       #  -----  upload traces  -----
       #----------------------------------------------

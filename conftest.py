@@ -169,19 +169,40 @@ def proposed_market(vega):
     return setup_simple_market(vega, approve_proposal=False)
 
 
+test_statuses = {}
+
 @pytest.hookimpl(tryfirst=True)
 def pytest_runtest_makereport(item, call):
-    if "page" in item.funcargs:  # Make sure the test uses the 'page' fixture
+    if "page" in item.funcargs:
         web_page: Page = item.funcargs["page"]
-        
-        # Capture when an error occurs or a test fails
-        should_capture_trace = call.excinfo is not None
-        if should_capture_trace:
+        test_name = item.name
+
+        # Update test status in the global dictionary
+        if call.excinfo is not None:
+            test_statuses[test_name] = 'failed'
+        elif test_name not in test_statuses:
+            test_statuses[test_name] = 'passed'
+
+        # Save the trace if the test has failed or errored out
+        if test_statuses[test_name] == 'failed':
             if not os.path.exists("traces"):
                 os.makedirs("traces")
 
+            trace_path = os.path.join("traces", f"{test_name}_{call.when}_trace.zip")
+            
             try:
-                trace_path = os.path.join("traces", f"{item.name}_{call.when}_trace.zip")
                 web_page.context.tracing.stop(path=trace_path)
             except Exception as e:
                 print(f"Failed to save trace: {e}")
+
+@pytest.fixture(scope="session", autouse=True)
+def cleanup_traces():
+    yield  # This ensures the fixture runs all the tests first
+    # After all tests are done, clean up the traces for the passed tests
+    for test_name, status in test_statuses.items():
+        if status == 'passed':
+            trace_path = os.path.join("traces", f"{test_name}_*_trace.zip")
+            try:
+                os.remove(trace_path)
+            except FileNotFoundError:
+                pass  # File might not exist if the test was never in a failed state

@@ -60,7 +60,6 @@ def init_page(vega: VegaServiceNull, browser: Browser, request: pytest.FixtureRe
     ) as context:
         context.tracing.start(screenshots=True, snapshots=True, sources=True)
         with context.new_page() as page:
-            try:
                 # Wait for the console to be up and running before any tests are run
                 attempts = 0
                 while attempts < 100:
@@ -88,15 +87,6 @@ def init_page(vega: VegaServiceNull, browser: Browser, request: pytest.FixtureRe
                 window_env = f"window._env_ = Object.assign({{}}, window._env_, {env})"
                 page.add_init_script(script=window_env)
                 yield page
-            finally:
-                if not os.path.exists("traces"):
-                    os.makedirs("traces")
-
-                try:
-                    trace_path = os.path.join("traces", request.node.name + "trace.zip")
-                    context.tracing.stop(path=trace_path)
-                except Exception as e:
-                    print(f"Failed to save trace: {e}")
 
 
 # default vega & page fixtures with function scope (refreshed at each test) that can be used in tests
@@ -177,3 +167,21 @@ def continuous_market(vega):
 @pytest.fixture(scope="function")
 def proposed_market(vega):
     return setup_simple_market(vega, approve_proposal=False)
+
+
+@pytest.hookimpl(tryfirst=True)
+def pytest_runtest_makereport(item, call):
+    if "page" in item.funcargs:  # Make sure the test uses the 'page' fixture
+        web_page: Page = item.funcargs["page"]
+        failed = call.excinfo is not None  # Test has failed if there is an exception info
+
+        # Only save the trace when the test has failed
+        if failed:
+            if not os.path.exists("traces"):
+                os.makedirs("traces")
+
+            try:
+                trace_path = os.path.join("traces", item.name + "trace.zip")
+                web_page.context.tracing.stop(path=trace_path)
+            except Exception as e:
+                print(f"Failed to save trace: {e}")

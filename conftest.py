@@ -173,15 +173,15 @@ def proposed_market(vega):
 def pytest_runtest_makereport(item, call):
     if "page" in item.funcargs:  # Make sure the test uses the 'page' fixture
         web_page: Page = item.funcargs["page"]
-        failed = call.excinfo is not None  # Test has failed if there is an exception info
-
-        # Only save the trace when the test has failed
-        if failed:
+        
+        # Capture when an error occurs or a test fails
+        should_capture_trace = call.excinfo is not None
+        if should_capture_trace:
             if not os.path.exists("traces"):
                 os.makedirs("traces")
 
             try:
-                trace_path = os.path.join("traces", item.name + "trace.zip")
+                trace_path = os.path.join("traces", f"{item.name}_{call.when}_trace.zip")
                 web_page.context.tracing.stop(path=trace_path)
             except Exception as e:
                 print(f"Failed to save trace: {e}")

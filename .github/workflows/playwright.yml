@@ -14,7 +14,6 @@ jobs:
       #----------------------------------------------
       #  -----  install dependencies  -----
       #----------------------------------------------
-      - run: ulimit
       - name: Install dependencies
         run: poetry install --no-interaction --no-root
       #----------------------------------------------
@@ -37,7 +36,7 @@ jobs:
       #  ----- run tests. -----
       #----------------------------------------------
       - name: Run tests
-        run: poetry run pytest -v -s --numprocesses auto --dist loadfile --durations=20
+        run: poetry run pytest -v -s --numprocesses 2 --dist loadfile --durations=20
       #----------------------------------------------
       #  -----  upload traces  -----
       #----------------------------------------------

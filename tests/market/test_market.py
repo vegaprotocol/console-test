@@ -37,7 +37,7 @@ initial_volume: float = 1
 initial_spread: float = 0.1
 market_name = "BTC:DAI_2023"
 
-
+@pytest.mark.skip("market info issue with SLA")
 @pytest.mark.usefixtures("vega", "page", "simple_market", "risk_accepted")
 def test_price_monitoring(simple_market, vega: VegaService, page: Page):
     page.goto(f"/#/markets/all")

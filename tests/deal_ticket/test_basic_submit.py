@@ -49,7 +49,6 @@ def test_limit_buy_order(continuous_market, vega: VegaService, page: Page):
         "BTC:DAI_2023Futr10+10LimitFilled120.00GTC"
     )
 
-
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_limit_sell_order(continuous_market, vega: VegaService, page: Page):
     page.goto(f"/#/markets/{continuous_market}")
@@ -60,8 +59,8 @@ def test_limit_sell_order(continuous_market, vega: VegaService, page: Page):
     expect(page.get_by_test_id("place-order").locator("span").first).to_have_text("Place limit order")
     expect(page.get_by_test_id("place-order").locator("span").last).to_have_text("10 BTC @ 100.00 BTC")
     page.get_by_test_id(place_order).click()
-    vega.wait_fn(1)
     vega.forward("10s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
     page.get_by_test_id("All").click()
     expect(page.get_by_role("row").nth(2)).to_contain_text(

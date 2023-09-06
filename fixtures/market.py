@@ -123,6 +123,7 @@ def setup_opening_auction_market(vega: VegaService, market_id: str = None, **kwa
     )
 
     vega.forward("10s")
+    vega.wait_fn(10)
     vega.wait_for_total_catchup()
 
     return market_id
@@ -134,6 +135,7 @@ def setup_continuous_market(vega: VegaService, market_id: str = None, **kwargs):
 
     submit_order(vega, "Key 1", market_id, "SIDE_BUY", 1, 110)
     vega.forward("10s")
+    vega.wait_fn(10)
     vega.wait_for_total_catchup()
 
     return market_id

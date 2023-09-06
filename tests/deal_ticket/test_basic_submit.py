@@ -93,7 +93,7 @@ def test_market_buy_order(continuous_market, vega: VegaService, page: Page):
     page.get_by_test_id(order_size).fill("10")
     page.get_by_test_id(tif).select_option("Fill or Kill (FOK)")
     page.get_by_test_id(place_order).click()
-    vega.wait_fn(10)
+    vega.wait_fn(1)
     vega.forward("10s")
     vega.wait_for_total_catchup()
     page.get_by_test_id("All").click()

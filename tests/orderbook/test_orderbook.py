@@ -21,7 +21,7 @@ def vega():
 
 
 @pytest.fixture(scope="module")
-def setup_market(vega):
+def setup_market(vega: VegaService):
     market_id = setup_simple_market(vega)
     submit_liquidity(vega, MM_WALLET.name, market_id)
     submit_multiple_orders(
@@ -40,6 +40,7 @@ def setup_market(vega):
     )
 
     vega.forward("10s")
+    vega.wait_fn(10)
     vega.wait_for_total_catchup()
 
     return [
@@ -50,19 +51,19 @@ def setup_market(vega):
 # these values don't align with the multiple orders above as
 # creating a trade triggers the liquidity provision
 orderbook_content = [
-    [130.00500, 10, 94],
-    [130.00000, 3, 84],
-    [120.00000, 7, 81],
-    [110.00000, 5, 74],
-    [105.00000, 2, 69],
-    [101.00000, 67, 67],
+    [130.00500, 10, 126],
+    [130.00000, 3, 116],
+    [120.00000, 7, 113],
+    [110.00000, 5, 106],
+    [105.00000, 2, 101],
+    [101.00000, 99, 99],
     # mid
-    [99.00000, 102, 102],
-    [95.00000, 3, 105],
-    [90.00000, 3, 108],
-    [85.00000, 5, 113],
-    [70.00000, 5, 118],
-    [69.99500, 10, 128],
+    [99.00000, 99, 99],
+    [95.00000, 3, 102],
+    [90.00000, 3, 105],
+    [85.00000, 5, 110],
+    [70.00000, 5, 115],
+    [69.99500, 10, 125],
 ]
 
 
@@ -84,7 +85,7 @@ def verify_prices_descending(page: Page):
 
 
 @pytest.mark.usefixtures("page", "risk_accepted")
-def test_orderbook_grid_content(setup_market, page: Page):
+def test_orderbook_grid_content(setup_market, page: Page, vega: VegaService):
     vega = setup_market[0]
     market_id = setup_market[1]
 
@@ -109,6 +110,7 @@ def test_orderbook_grid_content(setup_market, page: Page):
     )
 
     vega.forward("10s")
+    vega.wait_fn(10)
     vega.wait_for_total_catchup()
 
     # 6003-ORDB-001
@@ -119,9 +121,7 @@ def test_orderbook_grid_content(setup_market, page: Page):
     # 6003-ORDB-006
     # 6003-ORDB-007
     page.goto(f"/#/markets/{market_id}")
-
     page.locator("[data-testid=Orderbook]").click()
-
     # 6003-ORDB-013 
     assert (
         float(page.locator("[data-testid*=last-traded]").text_content()) == matching_order[1]
@@ -143,50 +143,50 @@ def test_orderbook_grid_content(setup_market, page: Page):
 def test_orderbook_resolution_change(setup_market, page: Page):
     market_id = setup_market[1]
     # 6003-ORDB-008
-    orderbook_content_0_00 = [
-        [130.01, 10, 94],
-        [130.00, 3, 84],
-        [120.00, 7, 81],
-        [110.00, 5, 74],
-        [105.00, 2, 69],
-        [101.00, 67, 67],
+    orderbook_content_0_01 = [
+        [130.01, 10, 126],
+        [130.00, 3, 116],
+        [120.00, 7, 113],
+        [110.00, 5, 106],
+        [105.00, 2, 101],
+        [101.00, 99, 99],
         # mid
-        [99.00, 102, 102],
-        [95.00, 3, 105],
-        [90.00, 3, 108],
-        [85.00, 5, 113],
-        [70.00, 15, 128],
+        [99.00, 99, 99],
+        [95.00, 3, 102],
+        [90.00, 3, 105],
+        [85.00, 5, 110],
+        [70.00, 15, 125],
     ]
 
-    orderbook_content_10 = [
-        [130, 13, 94],
-        [120, 7, 81],
-        [110, 7, 74],
-        [100, 67, 67],
+    orderbook_content_0_10 = [
+        [130, 13, 126],
+        [120, 7, 113],
+        [110, 7, 106],
+        [100, 99, 99],
         # mid
-        [100, 105, 105],
-        [90, 8, 113],
-        [70, 15, 128],
+        [100, 102, 102],
+        [90, 8, 110],
+        [70, 15, 125],
     ]
 
     orderbook_content_100 = [
-        [100, 94, 94],
+        [100, 126, 126],
         # mid
-        [100, 128, 128],
+        [100, 125, 125],
+        
     ]
 
     resolutions = [
-        ["0.00", orderbook_content_0_00],
-        ["10", orderbook_content_10],
+        ["0.01", orderbook_content_0_01],
+        ["10", orderbook_content_0_10],
         ["100", orderbook_content_100],
     ]
 
     page.goto(f"/#/markets/{market_id}")
-    #temporary skip
-    # for resolution in resolutions:
-    #     page.get_by_test_id("resolution").click()
-    #     page.get_by_role("menu").get_by_text(resolution[0], exact=True).click()
-    #     verify_orderbook_grid(page, resolution[1])
+    for resolution in resolutions:
+         page.get_by_test_id("resolution").click()
+         page.get_by_role("menu").get_by_text(resolution[0], exact=True).click()
+         verify_orderbook_grid(page, resolution[1])
 
 
 @pytest.mark.usefixtures("page", "risk_accepted")
@@ -208,7 +208,7 @@ def test_orderbook_price_size_copy(setup_market, page: Page):
         expect(page.get_by_test_id("order-size")).to_have_value(volume.text_content())
 
 @pytest.mark.usefixtures("page", "risk_accepted")
-def test_orderbook_price_movement(setup_market, page: Page):
+def test_orderbook_price_movement(setup_market, page: Page, vega: VegaService):
     vega = setup_market[0]
     market_id = setup_market[1]
 
@@ -248,7 +248,7 @@ def test_orderbook_price_movement(setup_market, page: Page):
         matching_order_2[0],
         matching_order_2[1]
     )
-
+    vega.wait_fn(10)
     vega.forward("10s")
     vega.wait_for_total_catchup()
 

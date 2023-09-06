@@ -37,7 +37,7 @@ jobs:
       #  -----  install vega binaries. -----
       #----------------------------------------------
       - name: Install vega binaries
-        run: poetry run python -m vega_sim.tools.load_binaries --force --dev --version v0.72.1-13267-96b96685
+        run: poetry run python -m vega_sim.tools.load_binaries --force --dev --version v0.72.1-13289-35c9c9c8
       #----------------------------------------------
       #  -----  pull console. -----
       #----------------------------------------------

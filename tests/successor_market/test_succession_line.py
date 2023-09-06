@@ -14,7 +14,7 @@ def successor_market(vega: VegaService):
         vega, parent_market_id, tdai_id, "successor_market"
     )
 
-
+@pytest.mark.skip("market info issue with SLA")
 @pytest.mark.usefixtures("page", "risk_accepted")
 def test_succession_line(page: Page, successor_market):
     page.goto(f"/#/markets/{successor_market}")

@@ -7,7 +7,6 @@ from actions.vega import submit_order
 
 InfoItem = namedtuple('InfoItem', ['name', 'infoText'])
 
-@pytest.mark.skip("temporary skip")
 @pytest.mark.parametrize("vega", [120], indirect=True)
 @pytest.mark.usefixtures("continuous_market","risk_accepted", "auth")
 def test_trading_chart(continuous_market, vega: VegaService, page: Page):
@@ -39,10 +38,14 @@ def test_trading_chart(continuous_market, vega: VegaService, page: Page):
         InfoItem("Volume", "Volume: 1")
     ]
     """Preparation steps to check study info on the page."""
-    element = page.locator(".plot-area-interaction").nth(1)
-    element.hover()
-
-    page.click(".pane__close-button-wrapper")
+    pane = page.locator(".pane__pane").nth(1)
+    pane.hover()
+    pane.locator(".pane__close-button-wrapper").click()
+    
+    pane = page.locator(".pane__pane").nth(1)
+    pane.hover()
+    pane.locator(".pane__close-button-wrapper").click()
+    page.locator('[title="Remove"]').click()
     
     info_items = page.query_selector_all(".plot-area")
     
@@ -57,6 +60,8 @@ def test_trading_chart(continuous_market, vega: VegaService, page: Page):
     #6004-CHAR-051
     page.mouse.wheel(0, 10)
     check_menu_item_checkbox(page, "Studies", study_info)
+
+    
     page.get_by_text("Studies").click(force=True)
     
 

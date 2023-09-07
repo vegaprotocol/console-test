@@ -20,7 +20,7 @@ jobs:
       #  -----  install vega binaries. -----
       #----------------------------------------------
       - name: Install vega binaries
-        run: poetry run python -m vega_sim.tools.load_binaries --force
+        run: poetry run python -m vega_sim.tools.load_binaries --force --latest
       #----------------------------------------------
       #  -----  pull console. -----
       #----------------------------------------------

@@ -134,10 +134,7 @@ def check_menu_item_checkbox(page, button_text, items):
         text = el.text_content().strip()
         assert text == items[i].name, f"Expected checkbox text '{items[i].name}' but found '{text}'."
 
-    for i, item in enumerate(items[0:]): 
+    for i, item in enumerate(items[0:]):
         info_locator = page.locator(".indicator-info-wrapper").nth(i+1)
         info_text = info_locator.text_content().strip()
         assert info_text == item.infoText, f"Expected info text '{item.infoText}' but found '{info_text}'."
-
-
-

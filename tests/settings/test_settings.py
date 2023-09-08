@@ -12,7 +12,6 @@ def vega():
 @pytest.mark.usefixtures("page")
 def test_share_usage_data(page: Page):
     page.goto("/")
-    page.pause()
     page.get_by_test_id("icon-cross").click()
     page.get_by_test_id("Settings").click()
     telemetry_switch = page.locator("#switch-settings-telemetry-switch")

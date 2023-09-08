@@ -147,7 +147,6 @@ def test_get_started_interactive(vega: VegaService, page: Page):
     vega.wait_for_total_catchup()
     #Assert dialog isn't visible
     expect(page.get_by_test_id("welcome-dialog")).not_to_be_visible()
-    page.pause()
 
 @pytest.mark.usefixtures("page", "risk_accepted")
 def test_get_started_seen_already(simple_market, page: Page):

@@ -77,7 +77,6 @@ def test_iceberg_validations(continuous_market, page: Page):
     page.get_by_test_id("order-peak-size").type("1")
     page.get_by_test_id("order-minimum-size").clear()
     page.get_by_test_id("order-minimum-size").type("2")
-    page.pause()
     expect(
         page.get_by_test_id("deal-ticket-peak-error-message")
     ).to_be_visible()

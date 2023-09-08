@@ -117,6 +117,7 @@ class TestAllMarkets:
             '[col-id="tradableInstrument.instrument.product.settlementAsset.symbol"] button'
         ).click()
         expect(page.get_by_test_id("dialog-title")).to_have_text("Asset details - tDAI")
+        # 6001-MARK-019
         page.get_by_test_id("close-asset-details-dialog").click()
 
     @pytest.mark.usefixtures("risk_accepted")
@@ -181,4 +182,5 @@ class TestAllMarketsNoMarkets:
     @pytest.mark.usefixtures("risk_accepted")
     def test_no_markets(self, page: Page):
         page.goto(f"/#/markets/all")
+        #6001-MARK-034
         expect(page.locator(".ag-overlay-wrapper")).to_have_text("No markets")

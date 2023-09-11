@@ -119,7 +119,7 @@ def test_get_started_interactive(vega: VegaService, page: Page):
 
     vega.wait_for_total_catchup()
     tdai_id = vega.find_asset_id(symbol="tDAI")
-    logger.info("tDAI", tdai_id)
+    logger.info(f"tDAI: {tdai_id}")
 
     vega.mint(
         "Key 1",

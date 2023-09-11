@@ -2,6 +2,9 @@ from collections import namedtuple
 from vega_sim.service import VegaService
 from actions.vega import submit_multiple_orders, submit_order, submit_liquidity
 
+import logging
+
+logger = logging.getLogger()
 
 # Defined namedtuples
 WalletConfig = namedtuple("WalletConfig", ["name", "passphrase"])
@@ -49,7 +52,7 @@ def setup_simple_market(
 
     vega.wait_for_total_catchup()
     tdai_id = vega.find_asset_id(symbol=custom_asset_symbol)
-    print(f"Created asset: {custom_asset_symbol}")
+    logger.info(f"Created asset: {custom_asset_symbol}")
 
     vega.mint(
         "Key 1",

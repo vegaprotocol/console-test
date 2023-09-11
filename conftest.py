@@ -125,7 +125,7 @@ def init_page(vega: VegaServiceNull, browser: Browser, request: pytest.FixtureRe
                     trace_path = os.path.join("traces", request.node.name + "trace.zip")
                     context.tracing.stop(path=trace_path)
                 except Exception as e:
-                    print(f"Failed to save trace: {e}")
+                    logger.error(f"Failed to save trace: {e}")
 
 
 # default vega & page fixtures with function scope (refreshed at each test) that can be used in tests

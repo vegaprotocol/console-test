@@ -6,6 +6,9 @@ from fixtures.market import setup_simple_market
 from conftest import init_vega
 from collections import namedtuple
 from actions.vega import submit_order
+import logging
+
+logger = logging.getLogger()
 
 
 @pytest.fixture(scope="module")
@@ -19,7 +22,10 @@ def vega():
 def simple_market(vega: VegaService):
     return setup_simple_market(vega)
 
-@pytest.mark.usefixtures("page",)
+
+@pytest.mark.usefixtures(
+    "page",
+)
 def test_get_started_interactive(vega: VegaService, page: Page):
     page.goto("/")
     # 0007-FUGS-001
@@ -27,18 +33,17 @@ def test_get_started_interactive(vega: VegaService, page: Page):
     expect(page.get_by_test_id("order-connect-wallet")).to_be_enabled
     # 0007-FUGS-006
     # 0007-FUGS-002
-    expect(page.locator(".list-none")).to_contain_text("1.Get a Vega wallet2.Connect3.Deposit funds4.Open a position")
-     #Assertion no steps complete
-    env = json.dumps({
-    "vega": "truthy_value"
-    })
+    expect(page.locator(".list-none")).to_contain_text(
+        "1.Get a Vega wallet2.Connect3.Deposit funds4.Open a position"
+    )
+    # Assertion no steps complete
+    env = json.dumps({"vega": "truthy_value"})
 
     script = f"window = Object.assign(window, {env});"
 
-
     page.add_init_script(script=script)
     page.reload()
-    #Assertion step 1 complete
+    # Assertion step 1 complete
     expect(page.get_by_test_id("icon-tick")).to_have_count(1)
     DEFAULT_WALLET_NAME = "MarketSim"  # This is the default wallet name within VegaServiceNull and CANNOT be changed
 
@@ -70,24 +75,23 @@ def test_get_started_interactive(vega: VegaService, page: Page):
     # Assert step 2 complete
     expect(page.get_by_test_id("icon-tick")).to_have_count(2)
     env = json.dumps(
-                    {   
-                        "VEGA_URL": f"http://localhost:{vega.data_node_rest_port}/graphql",
-                        "VEGA_WALLET_URL": f"http://localhost:{vega.wallet_port}",
-                    }
-                )
+        {
+            "VEGA_URL": f"http://localhost:{vega.data_node_rest_port}/graphql",
+            "VEGA_WALLET_URL": f"http://localhost:{vega.wallet_port}",
+        }
+    )
     window_env = f"window._env_ = Object.assign({{}}, window._env_, {env})"
     page.add_init_script(script=window_env)
 
     page.reload()
 
-   # Defined namedtuples
+    # Defined namedtuples
     WalletConfig = namedtuple("WalletConfig", ["name", "passphrase"])
 
     # Wallet Configurations
     MM_WALLET = WalletConfig("mm", "pin")
     MM_WALLET2 = WalletConfig("mm2", "pin2")
     TERMINATE_WALLET = WalletConfig("FJMKnwfZdd48C8NqvYrG", "bY3DxwtsCstMIIZdNpKs")
-
 
     wallets = [MM_WALLET, MM_WALLET2, TERMINATE_WALLET]
 
@@ -108,14 +112,14 @@ def test_get_started_interactive(vega: VegaService, page: Page):
     vega.create_asset(
         MM_WALLET.name,
         name="tDAI",
-        symbol='tDAI',
+        symbol="tDAI",
         decimals=5,
         max_faucet_amount=1e10,
     )
 
     vega.wait_for_total_catchup()
     tdai_id = vega.find_asset_id(symbol="tDAI")
-    print("tDAI", tdai_id)
+    logger.info("tDAI", tdai_id)
 
     vega.mint(
         "Key 1",
@@ -125,11 +129,11 @@ def test_get_started_interactive(vega: VegaService, page: Page):
 
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
-    #Assert step 3 complete
+    # Assert step 3 complete
     expect(page.get_by_test_id("icon-tick")).to_have_count(3)
 
     market_id = vega.create_simple_market(
-        "tDAI", 
+        "tDAI",
         proposal_key=MM_WALLET.name,
         settlement_asset_id=tdai_id,
         termination_key=TERMINATE_WALLET.name,
@@ -141,12 +145,13 @@ def test_get_started_interactive(vega: VegaService, page: Page):
     vega.forward("10s")
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
-        
+
     submit_order(vega, "Key 1", market_id, "SIDE_BUY", 1, 110)
     vega.forward("10s")
     vega.wait_for_total_catchup()
-    #Assert dialog isn't visible
+    # Assert dialog isn't visible
     expect(page.get_by_test_id("welcome-dialog")).not_to_be_visible()
+
 
 @pytest.mark.usefixtures("page", "risk_accepted")
 def test_get_started_seen_already(simple_market, page: Page):
@@ -160,7 +165,6 @@ def test_get_started_seen_already(simple_market, page: Page):
     get_started_locator.click()
     # 0007-FUGS-007
     expect(page.get_by_test_id("dialog-content").nth(1)).to_be_visible()
-
 
 
 @pytest.mark.usefixtures("page")

@@ -437,9 +437,6 @@ def test_maximum_number_of_active_stop_orders_oco(continuous_market, vega: VegaS
     page.get_by_test_id(order_limit_price_oco).fill("99")
     for i in range(2):
         page.get_by_test_id(submit_stop_order).click()
-        vega.wait_fn(1)
-        vega.forward("10s")
-        vega.wait_for_total_catchup()
     
         vega.wait_fn(1)
         vega.forward("10s")

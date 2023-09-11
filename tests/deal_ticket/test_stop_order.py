@@ -76,8 +76,6 @@ def create_position(vega: VegaService, market_id):
     vega.forward("10s")
     vega.wait_for_total_catchup
 
-
-@pytest.mark.skip("sim version issue")
 @pytest.mark.usefixtures("page", "continuous_market", "auth", "risk_accepted")
 def test_stop_order_form_error_validation(continuous_market, page: Page):
     # 7002-SORD-032
@@ -102,7 +100,6 @@ def test_stop_order_form_error_validation(continuous_market, page: Page):
         "Price cannot be lower than 0.00001"
     )
 
-@pytest.mark.skip("sim version issue")
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_submit_stop_order_rejected(continuous_market, vega: VegaService, page: Page):
     market_id = continuous_market
@@ -143,8 +140,6 @@ def test_submit_stop_order_rejected(continuous_market, vega: VegaService, page: 
         (page.get_by_role(row_table).locator(updatedAt_col)).nth(1)
     ).not_to_be_empty()
 
-
-@pytest.mark.skip("sim version issue")
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_submit_stop_market_order_triggered(
     continuous_market, vega: VegaService, page: Page
@@ -207,7 +202,6 @@ def test_submit_stop_market_order_triggered(
         (page.get_by_role(row_table).locator(updatedAt_col)).nth(1)
     ).not_to_be_empty()
 
-@pytest.mark.skip("sim version issue")
 @pytest.mark.usefixtures("continuous_market", "auth", "risk_accepted")
 def test_submit_stop_limit_order_pending(
     continuous_market, vega: VegaService, page: Page
@@ -271,7 +265,6 @@ def test_submit_stop_limit_order_pending(
         (page.get_by_role(row_table).locator(updatedAt_col)).nth(1)
     ).not_to_be_empty()
 
-@pytest.mark.skip("sim version issue")
 @pytest.mark.usefixtures("continuous_market", "auth", "risk_accepted")
 def test_submit_stop_limit_order_cancel(
     continuous_market, vega: VegaService, page: Page
@@ -342,7 +335,6 @@ def test_stop_market_order_form_validation(continuous_market, page: Page):
     expect(page.get_by_test_id(order_size)).to_be_empty
     expect(page.get_by_test_id(order_price)).not_to_be_visible()
 
-
 @pytest.mark.usefixtures("continuous_market", "auth", "risk_accepted")
 def test_stop_limit_order_form_validation(continuous_market, page: Page):
     # 7002-SORD-020
@@ -386,3 +378,31 @@ def test_stop_limit_order_form_validation(continuous_market, page: Page):
     expect(page.get_by_test_id(order_size)).to_be_empty
     page.get_by_test_id(order_price).click()
     expect(page.get_by_test_id(order_price)).to_be_empty()
+
+@pytest.mark.usefixtures("continuous_market", "auth", "risk_accepted")
+def test_maximum_number_of_active_stop_orders(
+    continuous_market, vega: VegaService, page: Page
+):
+    market_id = continuous_market
+    page.goto(f"/#/markets/{market_id}")
+    page.get_by_test_id(stop_orders_tab).click()
+    # create a position because stop order is reduce only type
+    create_position(vega, market_id)
+    for i in range(4):
+        page.get_by_test_id(stop_order_btn).click()
+        page.get_by_test_id(stop_limit_order_btn).is_visible()
+        page.get_by_test_id(stop_limit_order_btn).click()
+        page.get_by_test_id(order_side_sell).click()
+        page.get_by_test_id(trigger_below).click()
+        page.get_by_test_id(trigger_price).fill("102")
+        page.get_by_test_id(order_price).fill("99")
+        page.get_by_test_id(order_size).fill("1")
+        page.get_by_test_id(submit_stop_order).click()
+        vega.wait_fn(1)
+        vega.forward("10s")
+        vega.wait_for_total_catchup()
+        if page.get_by_test_id(close_toast).is_visible():
+            page.get_by_test_id(close_toast).click()
+        wait_for_graphql_response(page, "stopOrders")
+    #7002-SORD-011
+    expect(page.get_by_test_id("stop-order-warning-limit")).to_have_text("There is a limit of 4 active stop orders per market. Orders submitted above the limit will be immediately rejected.")

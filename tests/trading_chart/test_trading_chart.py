@@ -5,6 +5,10 @@
 # from vega_sim.service import VegaService
 # from actions.vega import submit_order
 
+# import logging
+
+# logger = logging.getLogger()
+
 # InfoItem = namedtuple('InfoItem', ['name', 'infoText'])
 
 # @pytest.mark.skip("temporary skip")
@@ -86,8 +90,8 @@
 #     combined_text = ''.join(texts)
 #     actual_date = combined_text[:-67]
 #     actual_ohlc = combined_text[-67:]
-#     print(actual_date)
-#     print(actual_ohlc)
+#     logger.info(actual_date)
+#     logger.info(actual_ohlc)
 #     assert re.match(expected_date_regex, actual_date)
 #     assert actual_ohlc == expected_ohlc
 #      # Check interval options and select '15m'

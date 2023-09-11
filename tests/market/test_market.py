@@ -4,7 +4,10 @@ from collections import namedtuple
 from playwright.sync_api import Page, expect
 from vega_sim.service import VegaService
 from actions.vega import submit_order
-from conftest import init_page, init_vega
+
+import logging
+
+logger = logging.getLogger()
 
 
 # Wallet Configurations
@@ -53,7 +56,7 @@ def test_price_monitoring(simple_market, vega: VegaService, page: Page):
     expect(page.get_by_test_id("opening-auction-sub-status").first).to_have_text(
         "Opening auction: Not enough liquidity to open"
     )
-    print(page.get_by_test_id("opening-auction-sub-status").inner_text)
+    logger.info(page.get_by_test_id("opening-auction-sub-status").inner_text)
     vega.submit_liquidity(
         key_name=MM_WALLET.name,
         market_id=simple_market,

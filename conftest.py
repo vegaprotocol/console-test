@@ -1,3 +1,4 @@
+import logging
 import docker
 import pytest
 import os
@@ -15,7 +16,29 @@ from fixtures.market import (
     setup_continuous_market,
 )
 
+import sys
+
+# Workaround for current xdist issue with displaying live logs from multiple workers
+# https://github.com/pytest-dev/pytest-xdist/issues/402
+sys.stdout = sys.stderr
+
 docker_client = docker.from_env()
+logger = logging.getLogger()
+
+
+def pytest_configure(config):
+    worker_id = os.environ.get("PYTEST_XDIST_WORKER")
+    if worker_id is not None:
+        log_dir = os.path.join(os.getcwd(), "logs")
+        log_name = f"tests_{worker_id}.log"
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
+        logging.basicConfig(
+            format=config.getini("log_file_format"),
+            datefmt=config.getini("log_file_date_format"),
+            filename=os.path.join(log_dir, log_name),
+            level=config.getini("log_file_level"),
+        )
 
 
 # Start VegaServiceNull and start up docker container for website
@@ -23,10 +46,13 @@ docker_client = docker.from_env()
 def init_vega(request=None):
     default_seconds = 1
     seconds_per_block = default_seconds
-    if request and hasattr(request, 'param'):
+    if request and hasattr(request, "param"):
         seconds_per_block = request.param
 
-    print("\nStarting VegaServiceNull")
+    logger.info(
+        "Starting VegaServiceNull",
+        extra={"worker_id": os.environ.get("PYTEST_XDIST_WORKER")},
+    )
     with VegaServiceNull(
         run_with_console=False,
         launch_graphql=False,
@@ -34,21 +60,24 @@ def init_vega(request=None):
         use_full_vega_wallet=True,
         store_transactions=True,
         transactions_per_block=1000,
-        seconds_per_block=seconds_per_block 
+        seconds_per_block=seconds_per_block,
     ) as vega:
         try:
             container = docker_client.containers.run(
                 container_name, detach=True, ports={"80/tcp": vega.console_port}
             )
             # docker setup
-            print(f"Container {container.id} started")
+            logger.info(
+                f"Container {container.id} started",
+                extra={"worker_id": os.environ.get("PYTEST_XDIST_WORKER")},
+            )
             yield vega
         except docker.errors.APIError as e:
-            print(f"Container {container.id} failed")
-            print(e)
+            logger.info(f"Container {container.id} failed")
+            logger.info(e)
             raise e
         finally:
-            print(f"Stopping container {container.id}")
+            logger.info(f"Stopping container {container.id}")
             container.stop()
 
 
@@ -96,7 +125,7 @@ def init_page(vega: VegaServiceNull, browser: Browser, request: pytest.FixtureRe
                     trace_path = os.path.join("traces", request.node.name + "trace.zip")
                     context.tracing.stop(path=trace_path)
                 except Exception as e:
-                    print(f"Failed to save trace: {e}")
+                    logger.error(f"Failed to save trace: {e}")
 
 
 # default vega & page fixtures with function scope (refreshed at each test) that can be used in tests

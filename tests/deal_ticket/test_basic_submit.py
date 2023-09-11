@@ -20,6 +20,7 @@ def test_limit_buy_order_GTT(continuous_market, vega: VegaService, page: Page):
     expires_at = datetime.now() + timedelta(days=1)
     expires_at_input_value = expires_at.strftime("%Y-%m-%dT%H:%M:%S")
     page.get_by_test_id("date-picker-field").fill(expires_at_input_value)
+    #7002-SORD-011
     expect(page.get_by_test_id("place-order").locator("span").first).to_have_text("Place limit order")
     expect(page.get_by_test_id("place-order").locator("span").last).to_have_text("10 BTC @ 120.00 BTC")
     page.get_by_test_id(place_order).click()
@@ -50,6 +51,7 @@ def test_limit_sell_order(continuous_market, vega: VegaService, page: Page):
     page.get_by_test_id(order_price).fill("100")
     page.get_by_test_id(order_side_sell).click()
     page.get_by_test_id(tif).select_option("Good for Normal (GFN)")
+    #7002-SORD-011
     expect(page.get_by_test_id("place-order").locator("span").first).to_have_text("Place limit order")
     expect(page.get_by_test_id("place-order").locator("span").last).to_have_text("10 BTC @ 100.00 BTC")
     page.get_by_test_id(place_order).click()
@@ -65,6 +67,7 @@ def test_market_sell_order(continuous_market, vega: VegaService, page: Page):
     page.get_by_test_id(market_order).click()
     page.get_by_test_id(order_size).fill("10")
     page.get_by_test_id(order_side_sell).click()
+    #7002-SORD-011
     expect(page.get_by_test_id("place-order").locator("span").first).to_have_text("Place market order")
     expect(page.get_by_test_id("place-order").locator("span").last).to_have_text("10 BTC @ market")
     page.get_by_test_id(place_order).click()

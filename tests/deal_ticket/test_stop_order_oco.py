@@ -83,7 +83,7 @@ def create_position(vega: VegaService, market_id):
     vega.forward("10s")
     vega.wait_for_total_catchup
 
-@pytest.mark.skip("sim version issue")
+
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_submit_stop_order_market_oco_rejected(continuous_market, vega: VegaService, page: Page):
     market_id = continuous_market
@@ -159,7 +159,7 @@ def test_submit_stop_order_market_oco_rejected(continuous_market, vega: VegaServ
     trigger_value_list = ["Mark < 102.00", "Mark > 103.00"]
     assert trigger_price_list.sort() == trigger_value_list.sort()
 
-@pytest.mark.skip("sim version issue")
+
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_submit_stop_oco_market_order_triggered(continuous_market, vega: VegaService, page: Page):
     market_id = continuous_market
@@ -232,7 +232,7 @@ def test_submit_stop_oco_market_order_triggered(continuous_market, vega: VegaSer
     trigger_value_list = ["Mark < 102.00", "Mark > 103.00"]
     assert trigger_price_list.sort() == trigger_value_list.sort()
 
-@pytest.mark.skip("sim version issue")
+
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_submit_stop_oco_market_order_pending(continuous_market, vega: VegaService, page: Page):
     market_id = continuous_market
@@ -266,7 +266,7 @@ def test_submit_stop_oco_market_order_pending(continuous_market, vega: VegaServi
         "PendingOCO"
     )
 
-@pytest.mark.skip("sim version issue")
+
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_submit_stop_oco_limit_order_pending(continuous_market, vega: VegaService, page: Page):
     market_id = continuous_market
@@ -314,7 +314,7 @@ def test_submit_stop_oco_limit_order_pending(continuous_market, vega: VegaServic
     trigger_value_list = ["Limit < 102.00", "Limit > 103.00"]
     assert trigger_price_list.sort() == trigger_value_list.sort()
 
-@pytest.mark.skip("sim version issue")
+
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_submit_stop_oco_limit_order_cancel(continuous_market, vega: VegaService, page: Page):
     market_id = continuous_market
@@ -414,3 +414,38 @@ def test_stop_limit_order_oco_form_validation(continuous_market, page: Page):
 
     expect(page.locator('[for="order-size-oco"]')).to_have_text("Size")
     expect(page.locator('[for="order-price-oco"]')).to_have_text("Price")
+
+@pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
+def test_maximum_number_of_active_stop_orders_oco(continuous_market, vega: VegaService, page: Page):
+    market_id = continuous_market
+    page.goto(f"/#/markets/{market_id}")
+    page.get_by_test_id(stop_orders_tab).click()
+    create_position(vega, market_id)
+    wait_for_graphql_response(page, "stopOrders")
+
+    page.get_by_test_id(stop_order_btn).click()
+    page.get_by_test_id(stop_limit_order_btn).is_visible()
+    page.get_by_test_id(stop_limit_order_btn).click()
+    page.get_by_test_id(order_side_sell).click()
+    page.get_by_test_id(trigger_below).click()
+    page.get_by_test_id(trigger_price).fill("102")
+    page.get_by_test_id(order_size).fill("3")
+    page.get_by_test_id(order_price).fill("103")
+    page.get_by_test_id(oco).click()
+    page.get_by_test_id(trigger_price_oco).fill("120")
+    page.get_by_test_id(order_size_oco).fill("2")
+    page.get_by_test_id(order_limit_price_oco).fill("99")
+    for i in range(2):
+        page.get_by_test_id(submit_stop_order).click()
+        vega.wait_fn(1)
+        vega.forward("10s")
+        vega.wait_for_total_catchup()
+    
+        vega.wait_fn(1)
+        vega.forward("10s")
+        vega.wait_for_total_catchup()
+        if page.get_by_test_id(close_toast).is_visible():
+            page.get_by_test_id(close_toast).click()
+        wait_for_graphql_response(page, "stopOrders")
+    #7002-SORD-011
+    expect(page.get_by_test_id("stop-order-warning-limit")).to_have_text("There is a limit of 4 active stop orders per market. Orders submitted above the limit will be immediately rejected.")

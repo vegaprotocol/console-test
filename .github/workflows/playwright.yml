@@ -41,31 +41,31 @@ jobs:
       - name: Install vega binaries
         if: steps.vega_binaries_cache.outputs.cache-hit != 'true'
         run: poetry run python -m vega_sim.tools.load_binaries --force --version $VEGA_VERSION
-      # #----------------------------------------------
-      # #  -----  pull console. -----
-      # #----------------------------------------------
-      # - name: pull console
-      #   run: |
-      #     poetry run docker pull vegaprotocol/trading:develop
-      # #----------------------------------------------
-      # #  -----  install playwright. -----
-      # #----------------------------------------------
-      # - name: Install Playwright
-      #   run: poetry run playwright install --with-deps chromium
-      # #----------------------------------------------
-      # #  ----- run tests. -----
-      # #----------------------------------------------
-      # - name: Run tests
-      #   run: poetry run pytest -v -s --numprocesses 2 --dist loadfile --durations=20
-      # #----------------------------------------------
-      # #  -----  upload traces  -----
-      # #----------------------------------------------
-      # - name: Upload Playwright Trace
-      #   uses: actions/upload-artifact@v3
-      #   if: always()
-      #   with:
-      #     name: playwright-trace
-      #     path: ./traces/
-      #     retention-days: 15
+      #----------------------------------------------
+      #  -----  pull console. -----
+      #----------------------------------------------
+      - name: pull console
+        run: |
+          poetry run docker pull vegaprotocol/trading:develop
+      #----------------------------------------------
+      #  -----  install playwright. -----
+      #----------------------------------------------
+      - name: Install Playwright
+        run: poetry run playwright install --with-deps chromium
+      #----------------------------------------------
+      #  ----- run tests. -----
+      #----------------------------------------------
+      - name: Run tests
+        run: poetry run pytest -v -s --numprocesses 2 --dist loadfile --durations=20
+      #----------------------------------------------
+      #  -----  upload traces  -----
+      #----------------------------------------------
+      - name: Upload Playwright Trace
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-trace
+          path: ./traces/
+          retention-days: 15
 
 

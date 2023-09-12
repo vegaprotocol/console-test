@@ -73,7 +73,7 @@ def init_vega(request=None):
             )
             yield vega
         except docker.errors.APIError as e:
-            logger.info(f"Container {container.id} failed")
+            logger.info(f"Container creation failed.")
             logger.info(e)
             raise e
         finally:

@@ -16,34 +16,40 @@ jobs:
       #----------------------------------------------
       - name: Install dependencies
         run: poetry install --no-interaction --no-root
-      #----------------------------------------------
-      #  -----  install vega binaries. -----
-      #----------------------------------------------
-      - name: Install vega binaries
-        run: poetry run python -m vega_sim.tools.load_binaries --force --version v0.72.14
-      #----------------------------------------------
-      #  -----  pull console. -----
-      #----------------------------------------------
-      - name: pull console
+      - name: find vega binaries path
         run: |
-          poetry run docker pull vegaprotocol/trading:develop
-      #----------------------------------------------
-      #  -----  install playwright. -----
-      #----------------------------------------------
-      - name: Install Playwright
-        run: poetry run playwright install --with-deps chromium
-      #----------------------------------------------
-      #  ----- run tests. -----
-      #----------------------------------------------
-      - name: Run tests
-        run: poetry run pytest -v -s --numprocesses 2 --dist loadfile --durations=20
-      #----------------------------------------------
-      #  -----  upload traces  -----
-      #----------------------------------------------
-      - name: Upload Playwright Trace
-        uses: actions/upload-artifact@v3
-        if: always()
-        with:
-          name: playwright-trace
-          path: ./traces/
-          retention-days: 15
+          echo "Installed vega binaries"
+          echo $(poetry run python -c "import vega_sim; print(vega_sim.vega_bin_path)")
+      # #----------------------------------------------
+      # #  -----  install vega binaries. -----
+      # #----------------------------------------------
+      # - name: Install vega binaries
+      #   run: poetry run python -m vega_sim.tools.load_binaries --force --version v0.72.14
+      # #----------------------------------------------
+      # #  -----  pull console. -----
+      # #----------------------------------------------
+      # - name: pull console
+      #   run: |
+      #     poetry run docker pull vegaprotocol/trading:develop
+      # #----------------------------------------------
+      # #  -----  install playwright. -----
+      # #----------------------------------------------
+      # - name: Install Playwright
+      #   run: poetry run playwright install --with-deps chromium
+      # #----------------------------------------------
+      # #  ----- run tests. -----
+      # #----------------------------------------------
+      # - name: Run tests
+      #   run: poetry run pytest -v -s --numprocesses 2 --dist loadfile --durations=20
+      # #----------------------------------------------
+      # #  -----  upload traces  -----
+      # #----------------------------------------------
+      # - name: Upload Playwright Trace
+      #   uses: actions/upload-artifact@v3
+      #   if: always()
+      #   with:
+      #     name: playwright-trace
+      #     path: ./traces/
+      #     retention-days: 15
+
+

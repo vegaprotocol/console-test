@@ -1,4 +1,8 @@
 name: Build and Run Tests
+
+env:
+  VEGA_VERSION: v0.72.14
+
 on:
   push:
     branches: [main, master]
@@ -17,10 +21,26 @@ jobs:
       - name: Install dependencies
         run: poetry install --no-interaction --no-root
       #----------------------------------------------
+      #  -----  find vega binaries path  -----
+      #----------------------------------------------
+      - name: Find vega binaries path
+        id: vega_bin_path
+        run: echo path=$(poetry run python -c "import vega_sim; print(vega_sim.vega_bin_path)") >> $GITHUB_OUTPUT
+      #----------------------------------------------
+      #  -----  vega binaries cache -----
+      #----------------------------------------------
+      - name: Vega binaries cache
+        uses: actions/cache@v3
+        id: vega_binaries_cache
+        with:
+          path: ${{ steps.vega_bin_path.outputs.path }}
+          key: ${{ runner.os }}-vega-binaries-${{ env.VEGA_VERSION }}
+      #----------------------------------------------
       #  -----  install vega binaries. -----
       #----------------------------------------------
       - name: Install vega binaries
-        run: poetry run python -m vega_sim.tools.load_binaries --force --version v0.72.14
+        if: steps.vega_binaries_cache.outputs.cache-hit != 'true'
+        run: poetry run python -m vega_sim.tools.load_binaries --force --version $VEGA_VERSION
       #----------------------------------------------
       #  -----  pull console. -----
       #----------------------------------------------
@@ -47,3 +67,5 @@ jobs:
           name: playwright-trace
           path: ./traces/
           retention-days: 15
+
+

@@ -140,4 +140,4 @@ def test_can_see_no_markets_message(simple_market, vega: VegaService, page: Page
 
     # 6001-MARK-061
     tab_proposed_markets = page.locator('[data-testid="tab-proposed-markets"]')
-    assert 'No markets' in tab_proposed_markets.text_content()
+    assert 'No proposed markets' in tab_proposed_markets.text_content()

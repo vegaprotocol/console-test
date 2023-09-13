@@ -34,17 +34,8 @@ def test_get_started_interactive(vega: VegaService, page: Page):
     # 0007-FUGS-006
     # 0007-FUGS-002
     expect(page.locator(".list-none")).to_contain_text(
-        "1.Get a Vega wallet2.Connect3.Deposit funds4.Open a position"
+        "1.Connect2.Deposit funds3.Open a position"
     )
-    # Assertion no steps complete
-    env = json.dumps({"vega": "truthy_value"})
-
-    script = f"window = Object.assign(window, {env});"
-
-    page.add_init_script(script=script)
-    page.reload()
-    # Assertion step 1 complete
-    expect(page.get_by_test_id("icon-tick")).to_have_count(1)
     DEFAULT_WALLET_NAME = "MarketSim"  # This is the default wallet name within VegaServiceNull and CANNOT be changed
 
     # Calling get_keypairs will internally call _load_tokens for the given wallet
@@ -72,8 +63,8 @@ def test_get_started_interactive(vega: VegaService, page: Page):
     page.add_init_script(script)
     page.reload()
 
-    # Assert step 2 complete
-    expect(page.get_by_test_id("icon-tick")).to_have_count(2)
+    # Assert step 1 complete
+    expect(page.get_by_test_id("icon-tick")).to_have_count(1)
     env = json.dumps(
         {
             "VEGA_URL": f"http://localhost:{vega.data_node_rest_port}/graphql",
@@ -129,8 +120,8 @@ def test_get_started_interactive(vega: VegaService, page: Page):
 
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
-    # Assert step 3 complete
-    expect(page.get_by_test_id("icon-tick")).to_have_count(3)
+    # Assert step 2 complete
+    expect(page.get_by_test_id("icon-tick")).to_have_count(2)
 
     market_id = vega.create_simple_market(
         "tDAI",

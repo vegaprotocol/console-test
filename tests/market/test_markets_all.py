@@ -28,11 +28,10 @@ class TestAllMarkets:
             "Description",
             "Trading mode",
             "Status",
-            "Successor market",
-            "Best bid",
-            "Best offer",
             "Mark price",
+            "24h volume",
             "Settlement asset",
+            "Spread",
             "",
         ]
 
@@ -65,9 +64,8 @@ class TestAllMarkets:
             '[data-testid="tab-open-markets"] .ag-center-cols-container .ag-row'
         ).first
         instrument_code_locator = (
-            '[col-id="tradableInstrument.instrument.code"] [data-testid="market-code"]'
+            '[col-id="tradableInstrument.instrument.code"] [data-testid="stack-cell-primary"]'
         )
-
         # 6001-MARK-035
         expect(row_selector.locator(instrument_code_locator)).to_have_text(
             "ETHBTC.QM21"
@@ -89,21 +87,15 @@ class TestAllMarkets:
         #  6001-MARK-038
         expect(row_selector.locator('[col-id="state"]')).to_have_text("Active")
 
-        # successor market
-        expect(row_selector.locator('[col-id="successorMarketID"]')).to_have_text("-")
-
         #  6001-MARK-039
-        expect(row_selector.locator('[col-id="data.bestBidPrice"]')).to_have_text(
-            "101.50"
+        expect(row_selector.locator('[col-id="data.markPrice"]')).to_have_text(
+            "107.50"
         )
 
         #  6001-MARK-040
-        expect(row_selector.locator('[col-id="data.bestOfferPrice"]')).to_have_text(
-            "103.50"
-        )
-
-        #  6001-MARK-041
-        expect(row_selector.locator('[col-id="data.markPrice"]')).to_have_text("107.50")
+        expect(row_selector.locator('[col-id="data.candles"]')).to_have_text(
+            "0.00"
+        )     
 
         #  6001-MARK-042
         expect(
@@ -111,6 +103,10 @@ class TestAllMarkets:
                 '[col-id="tradableInstrument.instrument.product.settlementAsset.symbol"]'
             )
         ).to_have_text("tDAI")
+
+        expect(row_selector.locator('[col-id="data.bestBidPrice"]')).to_have_text(
+            "2"
+        )
 
         # 6001-MARK-043
         row_selector.locator(
@@ -159,7 +155,7 @@ class TestAllMarkets:
         ).click()
         for i, market_name in enumerate(sorted_market_names):
             expect(
-                page.locator(f'[row-index="{i}"] [data-testid=market-code]')
+                page.locator(f'[row-index="{i}"] [col-id="tradableInstrument.instrument.name"]')
             ).to_have_text(market_name)
 
     @pytest.mark.usefixtures("risk_accepted")

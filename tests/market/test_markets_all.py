@@ -170,7 +170,7 @@ class TestAllMarkets:
             page.locator('.ag-header-row [col-id="data.bestBidPrice"]')
         )
         expect(page.locator(col_instrument_code)).to_have_attribute(
-            "aria-colindex", "6"
+            "aria-colindex", "8"
         )
 
 

@@ -32,10 +32,8 @@ class TestSettledMarket:
         page.get_by_test_id("Closed markets").click()
         headers = [
                 "Market",
-                "Description",
                 "Status",
                 "Settlement date",
-                "Successor market",
                 "Best bid",
                 "Best offer",
                 "Mark price",
@@ -63,8 +61,6 @@ class TestSettledMarket:
 
         # 6001-MARK-001
         expect(row_selector.locator('[col-id="code"]')).to_have_text("BTC:DAI_2023Futr")
-        # 6001-MARK-002
-        expect(row_selector.locator('[col-id="name"]')).to_have_text("BTC:DAI_2023")
         # 6001-MARK-003
         expect(row_selector.locator('[col-id="state"]')).to_have_text("Settled")
         # 6001-MARK-004
@@ -76,8 +72,6 @@ class TestSettledMarket:
         expected_pattern = re.compile(r"https://.*?/oracles/[a-f0-9]{64}")
         actual_href = row_selector.locator('[col-id="settlementDate"] [data-testid="link"]').get_attribute("href")
         assert expected_pattern.match(actual_href), f"Expected href to match {expected_pattern.pattern}, but got {actual_href}"
-
-        expect(row_selector.locator('[col-id="successorMarket"]')).to_have_text("-")
         # 6001-MARK-011
         expect(row_selector.locator('[col-id="bestBidPrice"]')).to_have_text("0.00")
         # 6001-MARK-012

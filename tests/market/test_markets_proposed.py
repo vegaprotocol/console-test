@@ -18,7 +18,7 @@ TERMINATE_WALLET = WalletConfig("FJMKnwfZdd48C8NqvYrG", "bY3DxwtsCstMIIZdNpKs")
 wallets = [MM_WALLET, MM_WALLET2, TERMINATE_WALLET]
 
 row_selector = '[data-testid="tab-proposed-markets"] .ag-center-cols-container .ag-row'
-col_market_id = '[col-id="market"] [data-testid="market-code"]'
+col_market_id = '[col-id="market"] [data-testid="stack-cell-primary"]'
 
 
 @pytest.mark.usefixtures("proposed_market", "risk_accepted")
@@ -40,7 +40,6 @@ def test_can_see_table_headers(proposed_market, vega: VegaService, page: Page):
     # Test that you can see table headers
     headers = [
             'Market',
-            'Description',
             'Settlement asset',
             'State',
             'Parent market',
@@ -73,16 +72,13 @@ def test_renders_markets_correctly(proposed_market, vega: VegaService, page: Pag
     # 6001-MARK-049
     expect(row.locator(col_market_id)).to_have_text("BTC:DAI_2023")
 
-    # 6001-MARK-050
-    expect(row.locator('[col-id="description"]')).to_have_text("BTC:DAI_2023")
-
     # 6001-MARK-051
     expect(row.locator('[col-id="asset"]')).to_have_text("tDAI")
 
     # 6001-MARK-052
     # 6001-MARK-053
     expect(row.locator('[col-id="state"]')).to_have_text("Open")
-    expect(row.locator('[col-id="parentMarket"]')).to_have_text("-")
+    expect(row.locator('[col-id="terms.change.successorConfiguration.parentMarketId"]')).to_have_text("-")
 
     # 6001-MARK-054
     # 6001-MARK-055
@@ -144,4 +140,4 @@ def test_can_see_no_markets_message(simple_market, vega: VegaService, page: Page
 
     # 6001-MARK-061
     tab_proposed_markets = page.locator('[data-testid="tab-proposed-markets"]')
-    assert 'No markets' in tab_proposed_markets.text_content()
+    assert 'No proposed markets' in tab_proposed_markets.text_content()

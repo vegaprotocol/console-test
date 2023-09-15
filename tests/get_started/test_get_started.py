@@ -138,6 +138,7 @@ class TestGetStarted:
         submit_order(vega, "Key 1", market_id, "SIDE_BUY", 1, 110)
         vega.forward("10s")
         vega.wait_for_total_catchup()
+        page.get_by_test_id("get-started-button").click()
         # Assert dialog isn't visible
         expect(page.get_by_test_id("welcome-dialog")).not_to_be_visible()
         

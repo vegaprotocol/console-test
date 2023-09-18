@@ -22,6 +22,7 @@ def create_settled_market(vega):
         market_id=market_id,
     )
     vega.forward("10s")
+    vega.wait_fn(10)
     vega.wait_for_total_catchup()
   
 
@@ -102,6 +103,7 @@ def test_terminated_market_no_settlement_date(page: Page, vega: VegaService):
     key_name="FJMKnwfZdd48C8NqvYrG",
     )
     vega.forward("60s")
+    vega.wait_fn(10)
     vega.wait_for_total_catchup()
     page.goto(f"/#/markets/all")
     page.get_by_test_id("Closed markets").click()

@@ -49,6 +49,9 @@ def check_pnl_color_value(element, expected_color, expected_value):
 def test_pnl_loss_portfolio(continuous_market, vega: VegaService, page: Page):
     page.set_viewport_size({"width": 1748, "height": 977})
     submit_order(vega, "Key 1", continuous_market, "SIDE_BUY", 1, 104.50000)
+    vega.forward("20s")
+    vega.wait_fn(10)
+    vega.wait_for_total_catchup()
     page.goto(f"http://localhost:{vega.console_port}/#/markets/{continuous_market}")
     page.get_by_role("link", name="Portfolio").click()
     page.get_by_test_id("Positions").click()
@@ -69,6 +72,9 @@ def test_pnl_loss_portfolio(continuous_market, vega: VegaService, page: Page):
     check_pnl_color_value(unrealised_pnl, "rgb(236, 0, 60)", "-4.00")
 
     submit_order(vega, "Key 1", continuous_market, "SIDE_SELL", 2, 101.50000)
+    vega.forward("20s")
+    vega.wait_fn(10)
+    vega.wait_for_total_catchup()
 
     wait_for_graphql_response(page, "EstimatePosition")
     check_pnl_color_value(realised_pnl, "rgb(236, 0, 60)", "-8.00")
@@ -79,6 +85,9 @@ def test_pnl_loss_portfolio(continuous_market, vega: VegaService, page: Page):
 def test_pnl_profit_portfolio(continuous_market, vega: VegaService, page: Page):
     page.set_viewport_size({"width": 1748, "height": 977})
     submit_order(vega, "Key 1", continuous_market, "SIDE_BUY", 1, 104.50000)
+    vega.forward("20s")
+    vega.wait_fn(10)
+    vega.wait_for_total_catchup()
     page.goto(f"http://localhost:{vega.console_port}/#/markets/{continuous_market}")
     page.get_by_role("link", name="Portfolio").click()
     page.get_by_test_id("Positions").click()
@@ -98,6 +107,9 @@ def test_pnl_profit_portfolio(continuous_market, vega: VegaService, page: Page):
     check_pnl_color_value(unrealised_pnl, "rgb(1, 145, 75)", "4.00")
 
     submit_order(vega, "Key 1", continuous_market, "SIDE_SELL", 2, 101.50000)
+    vega.forward("20s")
+    vega.wait_fn(10)
+    vega.wait_for_total_catchup()
     wait_for_graphql_response(page, "EstimatePosition")
     check_pnl_color_value(realised_pnl, "rgb(1, 145, 75)", "8.00")
     check_pnl_color_value(unrealised_pnl, "rgb(0, 0, 0)", "0.00")
@@ -130,6 +142,9 @@ def test_pnl_neutral_portfolio(continuous_market, vega: VegaService, page: Page)
 @pytest.mark.usefixtures("vega", "page", "continuous_market", "auth", "risk_accepted")
 def test_pnl_loss_trading(continuous_market, vega: VegaService, page: Page):
     submit_order(vega, "Key 1", continuous_market, "SIDE_BUY", 1, 104.50000)
+    vega.forward("20s")
+    vega.wait_fn(10)
+    vega.wait_for_total_catchup()
     page.set_viewport_size({"width": 1748, "height": 977})
     page.goto(f"http://localhost:{vega.console_port}/#/markets/{continuous_market}")
     wait_for_graphql_response(page, "EstimatePosition")
@@ -146,6 +161,9 @@ def test_pnl_loss_trading(continuous_market, vega: VegaService, page: Page):
     check_pnl_color_value(unrealised_pnl, "rgb(236, 0, 60)", "-4.00")
 
     submit_order(vega, "Key 1", continuous_market, "SIDE_SELL", 2, 101.50000)
+    vega.forward("20s")
+    vega.wait_fn(10)
+    vega.wait_for_total_catchup()
 
     wait_for_graphql_response(page, "EstimatePosition")
     check_pnl_color_value(realised_pnl, "rgb(236, 0, 60)", "-8.00")
@@ -155,6 +173,9 @@ def test_pnl_loss_trading(continuous_market, vega: VegaService, page: Page):
 @pytest.mark.usefixtures("vega", "page", "continuous_market", "auth", "risk_accepted")
 def test_pnl_profit_trading(continuous_market, vega: VegaService, page: Page):
     submit_order(vega, "Key 1", continuous_market, "SIDE_BUY", 1, 104.50000)
+    vega.forward("20s")
+    vega.wait_fn(10)
+    vega.wait_for_total_catchup()
     page.set_viewport_size({"width": 1748, "height": 977})
 
     page.goto(f"http://localhost:{vega.console_port}/#/markets/{continuous_market}")
@@ -176,6 +197,9 @@ def test_pnl_profit_trading(continuous_market, vega: VegaService, page: Page):
     check_pnl_color_value(unrealised_pnl, "rgb(1, 145, 75)", "4.00")
 
     submit_order(vega, "Key 1", continuous_market, "SIDE_SELL", 2, 101.50000)
+    vega.forward("20s")
+    vega.wait_fn(10)
+    vega.wait_for_total_catchup()
     wait_for_graphql_response(page, "EstimatePosition")
     check_pnl_color_value(realised_pnl, "rgb(1, 145, 75)", "8.00")
     check_pnl_color_value(unrealised_pnl, "rgb(0, 0, 0)", "0.00")

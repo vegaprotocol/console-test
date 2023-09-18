@@ -78,6 +78,7 @@ def test_limit_order_new_trade_top_of_list(continuous_market, vega, page):
     page.goto(f"/#/markets/{continuous_market}")
 
     vega.forward("10s")
+    vega.wait_fn(10)
     vega.wait_for_total_catchup()
     expected_trade = [
         "103.50",

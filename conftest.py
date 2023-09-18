@@ -79,6 +79,10 @@ def init_vega(request=None):
         finally:
             logger.info(f"Stopping container {container.id}")
             container.stop()
+            # Remove the container
+            logger.info(f"Removing container {container.id}")
+            container.remove()
+            
 
 
 @contextmanager
@@ -86,46 +90,44 @@ def init_page(vega: VegaServiceNull, browser: Browser, request: pytest.FixtureRe
     with browser.new_context(
         viewport={"width": 1920, "height": 1080},
         base_url=f"http://localhost:{vega.console_port}",
-    ) as context:
+    ) as context, context.new_page() as page:
         context.tracing.start(screenshots=True, snapshots=True, sources=True)
-        with context.new_page() as page:
-            try:
-                # Wait for the console to be up and running before any tests are run
-                attempts = 0
-                while attempts < 100:
-                    try:
-                        code = requests.get(
-                            f"http://localhost:{vega.console_port}/"
-                        ).status_code
-                        if code == 200:
-                            break
-                    except requests.exceptions.ConnectionError as e:
-                        attempts += 1
-                        if attempts < 100:
-                            time.sleep(0.1)
-                            continue
-                        else:
-                            raise e
-
-                # Set window._env_ so built docker image data uses datanode from vega market sim
-                env = json.dumps(
-                    {
-                        "VEGA_URL": f"http://localhost:{vega.data_node_rest_port}/graphql",
-                        "VEGA_WALLET_URL": f"http://localhost:{vega.wallet_port}",
-                    }
-                )
-                window_env = f"window._env_ = Object.assign({{}}, window._env_, {env})"
-                page.add_init_script(script=window_env)
-                yield page
-            finally:
-                if not os.path.exists("traces"):
-                    os.makedirs("traces")
-
+        try:
+            # Wait for the console to be up and running before any tests are run
+            attempts = 0
+            while attempts < 100:
                 try:
-                    trace_path = os.path.join("traces", request.node.name + "trace.zip")
-                    context.tracing.stop(path=trace_path)
-                except Exception as e:
-                    logger.error(f"Failed to save trace: {e}")
+                    code = requests.get(
+                        f"http://localhost:{vega.console_port}/"
+                    ).status_code
+                    if code == 200:
+                        break
+                except requests.exceptions.ConnectionError as e:
+                    attempts += 1
+                    if attempts < 100:
+                        time.sleep(0.1)
+                        continue
+                    else:
+                        raise e
+
+            # Set window._env_ so built docker image data uses datanode from vega market sim
+            env = json.dumps(
+                {
+                    "VEGA_URL": f"http://localhost:{vega.data_node_rest_port}/graphql",
+                    "VEGA_WALLET_URL": f"http://localhost:{vega.wallet_port}",
+                }
+            )
+            window_env = f"window._env_ = Object.assign({{}}, window._env_, {env})"
+            page.add_init_script(script=window_env)
+            yield page
+        finally:
+            if not os.path.exists("traces"):
+                os.makedirs("traces")
+            try:
+                trace_path = os.path.join("traces", request.node.name + "trace.zip")
+                context.tracing.stop(path=trace_path)
+            except Exception as e:
+                logger.error(f"Failed to save trace: {e}")
 
 
 # default vega & page fixtures with function scope (refreshed at each test) that can be used in tests

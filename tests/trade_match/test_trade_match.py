@@ -28,6 +28,7 @@ def test_trade_match_table(opening_auction_market: str, vega: VegaService, page:
         wait=False,
     )
     vega.forward("10s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
     submit_multiple_orders(
         vega,
@@ -37,6 +38,7 @@ def test_trade_match_table(opening_auction_market: str, vega: VegaService, page:
         [[5, 90], [5, 95], [1, 150]],
     )
     vega.forward("60s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
 
     # Positions

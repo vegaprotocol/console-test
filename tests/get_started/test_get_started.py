@@ -96,6 +96,7 @@ class TestGetStarted:
         )
 
         vega.forward("10s")
+        vega.wait_fn(1)
         vega.wait_for_total_catchup()
 
         vega.create_asset(
@@ -105,7 +106,7 @@ class TestGetStarted:
             decimals=5,
             max_faucet_amount=1e10,
         )
-
+        vega.wait_fn(1)
         vega.wait_for_total_catchup()
         tdai_id = vega.find_asset_id(symbol="tDAI")
         logger.info(f"tDAI: {tdai_id}")
@@ -137,6 +138,7 @@ class TestGetStarted:
 
         submit_order(vega, "Key 1", market_id, "SIDE_BUY", 1, 110)
         vega.forward("10s")
+        vega.wait_fn(1)
         vega.wait_for_total_catchup()
         page.get_by_test_id("get-started-button").click()
         # Assert dialog isn't visible

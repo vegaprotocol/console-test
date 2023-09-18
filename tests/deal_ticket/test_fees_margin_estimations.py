@@ -32,7 +32,7 @@ def test_margin_and_fees_estimations(continuous_market, vega: VegaService, page:
     page.get_by_test_id("order-size").type("200")
     page.get_by_test_id("order-price").type("20")
 
-    vega.wait_fn(10)
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
 
     expect(page.get_by_test_id(notional)).to_have_text("Notional4,000.00 BTC")
@@ -53,6 +53,7 @@ def test_margin_and_fees_estimations(continuous_market, vega: VegaService, page:
     # submit order by sim function
     order = submit_order(vega, "Key 1", market_id, "SIDE_BUY", 400, 38329483272398.838)
     vega.forward("20s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
     expect(page.get_by_test_id(margin_required)).to_have_text(
         "Margin required897,716,007,278,782.40 - 897,716,007,278,798.50 tDAI "

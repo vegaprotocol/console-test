@@ -15,6 +15,7 @@ def test_closed_market_position(vega: VegaService, page: Page):
         market_id=market_id,
     )
     vega.forward("10s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
     page.goto(f"/#/markets/{market_id}")
     expect(page.locator(".ag-overlay-panel")).to_have_text("No positions")

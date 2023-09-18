@@ -80,9 +80,7 @@ def create_position(vega: VegaService, market_id):
 @pytest.mark.usefixtures("page", "continuous_market", "auth", "risk_accepted")
 def test_stop_order_form_error_validation(continuous_market, page: Page):
     # 7002-SORD-032
-
-    market_id = continuous_market
-    page.goto(f"/#/markets/{market_id}")
+    page.goto(f"/#/markets/{continuous_market}")
     page.get_by_test_id(stop_order_btn).click()
     page.get_by_test_id(stop_limit_order_btn).is_visible()
     page.get_by_test_id(stop_limit_order_btn).click()
@@ -103,8 +101,7 @@ def test_stop_order_form_error_validation(continuous_market, page: Page):
 
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_submit_stop_order_rejected(continuous_market, vega: VegaService, page: Page):
-    market_id = continuous_market
-    page.goto(f"/#/markets/{market_id}")
+    page.goto(f"/#/markets/{continuous_market}")
     page.get_by_test_id(stop_orders_tab).click() 
     page.get_by_test_id(stop_order_btn).click()
     page.get_by_test_id(stop_market_order_btn).is_visible()
@@ -150,12 +147,10 @@ def test_submit_stop_market_order_triggered(
     # 7002-SORD-075
     # 7002-SORD-067
     # 7002-SORD-068
-
-    market_id = continuous_market
-    page.goto(f"/#/markets/{market_id}")
+    page.goto(f"/#/markets/{continuous_market}")
     page.get_by_test_id(stop_orders_tab).click()
     # create a position because stop order is reduce only type
-    create_position(vega, market_id)
+    create_position(vega, continuous_market)
 
     page.get_by_test_id(stop_order_btn).click()
     page.get_by_test_id(stop_market_order_btn).is_visible()
@@ -210,12 +205,10 @@ def test_submit_stop_limit_order_pending(
     # 7002-SORD-074
     # 7002-SORD-075
     # 7002-SORD-069
-
-    market_id = continuous_market
-    page.goto(f"/#/markets/{market_id}")
+    page.goto(f"/#/markets/{continuous_market}")
     page.get_by_test_id(stop_orders_tab).click()
     # create a position because stop order is reduce only type
-    create_position(vega, market_id)
+    create_position(vega, continuous_market)
 
     page.get_by_test_id(stop_order_btn).click()
     page.get_by_test_id(stop_limit_order_btn).is_visible()
@@ -266,14 +259,11 @@ def test_submit_stop_limit_order_pending(
     ).not_to_be_empty()
 
 @pytest.mark.usefixtures("continuous_market", "auth", "risk_accepted")
-def test_submit_stop_limit_order_cancel(
-    continuous_market, vega: VegaService, page: Page
-):
-    market_id = continuous_market
-    page.goto(f"/#/markets/{market_id}")
+def test_submit_stop_limit_order_cancel(continuous_market, vega: VegaService, page: Page):
+    page.goto(f"/#/markets/{continuous_market}")
     page.get_by_test_id(stop_orders_tab).click()
     # create a position because stop order is reduce only type
-    create_position(vega, market_id)
+    create_position(vega, continuous_market)
 
     page.get_by_test_id(stop_order_btn).click()
     page.get_by_test_id(stop_limit_order_btn).is_visible()
@@ -309,9 +299,7 @@ def test_stop_market_order_form_validation(continuous_market, page: Page):
     # 7002-SORD-058
     # 7002-SORD-064
     # 7002-SORD-065
-
-    market_id = continuous_market
-    page.goto(f"/#/markets/{market_id}")
+    page.goto(f"/#/markets/{continuous_market}")
     page.get_by_test_id(stop_order_btn).click()
     page.get_by_test_id(stop_market_order_btn).is_visible()
     page.get_by_test_id(stop_market_order_btn).click()
@@ -350,8 +338,7 @@ def test_stop_limit_order_form_validation(continuous_market, page: Page):
     # 7002-SORD-050
     # 7002-SORD-051
 
-    market_id = continuous_market
-    page.goto(f"/#/markets/{market_id}")
+    page.goto(f"/#/markets/{continuous_market}")
     page.get_by_test_id(stop_order_btn).click()
     page.get_by_test_id(stop_limit_order_btn).is_visible()
     page.get_by_test_id(stop_limit_order_btn).click()
@@ -383,11 +370,10 @@ def test_stop_limit_order_form_validation(continuous_market, page: Page):
 def test_maximum_number_of_active_stop_orders(
     continuous_market, vega: VegaService, page: Page
 ):
-    market_id = continuous_market
-    page.goto(f"/#/markets/{market_id}")
+    page.goto(f"/#/markets/{continuous_market}")
     page.get_by_test_id(stop_orders_tab).click()
     # create a position because stop order is reduce only type
-    create_position(vega, market_id)
+    create_position(vega, continuous_market)
     for i in range(4):
         page.get_by_test_id(stop_order_btn).click()
         page.get_by_test_id(stop_limit_order_btn).is_visible()

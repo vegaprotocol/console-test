@@ -40,7 +40,7 @@ def setup_simple_market(
         MM_WALLET.name, parameter="market.fee.factors.makerFee", new_value="0.1"
     )
     vega.forward("10s")
-    vega.wait_fn(10)
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
 
     vega.create_asset(
@@ -50,7 +50,7 @@ def setup_simple_market(
         decimals=5,
         max_faucet_amount=1e10,
     )
-    vega.wait_fn(10)
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
     tdai_id = vega.find_asset_id(symbol=custom_asset_symbol)
     logger.info(f"Created asset: {custom_asset_symbol}")
@@ -72,7 +72,7 @@ def setup_simple_market(
         asset=tdai_id,
         amount=mint_amount,
     )
-    vega.wait_fn(10)
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
 
     market_id = vega.create_simple_market(
@@ -86,7 +86,7 @@ def setup_simple_market(
     )
 
     vega.forward("10s")
-    vega.wait_fn(10)
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
 
     return market_id
@@ -108,7 +108,7 @@ def setup_simple_successor_market(
     )
 
     vega.forward("10s")
-    vega.wait_fn(10)
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
 
     return market_id
@@ -127,7 +127,7 @@ def setup_opening_auction_market(vega: VegaService, market_id: str = None, **kwa
     )
 
     vega.forward("10s")
-    vega.wait_fn(10)
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
 
     return market_id
@@ -139,7 +139,7 @@ def setup_continuous_market(vega: VegaService, market_id: str = None, **kwargs):
 
     submit_order(vega, "Key 1", market_id, "SIDE_BUY", 1, 110)
     vega.forward("10s")
-    vega.wait_fn(10)
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
 
     return market_id

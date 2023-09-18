@@ -79,6 +79,10 @@ def init_vega(request=None):
         finally:
             logger.info(f"Stopping container {container.id}")
             container.stop()
+            # Remove the container
+            logger.info(f"Removing container {container.id}")
+            container.remove()
+            
 
 
 @contextmanager
@@ -120,7 +124,6 @@ def init_page(vega: VegaServiceNull, browser: Browser, request: pytest.FixtureRe
             finally:
                 if not os.path.exists("traces"):
                     os.makedirs("traces")
-
                 try:
                     trace_path = os.path.join("traces", request.node.name + "trace.zip")
                     context.tracing.stop(path=trace_path)

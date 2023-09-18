@@ -74,6 +74,7 @@ def create_position(vega: VegaService, market_id):
     submit_order(vega, "Key 1", market_id, "SIDE_SELL", 100, 110)
     submit_order(vega, "Key 1", market_id, "SIDE_BUY", 100, 110)
     vega.forward("10s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup
 
 @pytest.mark.usefixtures("page", "continuous_market", "auth", "risk_accepted")
@@ -111,8 +112,8 @@ def test_submit_stop_order_rejected(continuous_market, vega: VegaService, page: 
     page.get_by_test_id(trigger_price).fill("103")
     page.get_by_test_id(order_size).fill("3")
     page.get_by_test_id(submit_stop_order).click()
-    vega.wait_fn(1)
     vega.forward("10s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
     
     page.get_by_test_id(close_toast).click()
@@ -169,9 +170,8 @@ def test_submit_stop_market_order_triggered(
     page.get_by_test_id(expiry_strategy_cancel).click()
 
     page.get_by_test_id(submit_stop_order).click()
-
-    vega.wait_fn(1)
     vega.forward("10s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
     page.wait_for_selector('[data-testid="toast-close"]', state="visible")
     page.get_by_test_id(close_toast).click()
@@ -231,8 +231,8 @@ def test_submit_stop_limit_order_pending(
     expires_at_input_value = expires_at.strftime("%Y-%m-%dT%H:%M:%S")
     page.get_by_test_id("date-picker-field").fill(expires_at_input_value)
     page.get_by_test_id(submit_stop_order).click()
-    vega.wait_fn(1)
     vega.forward("10s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
     
     page.wait_for_selector('[data-testid="toast-close"]', state="visible")
@@ -284,15 +284,15 @@ def test_submit_stop_limit_order_cancel(
     page.get_by_test_id(order_price).fill("99")
     page.get_by_test_id(order_size).fill("1")
     page.get_by_test_id(submit_stop_order).click()
-    vega.wait_fn(1)
     vega.forward("10s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
     
     page.get_by_test_id(close_toast).first.click()
     wait_for_graphql_response(page, "stopOrders")
     page.get_by_test_id(cancel).click()
-    vega.wait_fn(1)
     vega.forward("10s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
     page.get_by_test_id(close_toast).first.click()
 
@@ -398,8 +398,8 @@ def test_maximum_number_of_active_stop_orders(
         page.get_by_test_id(order_price).fill("99")
         page.get_by_test_id(order_size).fill("1")
         page.get_by_test_id(submit_stop_order).click()
-        vega.wait_fn(1)
         vega.forward("10s")
+        vega.wait_fn(1)
         vega.wait_for_total_catchup()
         if page.get_by_test_id(close_toast).is_visible():
             page.get_by_test_id(close_toast).click()

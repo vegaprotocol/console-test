@@ -81,6 +81,7 @@ def create_position(vega: VegaService, market_id):
     submit_order(vega, "Key 1", market_id, "SIDE_SELL", 100, 110)
     submit_order(vega, "Key 1", market_id, "SIDE_BUY", 100, 110)
     vega.forward("10s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup
 
 
@@ -106,8 +107,8 @@ def test_submit_stop_order_market_oco_rejected(continuous_market, vega: VegaServ
     page.get_by_test_id(trigger_price_oco).fill("102")
     page.get_by_test_id(order_size_oco).fill("3")
     page.get_by_test_id(submit_stop_order).click()
-    vega.wait_fn(1)
     vega.forward("10s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
     
     page.get_by_test_id(close_toast).click()
@@ -181,8 +182,8 @@ def test_submit_stop_oco_market_order_triggered(continuous_market, vega: VegaSer
     page.get_by_test_id(trigger_price_oco).fill("102")
     page.get_by_test_id(order_size_oco).fill("3")
     page.get_by_test_id(submit_stop_order).click()
-    vega.wait_fn(1)
     vega.forward("10s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
     
     page.get_by_test_id(close_toast).click()
@@ -252,8 +253,8 @@ def test_submit_stop_oco_market_order_pending(continuous_market, vega: VegaServi
     page.get_by_test_id(trigger_price_oco).fill("120")
     page.get_by_test_id(order_size_oco).fill("2")
     page.get_by_test_id(submit_stop_order).click()
-    vega.wait_fn(1)
     vega.forward("10s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
     page.get_by_test_id(close_toast).click()
     wait_for_graphql_response(page, "stopOrders")
@@ -290,8 +291,8 @@ def test_submit_stop_oco_limit_order_pending(continuous_market, vega: VegaServic
     # 7002-SORD-089
     page.get_by_test_id(order_limit_price_oco).fill("99")
     page.get_by_test_id(submit_stop_order).click()
-    vega.wait_fn(1)
     vega.forward("10s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
     
     page.get_by_test_id(close_toast).click()
@@ -339,15 +340,15 @@ def test_submit_stop_oco_limit_order_cancel(continuous_market, vega: VegaService
     # 7002-SORD-093
     page.get_by_test_id(order_limit_price_oco).fill("99")
     page.get_by_test_id(submit_stop_order).click()
-    vega.wait_fn(1)
     vega.forward("10s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
     
     page.get_by_test_id(close_toast).click()
     wait_for_graphql_response(page, "stopOrders")
     page.get_by_test_id(cancel).first.click()
-    vega.wait_fn(1)
     vega.forward("10s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
     page.get_by_test_id(close_toast).first.click()
 
@@ -438,8 +439,8 @@ def test_maximum_number_of_active_stop_orders_oco(continuous_market, vega: VegaS
     for i in range(2):
         page.get_by_test_id(submit_stop_order).click()
     
-        vega.wait_fn(1)
         vega.forward("10s")
+        vega.wait_fn(1)
         vega.wait_for_total_catchup()
         if page.get_by_test_id(close_toast).is_visible():
             page.get_by_test_id(close_toast).click()

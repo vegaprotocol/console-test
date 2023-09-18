@@ -99,6 +99,7 @@ def test_price_monitoring(simple_market, vega: VegaService, page: Page):
     )
 
     vega.forward("10s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
 
     expect(
@@ -140,9 +141,11 @@ def test_price_monitoring(simple_market, vega: VegaService, page: Page):
 
     # add order at the current price so that it is possible to change the status to price monitoring
     to_cancel = submit_order(vega, MM_WALLET2.name, simple_market, "SIDE_BUY", 1, 105)
-
-    vega.wait_for_total_catchup()
+    
     vega.forward("10s")
+    vega.wait_fn(1)
+    vega.wait_for_total_catchup()
+    
 
     expect(
         page.get_by_test_id(price_monitoring_bounds_row).first.get_by_text(
@@ -166,8 +169,10 @@ def test_price_monitoring(simple_market, vega: VegaService, page: Page):
 
     # cancel order to increase liquidity
     vega.cancel_order(MM_WALLET2.name, simple_market, to_cancel)
-    vega.wait_for_total_catchup()
+
     vega.forward("10s")
+    vega.wait_fn(1)
+    vega.wait_for_total_catchup()
 
     expect(page.get_by_text(market_name).first).to_be_attached()
     expect(

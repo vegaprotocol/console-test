@@ -50,7 +50,7 @@ def setup_simple_market(
         decimals=5,
         max_faucet_amount=1e10,
     )
-
+    vega.wait_fn(10)
     vega.wait_for_total_catchup()
     tdai_id = vega.find_asset_id(symbol=custom_asset_symbol)
     logger.info(f"Created asset: {custom_asset_symbol}")

@@ -40,6 +40,7 @@ def setup_market(vega):
     )
 
     vega.forward("10s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
 
     return [
@@ -109,6 +110,7 @@ def test_orderbook_grid_content(setup_market, page: Page):
     )
 
     vega.forward("10s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
 
     # 6003-ORDB-001
@@ -231,6 +233,7 @@ def test_orderbook_price_movement(setup_market, page: Page):
     )
 
     vega.forward("10s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
 
     # 6003-ORDB-013
@@ -250,6 +253,7 @@ def test_orderbook_price_movement(setup_market, page: Page):
     )
 
     vega.forward("10s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
 
     expect(book_el.locator('[data-testid=icon-arrow-down]')).to_be_attached()

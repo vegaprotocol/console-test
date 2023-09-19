@@ -71,7 +71,7 @@ jobs:
       #  ----- run tests. -----
       #----------------------------------------------
       - name: Run tests
-        run: poetry run pytest -v -s --numprocesses 6 --dist loadfile --durations=20
+        run: poetry run pytest -v -s --numprocesses 8 --dist loadfile --durations=20
       #----------------------------------------------
       #  -----  upload traces  -----
       #----------------------------------------------

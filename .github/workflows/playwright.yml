@@ -12,7 +12,7 @@ on:
 jobs:
   test:
     timeout-minutes: 30
-    runs-on: console-test
+    runs-on: 8-cores
     steps:
       - uses: actions/checkout@v3
       #----------------------------------------------
@@ -56,7 +56,7 @@ jobs:
       #  ----- run tests. -----
       #----------------------------------------------
       - name: Run tests
-        run: poetry run pytest -v -s --numprocesses 2 --dist loadfile --durations=20
+        run: poetry run pytest -v -s --numprocesses 4 --dist loadfile --durations=20
       #----------------------------------------------
       #  -----  upload traces  -----
       #----------------------------------------------

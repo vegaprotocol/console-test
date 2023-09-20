@@ -2,8 +2,6 @@ import pytest
 from playwright.sync_api import Page
 from vega_sim.service import VegaService
 from actions.vega import submit_order
-from conftest import init_vega
-from fixtures.market import setup_continuous_market
 
 
 def wait_for_graphql_response(page, query_name, timeout=5000):
@@ -37,16 +35,6 @@ def check_pnl_color_value(element, expected_color, expected_value):
     value = element.inner_text()
     assert color == expected_color, f"Unexpected color: {color}"
     assert value == expected_value, f"Unexpected value: {value}"
-
-@pytest.fixture(scope="module")
-def vega(request):
-    with init_vega(request) as vega:
-        yield vega
-
-@pytest.fixture(scope="module")
-def continuous_market(vega):
-    return setup_continuous_market(vega)
-
 
 @pytest.mark.usefixtures("vega", "page", "continuous_market", "auth", "risk_accepted")
 def test_pnl(continuous_market, vega: VegaService, page: Page):
@@ -130,3 +118,26 @@ def test_pnl(continuous_market, vega: VegaService, page: Page):
     check_pnl_color_value(key_mm2_unrealised_pnl, "rgb(0, 0, 0)", "0.00")
 
     page.get_by_role("link", name="Trading").click()
+
+    row = (
+        page.get_by_test_id("tab-positions")
+        .locator(".ag-center-cols-container .ag-row")
+        .nth(0)
+    )
+    realised_pnl = row.locator("[col-id='realisedPNL']")
+    unrealised_pnl = row.locator("[col-id='unrealisedPNL']")
+
+    # neutral trading realised
+    check_pnl_color_value(realised_pnl, "rgb(0, 0, 0)", "0.00")
+    check_pnl_color_value(unrealised_pnl, "rgb(0, 0, 0)", "0.00")
+
+    # profit trading realised
+    page.get_by_test_id("manage-vega-wallet").click()
+    page.locator('[role="menuitemradio"]').nth(1).click(position={ "x": 0, "y": 0})
+    check_pnl_color_value(realised_pnl, "rgb(1, 145, 75)", "8.00")
+    check_pnl_color_value(unrealised_pnl, "rgb(0, 0, 0)", "0.00")
+
+    # loss trading realised
+    page.locator('[role="menuitemradio"]').nth(0).click(position={ "x": 0, "y": 0})
+    check_pnl_color_value(realised_pnl, "rgb(236, 0, 60)", "-8.00")
+    check_pnl_color_value(unrealised_pnl, "rgb(0, 0, 0)", "0.00")

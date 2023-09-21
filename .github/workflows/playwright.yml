@@ -1,7 +1,7 @@
 name: Build and Run Tests
 
 env:
-  VEGA_VERSION: v0.72.14
+  VEGA_VERSION: v0.73.0-preview.6
 
 on:
   push:

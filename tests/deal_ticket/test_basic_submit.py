@@ -2,6 +2,8 @@ import pytest
 from playwright.sync_api import Page, expect
 from vega_sim.service import VegaService
 from datetime import datetime, timedelta
+from conftest import init_vega
+from fixtures.market import setup_continuous_market
 
 order_size = "order-size"
 order_price = "order-price"
@@ -12,7 +14,18 @@ tif = "order-tif"
 expire = "expire"
 
 
-@pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
+@pytest.fixture(scope="module")
+def vega(request):
+    with init_vega(request) as vega:
+        yield vega
+
+
+@pytest.fixture(scope="module")
+def continuous_market(vega):
+    return setup_continuous_market(vega)
+
+
+@pytest.mark.usefixtures("page", "auth", "risk_accepted")
 def test_limit_buy_order_GTT(continuous_market, vega: VegaService, page: Page):
     page.goto(f"/#/markets/{continuous_market}")
     page.get_by_test_id(order_size).fill("10")
@@ -21,8 +34,13 @@ def test_limit_buy_order_GTT(continuous_market, vega: VegaService, page: Page):
     expires_at = datetime.now() + timedelta(days=1)
     expires_at_input_value = expires_at.strftime("%Y-%m-%dT%H:%M:%S")
     page.get_by_test_id("date-picker-field").fill(expires_at_input_value)
-    expect(page.get_by_test_id("place-order").locator("span").first).to_have_text("Place limit order")
-    expect(page.get_by_test_id("place-order").locator("span").last).to_have_text("10 BTC @ 120.00 BTC")
+    # 7002-SORD-011
+    expect(page.get_by_test_id("place-order").locator("span").first).to_have_text(
+        "Place limit order"
+    )
+    expect(page.get_by_test_id("place-order").locator("span").last).to_have_text(
+        "10 BTC @ 120.00 BTC"
+    )
     page.get_by_test_id(place_order).click()
     vega.forward("10s")
     vega.wait_fn(10)
@@ -34,7 +52,7 @@ def test_limit_buy_order_GTT(continuous_market, vega: VegaService, page: Page):
     )
 
 
-@pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
+@pytest.mark.usefixtures("page", "auth", "risk_accepted")
 def test_limit_buy_order(continuous_market, vega: VegaService, page: Page):
     page.goto(f"/#/markets/{continuous_market}")
     page.get_by_test_id(order_size).fill("10")
@@ -49,15 +67,21 @@ def test_limit_buy_order(continuous_market, vega: VegaService, page: Page):
         "BTC:DAI_2023Futr10+10LimitFilled120.00GTC"
     )
 
-@pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
+
+@pytest.mark.usefixtures("page", "auth", "risk_accepted")
 def test_limit_sell_order(continuous_market, vega: VegaService, page: Page):
     page.goto(f"/#/markets/{continuous_market}")
     page.get_by_test_id(order_size).fill("10")
     page.get_by_test_id(order_price).fill("100")
     page.get_by_test_id(order_side_sell).click()
     page.get_by_test_id(tif).select_option("Good for Normal (GFN)")
-    expect(page.get_by_test_id("place-order").locator("span").first).to_have_text("Place limit order")
-    expect(page.get_by_test_id("place-order").locator("span").last).to_have_text("10 BTC @ 100.00 BTC")
+    # 7002-SORD-011
+    expect(page.get_by_test_id("place-order").locator("span").first).to_have_text(
+        "Place limit order"
+    )
+    expect(page.get_by_test_id("place-order").locator("span").last).to_have_text(
+        "10 BTC @ 100.00 BTC"
+    )
     page.get_by_test_id(place_order).click()
     vega.forward("10s")
     vega.wait_fn(10)
@@ -68,14 +92,19 @@ def test_limit_sell_order(continuous_market, vega: VegaService, page: Page):
     )
 
 
-@pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
+@pytest.mark.usefixtures("page", "auth", "risk_accepted")
 def test_market_sell_order(continuous_market, vega: VegaService, page: Page):
     page.goto(f"/#/markets/{continuous_market}")
     page.get_by_test_id(market_order).click()
     page.get_by_test_id(order_size).fill("10")
     page.get_by_test_id(order_side_sell).click()
-    expect(page.get_by_test_id("place-order").locator("span").first).to_have_text("Place market order")
-    expect(page.get_by_test_id("place-order").locator("span").last).to_have_text("10 BTC @ market")
+    # 7002-SORD-011
+    expect(page.get_by_test_id("place-order").locator("span").first).to_have_text(
+        "Place market order"
+    )
+    expect(page.get_by_test_id("place-order").locator("span").last).to_have_text(
+        "10 BTC @ market"
+    )
     page.get_by_test_id(place_order).click()
     vega.forward("10s")
     vega.wait_fn(10)
@@ -86,7 +115,7 @@ def test_market_sell_order(continuous_market, vega: VegaService, page: Page):
     )
 
 
-@pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
+@pytest.mark.usefixtures("page", "auth", "risk_accepted")
 def test_market_buy_order(continuous_market, vega: VegaService, page: Page):
     page.goto(f"/#/markets/{continuous_market}")
     page.get_by_test_id(market_order).click()

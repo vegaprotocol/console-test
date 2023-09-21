@@ -3,6 +3,8 @@ from collections import namedtuple
 from playwright.sync_api import expect, Page
 from vega_sim.service import VegaService
 from actions.vega import submit_order
+from conftest import init_vega
+from fixtures.market import setup_continuous_market
 
 # Defined namedtuples
 WalletConfig = namedtuple("WalletConfig", ["name", "passphrase"])
@@ -22,82 +24,91 @@ def hover_and_assert_tooltip(page, element_text):
     expect(page.get_by_role("tooltip")).to_be_visible()
 
 
-@pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
-def test_iceberg_submit(continuous_market, vega: VegaService, page: Page):
-    page.goto(f"/#/markets/{continuous_market}")
-    page.get_by_test_id("iceberg").click()
-    page.get_by_test_id("order-peak-size").type("2")
-    page.get_by_test_id("order-minimum-size").type("1")
-    page.get_by_test_id("order-size").type("3")
-    page.get_by_test_id("order-price").type("107")
-    page.get_by_test_id("place-order").click()
+class TestIcebergOrdersValidations:
+    @pytest.fixture(scope="class")
+    def vega(self, request):
+        with init_vega(request) as vega:
+            yield vega
 
-    expect(page.get_by_test_id("toast-content")).to_have_text(
-        "Awaiting confirmationPlease wait for your transaction to be confirmedView in"
-        " block explorer"
-    )
+    @pytest.fixture(scope="class")
+    def continuous_market(self, vega):
+        return setup_continuous_market(vega)
 
-    vega.wait_fn(10)
-    vega.forward("10s")
-    vega.wait_for_total_catchup()
-    expect(page.get_by_test_id("toast-content")).to_have_text(
-        "Order filledYour transaction has been confirmed View in block explorerSubmit"
-        " order - filledBTC:DAI_2023+3 @ 107.00 tDAI"
-    )
-    page.get_by_test_id("All").click()
-    expect((page.get_by_role("row").locator('[col-id="type"]')).nth(1)).to_have_text(
-        "Limit (Iceberg)"
-    )
+    @pytest.mark.usefixtures("page", "auth", "risk_accepted")
+    def test_iceberg_submit(self, continuous_market, vega: VegaService, page: Page):
+        page.goto(f"/#/markets/{continuous_market}")
+        page.get_by_test_id("iceberg").click()
+        page.get_by_test_id("order-peak-size").type("2")
+        page.get_by_test_id("order-minimum-size").type("1")
+        page.get_by_test_id("order-size").type("3")
+        page.get_by_test_id("order-price").type("107")
+        page.get_by_test_id("place-order").click()
 
+        expect(page.get_by_test_id("toast-content")).to_have_text(
+            "Awaiting confirmationPlease wait for your transaction to be confirmedView"
+            " in block explorer"
+        )
 
-@pytest.mark.usefixtures("page", "continuous_market", "auth", "risk_accepted")
-def test_iceberg_tooltips(continuous_market, page: Page):
-    page.goto(f"/#/markets/{continuous_market}")
-    hover_and_assert_tooltip(page, "Iceberg")
-    page.get_by_test_id("iceberg").click()
-    hover_and_assert_tooltip(page, "Peak size")
-    hover_and_assert_tooltip(page, "Minimum size")
+        vega.forward("10s")
+        vega.wait_fn(1)
+        vega.wait_for_total_catchup()
+        expect(page.get_by_test_id("toast-content")).to_have_text(
+            "Order filledYour transaction has been confirmed View in block"
+            " explorerSubmit order - filledBTC:DAI_2023+3 @ 107.00 tDAI"
+        )
+        page.get_by_test_id("All").click()
+        expect(
+            (page.get_by_role("row").locator('[col-id="type"]')).nth(1)
+        ).to_have_text("Limit (Iceberg)")
 
+    @pytest.mark.usefixtures("page", "auth", "risk_accepted")
+    def test_iceberg_tooltips(self, continuous_market, page: Page):
+        page.goto(f"/#/markets/{continuous_market}")
+        hover_and_assert_tooltip(page, "Iceberg")
+        page.get_by_test_id("iceberg").click()
+        hover_and_assert_tooltip(page, "Peak size")
+        hover_and_assert_tooltip(page, "Minimum size")
 
-@pytest.mark.usefixtures("page", "continuous_market", "auth", "risk_accepted")
-def test_iceberg_validations(continuous_market, page: Page):
-    page.goto(f"/#/markets/{continuous_market}")
-    page.get_by_test_id("iceberg").click()
-    page.get_by_test_id("place-order").click()
-    expect(page.get_by_test_id("deal-ticket-peak-error-message")).to_be_visible()
-    expect(page.get_by_test_id("deal-ticket-peak-error-message")).to_have_text(
-        "You need to provide a peak size"
-    )
-    expect(page.get_by_test_id("deal-ticket-minimum-error-message")).to_be_visible()
-    expect(page.get_by_test_id("deal-ticket-minimum-error-message")).to_have_text(
-        "You need to provide a minimum visible size"
-    )
-    page.get_by_test_id("order-peak-size").clear()
-    page.get_by_test_id("order-peak-size").type("1")
-    page.get_by_test_id("order-minimum-size").clear()
-    page.get_by_test_id("order-minimum-size").type("2")
-    expect(page.get_by_test_id("deal-ticket-peak-error-message")).to_be_visible()
-    expect(page.get_by_test_id("deal-ticket-peak-error-message")).to_have_text(
-        "Peak size cannot be greater than the size (0)"
-    )
-    expect(page.get_by_test_id("deal-ticket-minimum-error-message")).to_be_visible()
-    expect(page.get_by_test_id("deal-ticket-minimum-error-message")).to_have_text(
-        "Minimum visible size cannot be greater than the peak size (1)"
-    )
-    page.get_by_test_id("order-minimum-size").clear()
-    page.get_by_test_id("order-minimum-size").type("0.1")
-    expect(page.get_by_test_id("deal-ticket-minimum-error-message")).to_be_visible()
-    expect(page.get_by_test_id("deal-ticket-minimum-error-message")).to_have_text(
-        "Minimum visible size cannot be lower than 1"
-    )
+    @pytest.mark.usefixtures("page", "auth", "risk_accepted")
+    def test_iceberg_validations(self, continuous_market, page: Page):
+        page.goto(f"/#/markets/{continuous_market}")
+        page.get_by_test_id("iceberg").click()
+        page.get_by_test_id("place-order").click()
+        expect(page.get_by_test_id("deal-ticket-peak-error-message")).to_be_visible()
+        expect(page.get_by_test_id("deal-ticket-peak-error-message")).to_have_text(
+            "You need to provide a peak size"
+        )
+        expect(page.get_by_test_id("deal-ticket-minimum-error-message")).to_be_visible()
+        expect(page.get_by_test_id("deal-ticket-minimum-error-message")).to_have_text(
+            "You need to provide a minimum visible size"
+        )
+        page.get_by_test_id("order-peak-size").clear()
+        page.get_by_test_id("order-peak-size").type("1")
+        page.get_by_test_id("order-minimum-size").clear()
+        page.get_by_test_id("order-minimum-size").type("2")
+        expect(page.get_by_test_id("deal-ticket-peak-error-message")).to_be_visible()
+        expect(page.get_by_test_id("deal-ticket-peak-error-message")).to_have_text(
+            "Peak size cannot be greater than the size (0)"
+        )
+        expect(page.get_by_test_id("deal-ticket-minimum-error-message")).to_be_visible()
+        expect(page.get_by_test_id("deal-ticket-minimum-error-message")).to_have_text(
+            "Minimum visible size cannot be greater than the peak size (1)"
+        )
+        page.get_by_test_id("order-minimum-size").clear()
+        page.get_by_test_id("order-minimum-size").type("0.1")
+        expect(page.get_by_test_id("deal-ticket-minimum-error-message")).to_be_visible()
+        expect(page.get_by_test_id("deal-ticket-minimum-error-message")).to_have_text(
+            "Minimum visible size cannot be lower than 1"
+        )
 
 
 @pytest.mark.usefixtures("vega", "page", "continuous_market", "auth", "risk_accepted")
 def test_iceberg_open_order(continuous_market, vega: VegaService, page: Page):
     page.goto(f"/#/markets/{continuous_market}")
 
-    submit_order(vega, "Key 1", vega.all_markets()[0].id, "SIDE_SELL", 102, 101, 2, 1)
+    submit_order(vega, "Key 1", continuous_market, "SIDE_SELL", 102, 101, 2, 1)
     vega.forward("10s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
     page.wait_for_selector(".ag-center-cols-container .ag-row")
     expect(
@@ -127,9 +138,10 @@ def test_iceberg_open_order(continuous_market, vega: VegaService, page: Page):
     expect(page.locator('[id^="cell-price-"]').first).to_have_text("101.50")
     expect(page.locator('[id^="cell-size-"]').first).to_have_text("99")
 
-    submit_order(vega, MM_WALLET2.name, vega.all_markets()[0].id, "SIDE_BUY", 103, 101)
+    submit_order(vega, MM_WALLET2.name, continuous_market, "SIDE_BUY", 103, 101)
 
     vega.forward("10s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
     expect(
         page.locator(

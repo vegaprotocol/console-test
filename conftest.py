@@ -1,3 +1,4 @@
+import logging
 import docker
 import pytest
 import os
@@ -15,7 +16,29 @@ from fixtures.market import (
     setup_continuous_market,
 )
 
+import sys
+
+# Workaround for current xdist issue with displaying live logs from multiple workers
+# https://github.com/pytest-dev/pytest-xdist/issues/402
+sys.stdout = sys.stderr
+
 docker_client = docker.from_env()
+logger = logging.getLogger()
+
+
+def pytest_configure(config):
+    worker_id = os.environ.get("PYTEST_XDIST_WORKER")
+    if worker_id is not None:
+        log_dir = os.path.join(os.getcwd(), "logs")
+        log_name = f"tests_{worker_id}.log"
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
+        logging.basicConfig(
+            format=config.getini("log_file_format"),
+            datefmt=config.getini("log_file_date_format"),
+            filename=os.path.join(log_dir, log_name),
+            level=config.getini("log_file_level"),
+        )
 
 
 # Start VegaServiceNull and start up docker container for website
@@ -23,10 +46,13 @@ docker_client = docker.from_env()
 def init_vega(request=None):
     default_seconds = 1
     seconds_per_block = default_seconds
-    if request and hasattr(request, 'param'):
+    if request and hasattr(request, "param"):
         seconds_per_block = request.param
 
-    print("\nStarting VegaServiceNull")
+    logger.info(
+        "Starting VegaServiceNull",
+        extra={"worker_id": os.environ.get("PYTEST_XDIST_WORKER")},
+    )
     with VegaServiceNull(
         run_with_console=False,
         launch_graphql=False,
@@ -34,22 +60,29 @@ def init_vega(request=None):
         use_full_vega_wallet=True,
         store_transactions=True,
         transactions_per_block=1000,
-        seconds_per_block=seconds_per_block 
+        seconds_per_block=seconds_per_block,
     ) as vega:
         try:
             container = docker_client.containers.run(
                 container_name, detach=True, ports={"80/tcp": vega.console_port}
             )
             # docker setup
-            print(f"Container {container.id} started")
+            logger.info(
+                f"Container {container.id} started",
+                extra={"worker_id": os.environ.get("PYTEST_XDIST_WORKER")},
+            )
             yield vega
         except docker.errors.APIError as e:
-            print(f"Container {container.id} failed")
-            print(e)
+            logger.info(f"Container creation failed.")
+            logger.info(e)
             raise e
         finally:
-            print(f"Stopping container {container.id}")
+            logger.info(f"Stopping container {container.id}")
             container.stop()
+            # Remove the container
+            logger.info(f"Removing container {container.id}")
+            container.remove()
+            
 
 
 @contextmanager
@@ -57,46 +90,44 @@ def init_page(vega: VegaServiceNull, browser: Browser, request: pytest.FixtureRe
     with browser.new_context(
         viewport={"width": 1920, "height": 1080},
         base_url=f"http://localhost:{vega.console_port}",
-    ) as context:
+    ) as context, context.new_page() as page:
         context.tracing.start(screenshots=True, snapshots=True, sources=True)
-        with context.new_page() as page:
-            try:
-                # Wait for the console to be up and running before any tests are run
-                attempts = 0
-                while attempts < 100:
-                    try:
-                        code = requests.get(
-                            f"http://localhost:{vega.console_port}/"
-                        ).status_code
-                        if code == 200:
-                            break
-                    except requests.exceptions.ConnectionError as e:
-                        attempts += 1
-                        if attempts < 100:
-                            time.sleep(0.1)
-                            continue
-                        else:
-                            raise e
-
-                # Set window._env_ so built docker image data uses datanode from vega market sim
-                env = json.dumps(
-                    {
-                        "VEGA_URL": f"http://localhost:{vega.data_node_rest_port}/graphql",
-                        "VEGA_WALLET_URL": f"http://localhost:{vega.wallet_port}",
-                    }
-                )
-                window_env = f"window._env_ = Object.assign({{}}, window._env_, {env})"
-                page.add_init_script(script=window_env)
-                yield page
-            finally:
-                if not os.path.exists("traces"):
-                    os.makedirs("traces")
-
+        try:
+            # Wait for the console to be up and running before any tests are run
+            attempts = 0
+            while attempts < 100:
                 try:
-                    trace_path = os.path.join("traces", request.node.name + "trace.zip")
-                    context.tracing.stop(path=trace_path)
-                except Exception as e:
-                    print(f"Failed to save trace: {e}")
+                    code = requests.get(
+                        f"http://localhost:{vega.console_port}/"
+                    ).status_code
+                    if code == 200:
+                        break
+                except requests.exceptions.ConnectionError as e:
+                    attempts += 1
+                    if attempts < 100:
+                        time.sleep(0.1)
+                        continue
+                    else:
+                        raise e
+
+            # Set window._env_ so built docker image data uses datanode from vega market sim
+            env = json.dumps(
+                {
+                    "VEGA_URL": f"http://localhost:{vega.data_node_rest_port}/graphql",
+                    "VEGA_WALLET_URL": f"http://localhost:{vega.wallet_port}",
+                }
+            )
+            window_env = f"window._env_ = Object.assign({{}}, window._env_, {env})"
+            page.add_init_script(script=window_env)
+            yield page
+        finally:
+            if not os.path.exists("traces"):
+                os.makedirs("traces")
+            try:
+                trace_path = os.path.join("traces", request.node.name + "trace.zip")
+                context.tracing.stop(path=trace_path)
+            except Exception as e:
+                logger.error(f"Failed to save trace: {e}")
 
 
 # default vega & page fixtures with function scope (refreshed at each test) that can be used in tests
@@ -150,10 +181,21 @@ def auth(vega: VegaServiceNull, page: Page):
 
 
 # Set 'risk accepted' flag, so that the risk dialog doesn't show up
+def risk_accepted_setup(page: Page):
+    onboarding_config = json.dumps({"state": {"dismissed": True}, "version": 0})
+    storage_javascript = [
+        "localStorage.setItem('vega_risk_accepted', 'true');",
+        f"localStorage.setItem('vega_onboarding', '{onboarding_config}');",
+        "localStorage.setItem('vega_telemetry_approval', 'false');",
+        "localStorage.setItem('vega_telemetry_viewed', 'true');",
+    ]
+    script = "".join(storage_javascript)
+    page.add_init_script(script)
+
+
 @pytest.fixture(scope="function")
 def risk_accepted(page: Page):
-    script = "localStorage.setItem('vega_risk_accepted', 'true'); localStorage.setItem('vega_onboarding_viewed', 'true'); localStorage.setItem('vega_telemetry_approval', 'false'); localStorage.setItem('vega_telemetry_viewed', 'true');"
-    page.add_init_script(script)
+    risk_accepted_setup(page)
 
 
 @pytest.fixture(scope="function")

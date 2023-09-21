@@ -41,6 +41,7 @@ def test_market_lifecycle(proposed_market, vega: VegaService, page: Page):
 
     # "wait" for market to be approved and enacted
     vega.forward("60s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
 
     # check that market is in pending state
@@ -84,6 +85,7 @@ def test_market_lifecycle(proposed_market, vega: VegaService, page: Page):
     submit_order(vega, MM_WALLET2.name, market_id, "SIDE_BUY", 1, 100)
 
     vega.forward("10s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
 
     # check market state is now active and trading mode is continuous
@@ -98,6 +100,7 @@ def test_market_lifecycle(proposed_market, vega: VegaService, page: Page):
         key_name=TERMINATE_WALLET.name,
     )
     vega.forward("60s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
 
     # market state should be changed to "Trading Terminated" because of the invalid oracle
@@ -111,6 +114,7 @@ def test_market_lifecycle(proposed_market, vega: VegaService, page: Page):
         market_id=market_id,
     )
     vega.forward("10s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
 
     # check market state is now settled

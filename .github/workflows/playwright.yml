@@ -1,4 +1,8 @@
 name: Build and Run Tests
+
+env:
+  VEGA_VERSION: v0.72.14
+
 on:
   push:
     branches: [main, master]
@@ -7,20 +11,51 @@ on:
   workflow_dispatch:
 jobs:
   test:
-    timeout-minutes: 20
-    runs-on: console-test
+    timeout-minutes: 30
+    runs-on: 4-cores
     steps:
       - uses: actions/checkout@v3
       #----------------------------------------------
       #  -----  install dependencies  -----
       #----------------------------------------------
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      #----------------------------------------------
+      #  -----  install & configure poetry  -----
+      #----------------------------------------------
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          virtualenvs-path: console-test/.venv
+
       - name: Install dependencies
         run: poetry install --no-interaction --no-root
+
+      #----------------------------------------------
+      #  -----  find vega binaries path  -----
+      #----------------------------------------------
+      - name: Find vega binaries path
+        id: vega_bin_path
+        run: echo path=$(poetry run python -c "import vega_sim; print(vega_sim.vega_bin_path)") >> $GITHUB_OUTPUT
+      #----------------------------------------------
+      #  -----  vega binaries cache -----
+      #----------------------------------------------
+      - name: Vega binaries cache
+        uses: actions/cache@v3
+        id: vega_binaries_cache
+        with:
+          path: ${{ steps.vega_bin_path.outputs.path }}
+          key: ${{ runner.os }}-vega-binaries-${{ env.VEGA_VERSION }}
       #----------------------------------------------
       #  -----  install vega binaries. -----
       #----------------------------------------------
       - name: Install vega binaries
-        run: poetry run python -m vega_sim.tools.load_binaries --force --dev --version v0.72.1-13289-35c9c9c8
+        if: steps.vega_binaries_cache.outputs.cache-hit != 'true'
+        run: poetry run python -m vega_sim.tools.load_binaries --force --version $VEGA_VERSION
       #----------------------------------------------
       #  -----  pull console. -----
       #----------------------------------------------
@@ -36,7 +71,7 @@ jobs:
       #  ----- run tests. -----
       #----------------------------------------------
       - name: Run tests
-        run: poetry run pytest -v -s --numprocesses 2 --dist loadfile --durations=20
+        run: poetry run pytest -v -s --numprocesses 4 --dist loadfile --durations=20
       #----------------------------------------------
       #  -----  upload traces  -----
       #----------------------------------------------

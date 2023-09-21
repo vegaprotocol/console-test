@@ -12,14 +12,29 @@ on:
 jobs:
   test:
     timeout-minutes: 30
-    runs-on: console-test
+    runs-on: 4-cores
     steps:
       - uses: actions/checkout@v3
       #----------------------------------------------
       #  -----  install dependencies  -----
       #----------------------------------------------
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+    #----------------------------------------------
+    #  -----  install & configure poetry  -----
+    #----------------------------------------------
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          virtualenvs-path: console-test/.venv
+      
       - name: Install dependencies
         run: poetry install --no-interaction --no-root
+
       #----------------------------------------------
       #  -----  find vega binaries path  -----
       #----------------------------------------------
@@ -56,7 +71,7 @@ jobs:
       #  ----- run tests. -----
       #----------------------------------------------
       - name: Run tests
-        run: poetry run pytest -v -s --numprocesses 2 --dist loadfile --durations=20
+        run: poetry run pytest -v -s --numprocesses 4 --dist loadfile --durations=20
       #----------------------------------------------
       #  -----  upload traces  -----
       #----------------------------------------------

@@ -15,7 +15,7 @@ def test_market_selector(continuous_market, page: Page):
     # 6001-MARK-024
     # 6001-MARK-025
     btc_market = page.locator('[data-testid="market-selector-list"] a')
-    expect(btc_market.locator("h3")).to_have_text("BTC:DAI_2023 Futr")
+    expect(btc_market.locator("h3")).to_have_text("BTC:DAI_2023Futr")
     expect(btc_market.locator('[data-testid="market-selector-volume"]')).to_have_text(
         "0.00"
     )

@@ -74,7 +74,7 @@ class TestSettledMarket:
         # 6001-MARK-008
         # 6001-MARK-010
         expect(row_selector.locator('[col-id="settlementDate"]')).to_have_text(
-            "4 months ago"
+            "5 months ago"
         )
         expected_pattern = re.compile(r"https://.*?/oracles/[a-f0-9]{64}")
         actual_href = row_selector.locator(
@@ -107,7 +107,7 @@ class TestSettledMarket:
         expect(row_selector.locator('[col-id="settlementAsset"]')).to_have_text("tDAI")
         # 6001-MARK-020
         expect(row_selector.locator('[col-id="settlementDate"]')).to_have_text(
-            "4 months ago"
+            "5 months ago"
         )
 
 

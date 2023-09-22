@@ -81,7 +81,6 @@ def create_position(vega: VegaService, market_id):
     vega.wait_fn(1)
     vega.wait_for_total_catchup
 
-
 @pytest.mark.usefixtures("page", "continuous_market", "auth", "risk_accepted")
 def test_stop_order_form_error_validation(continuous_market, page: Page):
     # 7002-SORD-032
@@ -104,7 +103,7 @@ def test_stop_order_form_error_validation(continuous_market, page: Page):
         "Price cannot be lower than 0.00001"
     )
 
-
+@pytest.mark.skip("core issue")
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_submit_stop_order_rejected(continuous_market, vega: VegaService, page: Page):
     page.goto(f"/#/markets/{continuous_market}")
@@ -118,7 +117,6 @@ def test_submit_stop_order_rejected(continuous_market, vega: VegaService, page: 
     vega.forward("10s")
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
-
     page.get_by_test_id(close_toast).click()
     wait_for_graphql_response(page, "stopOrders")
     page.get_by_role(row_table).locator(market_name_col).nth(1).is_visible()
@@ -144,7 +142,7 @@ def test_submit_stop_order_rejected(continuous_market, vega: VegaService, page: 
         (page.get_by_role(row_table).locator(updatedAt_col)).nth(1)
     ).not_to_be_empty()
 
-
+@pytest.mark.skip("core issue")
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_submit_stop_market_order_triggered(
     continuous_market, vega: VegaService, page: Page
@@ -170,7 +168,6 @@ def test_submit_stop_market_order_triggered(
     expires_at_input_value = expires_at.strftime("%Y-%m-%dT%H:%M:%S")
     page.get_by_test_id("date-picker-field").fill(expires_at_input_value)
     page.get_by_test_id(expiry_strategy_cancel).click()
-
     page.get_by_test_id(submit_stop_order).click()
     vega.forward("10s")
     vega.wait_fn(1)
@@ -204,7 +201,7 @@ def test_submit_stop_market_order_triggered(
         (page.get_by_role(row_table).locator(updatedAt_col)).nth(1)
     ).not_to_be_empty()
 
-
+@pytest.mark.skip("core issue")
 @pytest.mark.usefixtures("continuous_market", "auth", "risk_accepted")
 def test_submit_stop_limit_order_pending(
     continuous_market, vega: VegaService, page: Page
@@ -266,7 +263,7 @@ def test_submit_stop_limit_order_pending(
         (page.get_by_role(row_table).locator(updatedAt_col)).nth(1)
     ).not_to_be_empty()
 
-
+@pytest.mark.skip("core issue")
 @pytest.mark.usefixtures("continuous_market", "auth", "risk_accepted")
 def test_submit_stop_limit_order_cancel(
     continuous_market, vega: VegaService, page: Page
@@ -388,6 +385,7 @@ class TestStopOcoValidation:
         page.get_by_test_id(order_price).click()
         expect(page.get_by_test_id(order_price)).to_be_empty()
 
+    @pytest.mark.skip("core issue")
     @pytest.mark.usefixtures("page", "auth", "risk_accepted")
     def test_maximum_number_of_active_stop_orders(
         self, continuous_market, vega: VegaService, page: Page

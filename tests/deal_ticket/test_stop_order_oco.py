@@ -87,7 +87,7 @@ def create_position(vega: VegaService, market_id):
     vega.wait_fn(1)
     vega.wait_for_total_catchup
 
-
+@pytest.mark.skip("core issue")
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_submit_stop_order_market_oco_rejected(
     continuous_market, vega: VegaService, page: Page
@@ -169,7 +169,7 @@ def test_submit_stop_order_market_oco_rejected(
     trigger_value_list = ["Mark < 102.00", "Mark > 103.00"]
     assert trigger_price_list.sort() == trigger_value_list.sort()
 
-
+@pytest.mark.skip("core issue")
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_submit_stop_oco_market_order_triggered(
     continuous_market, vega: VegaService, page: Page
@@ -250,7 +250,7 @@ def test_submit_stop_oco_market_order_triggered(
     trigger_value_list = ["Mark < 102.00", "Mark > 103.00"]
     assert trigger_price_list.sort() == trigger_value_list.sort()
 
-
+@pytest.mark.skip("core issue")
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_submit_stop_oco_market_order_pending(
     continuous_market, vega: VegaService, page: Page
@@ -286,7 +286,7 @@ def test_submit_stop_oco_market_order_pending(
         "PendingOCO"
     )
 
-
+@pytest.mark.skip("core issue")
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_submit_stop_oco_limit_order_pending(
     continuous_market, vega: VegaService, page: Page
@@ -340,7 +340,7 @@ def test_submit_stop_oco_limit_order_pending(
     trigger_value_list = ["Limit < 102.00", "Limit > 103.00"]
     assert trigger_price_list.sort() == trigger_value_list.sort()
 
-
+@pytest.mark.skip("core issue")
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_submit_stop_oco_limit_order_cancel(
     continuous_market, vega: VegaService, page: Page
@@ -454,7 +454,7 @@ class TestStopOcoValidation:
 
         expect(page.locator('[for="order-size-oco"]')).to_have_text("Size")
         expect(page.locator('[for="order-price-oco"]')).to_have_text("Price")
-
+    @pytest.mark.skip("core issue")
     @pytest.mark.usefixtures("page", "auth", "risk_accepted")
     def test_maximum_number_of_active_stop_orders_oco(
         self, continuous_market, vega: VegaService, page: Page

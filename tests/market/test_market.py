@@ -2,7 +2,7 @@ import pytest
 
 from collections import namedtuple
 from playwright.sync_api import Page, expect
-from vega_sim.service import VegaService
+from vega_sim.service import VegaService, PeggedOrder
 from actions.vega import submit_order
 
 import logging
@@ -62,9 +62,28 @@ def test_price_monitoring(simple_market, vega: VegaService, page: Page):
         market_id=simple_market,
         commitment_amount=initial_commitment,
         fee=0.002,
-        buy_specs=[("PEGGED_REFERENCE_MID", 0.0005, 1)],
-        sell_specs=[("PEGGED_REFERENCE_MID", 0.0005, 1)],
         is_amendment=False,
+    )
+
+    vega.submit_order(
+        market_id=simple_market,
+        trading_key=MM_WALLET.name,
+        side="SIDE_BUY",
+        order_type="TYPE_LIMIT",
+        pegged_order=PeggedOrder(reference="PEGGED_REFERENCE_MID", offset=0.0005),
+        wait=False,
+        time_in_force="TIME_IN_FORCE_GTC",
+        volume=99,
+    )
+    vega.submit_order(
+        market_id=simple_market,
+        trading_key=MM_WALLET.name,
+        side="SIDE_SELL",
+        order_type="TYPE_LIMIT",
+        pegged_order=PeggedOrder(reference="PEGGED_REFERENCE_MID", offset=0.0005),
+        wait=False,
+        time_in_force="TIME_IN_FORCE_GTC",
+        volume=99,
     )
 
     expect(

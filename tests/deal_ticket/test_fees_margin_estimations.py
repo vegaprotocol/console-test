@@ -42,7 +42,7 @@ def test_margin_and_fees_estimations(continuous_market, vega: VegaService, page:
     )
 
     page.get_by_test_id("place-order").click()
-
+    page.get_by_test_id("toast-content").click()
     vega.wait_fn(10)
     vega.wait_for_total_catchup()
     expect(page.get_by_test_id(margin_required)).to_have_text(
@@ -86,6 +86,7 @@ def test_margin_and_fees_estimations(continuous_market, vega: VegaService, page:
 
     # verify if we can submit order after reverted margin
     page.get_by_test_id("place-order").click()
+    page.get_by_test_id("toast-content").click()
     vega.wait_fn(10)
     vega.wait_for_total_catchup()
     # skip temporary 

@@ -122,7 +122,6 @@ def test_market_info_instrument(page: Page):
 def test_market_info_oracle(page: Page, vega: VegaService):
     # 6002-MDET-203
     page.get_by_test_id(market_title_test_id).get_by_text("Oracle").click()
-    page.pause()
     expect(
         page.locator('[data-state="open"]').get_by_test_id("accordion-content")
     ).to_contain_text("No oracle proof for settlement data")

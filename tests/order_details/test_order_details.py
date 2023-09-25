@@ -12,12 +12,12 @@ order_details = [
     ("order-size-label", "Size", "order-size-value", "-102"),
     ("order-remaining-label", "Remaining", "order-remaining-value", "-2"),
     ("order-status-label", "Status", "order-status-value", "Active"),
-    ("order-id-label", "Order ID", "order-id-value", "^.{10}\u2026.+Copy$", True),
+    ("order-id-label", "Order ID", "order-id-value", r"^.{10}\u2026.+Copy$", True),
     (
         "order-created-label",
         "Created",
         "order-created-value",
-        "^\d{1,2}/\d{1,2}/\d{4}, \d{1,2}:\d{2}:\d{2} (AM|PM)$",
+        r"^\d{1,2}/\d{1,2}/\d{4}, \d{1,2}:\d{2}:\d{2}$",
         True,
     ),
     (

@@ -9,7 +9,7 @@ import time
 from contextlib import contextmanager
 from vega_sim.null_service import VegaServiceNull
 from playwright.sync_api import Browser, Page
-from config import container_name
+from config import console_image_name
 from fixtures.market import (
     setup_simple_market,
     setup_opening_auction_market,
@@ -64,7 +64,7 @@ def init_vega(request=None):
     ) as vega:
         try:
             container = docker_client.containers.run(
-                container_name, detach=True, ports={"80/tcp": vega.console_port}
+                console_image_name, detach=True, ports={"80/tcp": vega.console_port}
             )
             # docker setup
             logger.info(
@@ -82,7 +82,6 @@ def init_vega(request=None):
             # Remove the container
             logger.info(f"Removing container {container.id}")
             container.remove()
-            
 
 
 @contextmanager

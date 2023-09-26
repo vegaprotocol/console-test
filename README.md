@@ -19,14 +19,18 @@
     ```bash
     poetry install
     ```
-1. **Download the necessary binaries: Run the following command within your Python environment (use force so that the binaries are overwritten):
+1. **Download the necessary binaries: Run the following command within your Python environment (use force so that the binaries are overwritten, current version depends on the environment you want to check):
     ```bash
-    python -m vega_sim.tools.load_binaries --force --version v0.72.14
+    python -m vega_sim.tools.load_binaries --force --version $VEGA_VERSION
     ```
 1. **Pull the docker image of the trading app**:
    You can pull the image you want to test, for example:
     ```bash
     docker pull vegaprotocol/trading:develop
+    ```
+    or
+    ```bash
+    docker pull vegaprotocol/trading:mainnet
     ```
    All available images can be found [here](https://hub.docker.com/r/vegaprotocol/trading/tags).
 1. **Start Docker**: Make sure your Docker daemon is running.

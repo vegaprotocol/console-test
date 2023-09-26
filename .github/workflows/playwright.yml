@@ -83,4 +83,14 @@ jobs:
           path: ./traces/
           retention-days: 15
 
+      #----------------------------------------------
+      #  -----  upload logs  -----
+      #----------------------------------------------
+      - name: Upload worker logs
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: worker-logs
+          path: ./logs/
+          retention-days: 15
 

@@ -13,11 +13,7 @@ vega-sim = {git = "https://github.com/vegaprotocol/vega-market-sim.git"}
 pytest-playwright = "^0.4.2"
 docker = "^6.1.3"
 pytest-xdist = "^3.3.1"
-<<<<<<< HEAD
-pytest-rerunfailures = "^10.2"
 python-dotenv = "^1.0.0"
-=======
->>>>>>> 1d08f56 (chore: toast wait)
 
 [build-system]
 requires = ["poetry-core"]

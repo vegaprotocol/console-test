@@ -23,6 +23,7 @@ def test_trade_match_table(opening_auction_market: str, vega: VegaService, page:
         price=10e15,
         wait=False,
     )
+
     vega.forward("10s")
     vega.wait_fn(1)
     vega.wait_for_total_catchup()

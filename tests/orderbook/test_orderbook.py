@@ -14,6 +14,7 @@ WalletConfig = namedtuple("WalletConfig", ["name", "passphrase"])
 MM_WALLET = WalletConfig("mm", "pin")
 MM_WALLET2 = WalletConfig("mm2", "pin2")
 
+
 @pytest.fixture(scope="module")
 def vega():
     with init_vega() as vega:
@@ -23,7 +24,7 @@ def vega():
 @pytest.fixture(scope="module")
 def setup_market(vega):
     market_id = setup_simple_market(vega)
-    submit_liquidity(vega, MM_WALLET.name, market_id)
+    submit_liquidity(vega, MM_WALLET.name, market_id, mid_price=100)
     submit_multiple_orders(
         vega,
         MM_WALLET.name,
@@ -48,6 +49,7 @@ def setup_market(vega):
         market_id,
     ]
 
+
 # these values don't align with the multiple orders above as
 # creating a trade triggers the liquidity provision
 orderbook_content = [
@@ -67,7 +69,9 @@ orderbook_content = [
 ]
 
 
-def verify_orderbook_grid(page: Page, content: List[List[float]], last_trade_price: float=False):
+def verify_orderbook_grid(
+    page: Page, content: List[List[float]], last_trade_price: float = False
+):
     rows = page.locator("[data-testid$=-rows-container]").all()
     for row_index, content_row in enumerate(content):
         cells = rows[row_index].locator("button").all()
@@ -98,7 +102,7 @@ def test_orderbook_grid_content(setup_market, page: Page):
         market_id,
         "SIDE_SELL",
         matching_order[0],
-        matching_order[1]
+        matching_order[1],
     )
     submit_order(
         vega,
@@ -106,7 +110,7 @@ def test_orderbook_grid_content(setup_market, page: Page):
         market_id,
         "SIDE_BUY",
         matching_order[0],
-        matching_order[1]
+        matching_order[1],
     )
 
     vega.forward("10s")
@@ -124,9 +128,10 @@ def test_orderbook_grid_content(setup_market, page: Page):
 
     page.locator("[data-testid=Orderbook]").click()
 
-    # 6003-ORDB-013 
+    # 6003-ORDB-013
     assert (
-        float(page.locator("[data-testid*=last-traded]").text_content()) == matching_order[1]
+        float(page.locator("[data-testid*=last-traded]").text_content())
+        == matching_order[1]
     )
 
     # 6003-ORDB-011
@@ -134,7 +139,8 @@ def test_orderbook_grid_content(setup_market, page: Page):
     spread_text = page.locator("[data-testid=spread]").text_content()[1:-1]
     assert (
         # TODO: figure out how to not have hardcoded value
-        spread_text == "2.00"
+        spread_text
+        == "2.00"
     )
 
     verify_orderbook_grid(page, orderbook_content)
@@ -184,7 +190,7 @@ def test_orderbook_resolution_change(setup_market, page: Page):
     ]
 
     page.goto(f"/#/markets/{market_id}")
-    #temporary skip
+    # temporary skip
     # for resolution in resolutions:
     #     page.get_by_test_id("resolution").click()
     #     page.get_by_role("menu").get_by_text(resolution[0], exact=True).click()
@@ -209,6 +215,7 @@ def test_orderbook_price_size_copy(setup_market, page: Page):
         volume.click()
         expect(page.get_by_test_id("order-size")).to_have_value(volume.text_content())
 
+
 @pytest.mark.usefixtures("page", "risk_accepted")
 def test_orderbook_price_movement(setup_market, page: Page):
     vega = setup_market[0]
@@ -220,7 +227,7 @@ def test_orderbook_price_movement(setup_market, page: Page):
     book_el = page.locator("[data-testid=orderbook-grid-element]")
 
     # no arrow shown on load
-    expect(book_el.locator('[data-testid^=icon-arrow]')).not_to_be_attached()
+    expect(book_el.locator("[data-testid^=icon-arrow]")).not_to_be_attached()
 
     matching_order_1 = [1, 101]
     submit_order(
@@ -229,7 +236,7 @@ def test_orderbook_price_movement(setup_market, page: Page):
         market_id,
         "SIDE_BUY",
         matching_order_1[0],
-        matching_order_1[1]
+        matching_order_1[1],
     )
 
     vega.forward("10s")
@@ -237,9 +244,10 @@ def test_orderbook_price_movement(setup_market, page: Page):
     vega.wait_for_total_catchup()
 
     # 6003-ORDB-013
-    expect(book_el.locator('[data-testid=icon-arrow-up]')).to_be_attached()
+    expect(book_el.locator("[data-testid=icon-arrow-up]")).to_be_attached()
     assert (
-        float(page.locator("[data-testid*=last-traded]").text_content()) == matching_order_1[1]
+        float(page.locator("[data-testid*=last-traded]").text_content())
+        == matching_order_1[1]
     )
 
     matching_order_2 = [1, 99]
@@ -249,15 +257,16 @@ def test_orderbook_price_movement(setup_market, page: Page):
         market_id,
         "SIDE_SELL",
         matching_order_2[0],
-        matching_order_2[1]
+        matching_order_2[1],
     )
 
     vega.forward("10s")
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
 
-    expect(book_el.locator('[data-testid=icon-arrow-down]')).to_be_attached()
+    expect(book_el.locator("[data-testid=icon-arrow-down]")).to_be_attached()
 
     assert (
-        float(page.locator("[data-testid*=last-traded]").text_content()) == matching_order_2[1]
+        float(page.locator("[data-testid*=last-traded]").text_content())
+        == matching_order_2[1]
     )

@@ -1,6 +1,7 @@
 from collections import namedtuple
-from vega_sim.service import VegaService
+from vega_sim.service import VegaService, PeggedOrder
 from actions.vega import submit_multiple_orders, submit_order, submit_liquidity
+
 
 import logging
 
@@ -118,7 +119,7 @@ def setup_opening_auction_market(vega: VegaService, market_id: str = None, **kwa
     if market_id is None or market_id not in vega.all_markets():
         market_id = setup_simple_market(vega, **kwargs)
 
-    submit_liquidity(vega, MM_WALLET.name, market_id)
+    submit_liquidity(vega, MM_WALLET.name, market_id, mid_price=100)
     submit_multiple_orders(
         vega, MM_WALLET.name, market_id, "SIDE_SELL", [[1, 110], [1, 105]]
     )
@@ -138,6 +139,7 @@ def setup_continuous_market(vega: VegaService, market_id: str = None, **kwargs):
         market_id = setup_opening_auction_market(vega, **kwargs)
 
     submit_order(vega, "Key 1", market_id, "SIDE_BUY", 1, 110)
+
     vega.forward("10s")
     vega.wait_fn(1)
     vega.wait_for_total_catchup()

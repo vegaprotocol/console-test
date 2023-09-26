@@ -16,6 +16,7 @@ margin_required = "deal-ticket-fee-margin-required"
 item_value = "item-value"
 market_trading_mode = "market-trading-mode"
 
+
 @pytest.mark.parametrize("vega", [120], indirect=True)
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_margin_and_fees_estimations(continuous_market, vega: VegaService, page: Page):
@@ -89,7 +90,7 @@ def test_margin_and_fees_estimations(continuous_market, vega: VegaService, page:
     page.get_by_test_id("toast-content").click()
     vega.wait_fn(10)
     vega.wait_for_total_catchup()
-    # skip temporary 
+    # skip temporary
     # expect(page.get_by_test_id("toast-content")).to_contain_text(
     #     "Your transaction has been confirmed"
     # )

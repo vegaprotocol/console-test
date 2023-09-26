@@ -70,7 +70,7 @@ def test_price_monitoring(simple_market, vega: VegaService, page: Page):
         trading_key=MM_WALLET.name,
         side="SIDE_BUY",
         order_type="TYPE_LIMIT",
-        pegged_order=PeggedOrder(reference="PEGGED_REFERENCE_MID", offset=0.0005),
+        price=initial_price - 0.0005,
         wait=False,
         time_in_force="TIME_IN_FORCE_GTC",
         volume=99,
@@ -80,7 +80,7 @@ def test_price_monitoring(simple_market, vega: VegaService, page: Page):
         trading_key=MM_WALLET.name,
         side="SIDE_SELL",
         order_type="TYPE_LIMIT",
-        pegged_order=PeggedOrder(reference="PEGGED_REFERENCE_MID", offset=0.0005),
+        price=initial_price + 0.0005,
         wait=False,
         time_in_force="TIME_IN_FORCE_GTC",
         volume=99,
@@ -160,11 +160,10 @@ def test_price_monitoring(simple_market, vega: VegaService, page: Page):
 
     # add order at the current price so that it is possible to change the status to price monitoring
     to_cancel = submit_order(vega, MM_WALLET2.name, simple_market, "SIDE_BUY", 1, 105)
-    
+
     vega.forward("10s")
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
-    
 
     expect(
         page.get_by_test_id(price_monitoring_bounds_row).first.get_by_text(

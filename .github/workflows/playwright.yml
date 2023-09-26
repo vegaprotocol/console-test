@@ -1,9 +1,5 @@
 name: Build and Run Tests
 
-env:
-  VEGA_VERSION: v0.73.0-preview.7
-  CONSOLE_IMAGE_NAME: vegaprotocol/trading:develop
-
 on:
   push:
     branches:

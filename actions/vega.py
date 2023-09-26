@@ -36,9 +36,7 @@ def submit_multiple_orders(
         submit_order(vega, wallet_name, market_id, side, volume, price)
 
 
-def submit_liquidity(
-    vega: VegaService, wallet_name: str, market_id: str, mid_price: float
-):
+def submit_liquidity(vega: VegaService, wallet_name: str, market_id: str):
     vega.submit_simple_liquidity(
         key_name=wallet_name,
         market_id=market_id,
@@ -46,26 +44,7 @@ def submit_liquidity(
         fee=0.000,
         is_amendment=False,
     )
-    vega.submit_order(
-        market_id=market_id,
-        trading_key=wallet_name,
-        side="SIDE_BUY",
-        order_type="TYPE_LIMIT",
-        price=mid_price - 1,
-        wait=False,
-        time_in_force="TIME_IN_FORCE_GTC",
-        volume=1,
-    )
-    vega.submit_order(
-        market_id=market_id,
-        trading_key=wallet_name,
-        side="SIDE_SELL",
-        order_type="TYPE_LIMIT",
-        price=mid_price + 1,
-        wait=False,
-        time_in_force="TIME_IN_FORCE_GTC",
-        volume=1,
-    )
+
     vega.submit_order(
         market_id=market_id,
         trading_key=wallet_name,
@@ -74,7 +53,7 @@ def submit_liquidity(
         pegged_order=PeggedOrder(reference="PEGGED_REFERENCE_MID", offset=1),
         wait=False,
         time_in_force="TIME_IN_FORCE_GTC",
-        volume=98,
+        volume=99,
     )
     vega.submit_order(
         market_id=market_id,
@@ -84,5 +63,5 @@ def submit_liquidity(
         pegged_order=PeggedOrder(reference="PEGGED_REFERENCE_MID", offset=1),
         wait=False,
         time_in_force="TIME_IN_FORCE_GTC",
-        volume=98,
+        volume=99,
     )

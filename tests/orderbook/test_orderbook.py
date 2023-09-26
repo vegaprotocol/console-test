@@ -24,7 +24,7 @@ def vega():
 @pytest.fixture(scope="module")
 def setup_market(vega):
     market_id = setup_simple_market(vega)
-    submit_liquidity(vega, MM_WALLET.name, market_id, mid_price=100)
+    submit_liquidity(vega, MM_WALLET.name, market_id)
     submit_multiple_orders(
         vega,
         MM_WALLET.name,

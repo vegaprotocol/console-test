@@ -119,7 +119,7 @@ def setup_opening_auction_market(vega: VegaService, market_id: str = None, **kwa
     if market_id is None or market_id not in vega.all_markets():
         market_id = setup_simple_market(vega, **kwargs)
 
-    submit_liquidity(vega, MM_WALLET.name, market_id, mid_price=100)
+    submit_liquidity(vega, MM_WALLET.name, market_id)
     submit_multiple_orders(
         vega, MM_WALLET.name, market_id, "SIDE_SELL", [[1, 110], [1, 105]]
     )

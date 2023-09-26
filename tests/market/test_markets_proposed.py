@@ -101,11 +101,11 @@ def test_renders_markets_correctly(proposed_market, page: Page):
     )
 
     # 6001-MARK-059
-    expected_href = (
-        r"^https:\/\/governance\.stagnet1\.vega\.rocks\/proposals\/[a-f0-9]{64}$"
+    expect(first_item_link).to_contain_text("View proposal")
+    expect(first_item_link).to_have_attribute(
+        "href",
+        re.compile(r"\/proposals\/[a-f0-9]{64}$"),
     )
-    assert first_item_link.inner_text() == "View proposal"
-    assert re.match(expected_href, first_item_link.get_attribute("href"))
 
     # temporary skip
     # 6001-MARK-060

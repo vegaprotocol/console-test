@@ -49,7 +49,6 @@ jobs:
           keys-case: upper
           export-variables: true
           log-variables: true
-
       #----------------------------------------------
       #  -----  install dependencies  -----
       #----------------------------------------------
@@ -69,7 +68,7 @@ jobs:
 
       - name: Install dependencies
         run: poetry install --no-interaction --no-root
-
+    
       #----------------------------------------------
       #  -----  find vega binaries path  -----
       #----------------------------------------------

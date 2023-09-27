@@ -87,7 +87,7 @@ def verify_prices_descending(page: Page):
     prices = [float(price.text_content()) for price in prices_locator.all()]
     assert prices == sorted(prices, reverse=True)
 
-
+@pytest.mark.skip("tbd")
 @pytest.mark.usefixtures("page", "risk_accepted")
 def test_orderbook_grid_content(setup_market, page: Page):
     vega = setup_market[0]

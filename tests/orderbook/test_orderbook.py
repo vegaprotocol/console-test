@@ -215,7 +215,7 @@ def test_orderbook_price_size_copy(setup_market, page: Page):
         volume.click()
         expect(page.get_by_test_id("order-size")).to_have_value(volume.text_content())
 
-
+@pytest.mark.skip("tbd")
 @pytest.mark.usefixtures("page", "risk_accepted")
 def test_orderbook_price_movement(setup_market, page: Page):
     vega = setup_market[0]

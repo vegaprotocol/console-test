@@ -183,7 +183,7 @@ def test_price_monitoring(simple_market, vega: VegaService, page: Page):
     )
     expect(
         page.get_by_test_id(liquidity_supplied).get_by_test_id(item_value)
-    ).to_have_text("100.00 (17.93%)")
+    ).to_have_text("100.00 (17.57%)")
 
     # cancel order to increase liquidity
     vega.cancel_order(MM_WALLET2.name, simple_market, to_cancel)

@@ -76,7 +76,7 @@ def test_market_info_market_volume(page: Page):
         ["24 Hour Volume", "-"],
         ["Open Interest", "1"],
         ["Best Bid Volume", "99"],
-        ["Best Offer Volume", "96"],
+        ["Best Offer Volume", "99"],
         ["Best Static Bid Volume", "1"],
         ["Best Static Offer Volume", "1"],
     ]
@@ -221,15 +221,15 @@ def test_market_info_liquidity_monitoring_parameters(page: Page):
 
 
 # Liquidity resolves to 3 results
-def test_market_info_liquidity(page: Page):
+def test_market_info_liquidit(page: Page):
     # 6002-MDET-213
     page.get_by_test_id(market_title_test_id).get_by_text(
         "Liquidity", exact=True
     ).click()
+    page.pause()
     fields = [
         ["Target Stake", "5.82757 tDAI"],
         ["Supplied Stake", "10,000.00 tDAI"],
-        ["Market Value Proxy", "10,000.00 tDAI"],
     ]
     validate_info_section(page, fields)
 

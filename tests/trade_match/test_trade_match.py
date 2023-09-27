@@ -5,17 +5,13 @@ from vega_sim.service import VegaService
 from actions.vega import submit_multiple_orders
 
 
-@pytest.mark.usefixtures("page", "vega", "opening_auction_market", "auth", "risk_accepted")
+@pytest.mark.usefixtures(
+    "page", "vega", "opening_auction_market", "auth", "risk_accepted"
+)
 def test_trade_match_table(opening_auction_market: str, vega: VegaService, page: Page):
     row_locator = ".ag-center-cols-container .ag-row"
+    page.goto(f"/#/markets/{opening_auction_market}")
 
-    submit_multiple_orders(
-        vega,
-        "Key 1",
-        opening_auction_market,
-        "SIDE_BUY",
-        [[5, 110], [5, 105], [1, 50]],
-    )
     # sending order to be rejected, wait=False to avoid returning error from market-sim
     vega.submit_order(
         trading_key="Key 1",
@@ -27,9 +23,22 @@ def test_trade_match_table(opening_auction_market: str, vega: VegaService, page:
         price=10e15,
         wait=False,
     )
+
     vega.forward("10s")
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
+
+    submit_multiple_orders(
+        vega,
+        "Key 1",
+        opening_auction_market,
+        "SIDE_BUY",
+        [[5, 110], [5, 105], [1, 50]],
+    )
+    vega.forward("10s")
+    vega.wait_fn(1)
+    vega.wait_for_total_catchup()
+
     submit_multiple_orders(
         vega,
         "Key 1",

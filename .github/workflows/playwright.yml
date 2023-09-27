@@ -1,20 +1,55 @@
 name: Build and Run Tests
 
-env:
-  VEGA_VERSION: v0.73.0-preview.6
-
 on:
   push:
-    branches: [main, master]
+    branches:
+      - main
+      - develop
   pull_request:
-    branches: [main, master]
+    branches:
+      - main
+      - develop
   workflow_dispatch:
+    inputs:
+      VEGA_VERSION:
+        description: "Vega version to test"
+        required: true
+        default: v0.73.0-preview.7
+      CONSOLE_IMAGE_NAME:
+        description: "Console image name"
+        required: true
+        default: vegaprotocol/trading:develop
 jobs:
   test:
-    timeout-minutes: 30
-    runs-on: 4-cores
+    timeout-minutes: 15
+    runs-on: 8-cores
     steps:
       - uses: actions/checkout@v3
+
+      - name: Load inputs
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          echo "VEGA_VERSION=${{ github.event.inputs.VEGA_VERSION }}" >> $GITHUB_ENV
+          echo "CONSOLE_IMAGE_NAME=${{ github.event.inputs.CONSOLE_IMAGE_NAME }}" >> $GITHUB_ENV
+
+      - name: Import env from dotenv (push)
+        if: ${{ github.event_name == 'push' }}
+        uses: falti/dotenv-action@v1.0.4
+        with:
+          path: .env.${{ github.ref_name }}
+          export-variables: true
+          keys-case: upper
+          log-variables: true
+
+      - name: Import env from dotenv (pull_request)
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: falti/dotenv-action@v1.0.4
+        with:
+          path: .env.${{ github.base_ref }}
+          keys-case: upper
+          export-variables: true
+          log-variables: true
+
       #----------------------------------------------
       #  -----  install dependencies  -----
       #----------------------------------------------
@@ -55,13 +90,13 @@ jobs:
       #----------------------------------------------
       - name: Install vega binaries
         if: steps.vega_binaries_cache.outputs.cache-hit != 'true'
-        run: poetry run python -m vega_sim.tools.load_binaries --force --version $VEGA_VERSION
+        run: poetry run python -m vega_sim.tools.load_binaries --force --version ${{ env.VEGA_VERSION }}
       #----------------------------------------------
       #  -----  pull console. -----
       #----------------------------------------------
       - name: pull console
         run: |
-          poetry run docker pull vegaprotocol/trading:develop
+          poetry run docker pull ${{ env.CONSOLE_IMAGE_NAME }}
       #----------------------------------------------
       #  -----  install playwright. -----
       #----------------------------------------------
@@ -71,7 +106,7 @@ jobs:
       #  ----- run tests. -----
       #----------------------------------------------
       - name: Run tests
-        run: poetry run pytest -v -s --numprocesses 4 --dist loadfile --durations=20
+        run: poetry run pytest -v -s --numprocesses 4 --dist loadfile --durations=10
       #----------------------------------------------
       #  -----  upload traces  -----
       #----------------------------------------------
@@ -81,4 +116,15 @@ jobs:
         with:
           name: playwright-trace
           path: ./traces/
+          retention-days: 15
+
+      #----------------------------------------------
+      #  -----  upload logs  -----
+      #----------------------------------------------
+      - name: Upload worker logs
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: worker-logs
+          path: ./logs/
           retention-days: 15

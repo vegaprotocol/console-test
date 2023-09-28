@@ -49,7 +49,6 @@ jobs:
           keys-case: upper
           export-variables: true
           log-variables: true
-
       #----------------------------------------------
       #  -----  install dependencies  -----
       #----------------------------------------------

@@ -12,7 +12,7 @@ def vega(request):
 def continuous_market(vega):
     return setup_continuous_market(vega)
 
-
+@pytest.mark.skip("We currently can't approve wallet connection through Sim")
 @pytest.mark.usefixtures("page", "risk_accepted")
 def test_connect_vega_wallet(continuous_market, page: Page):
     page.goto(f"/#/markets/{continuous_market}")
@@ -31,4 +31,5 @@ def test_sidebar_should_be_open_after_reload(continuous_market, page: Page):
     expect(page.get_by_test_id("deal-ticket-form")).to_be_visible()
     page.get_by_test_id("Order").click()
     expect(page.get_by_test_id("deal-ticket-form")).not_to_be_visible()
+    page.reload()
     expect(page.get_by_test_id("deal-ticket-form")).to_be_visible()

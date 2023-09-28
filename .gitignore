@@ -6,3 +6,4 @@ node_modules/
 .pytest_cache
 traces/
 .DS_Store
+/logs

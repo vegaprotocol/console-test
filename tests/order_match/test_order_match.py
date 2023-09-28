@@ -6,6 +6,10 @@ from vega_sim.service import VegaService
 from playwright.sync_api import expect
 from actions.vega import submit_order
 
+import logging
+
+logger = logging.getLogger()
+
 
 # Could be turned into a helper function in the future.
 def verify_data_grid(page, data_test_id, expected_pattern):
@@ -26,15 +30,15 @@ def verify_data_grid(page, data_test_id, expected_pattern):
         # We are using regex so that we can run tests in different timezones.
         if re.match(r"^\\d", expected):  # check if it's a regex
             if re.search(expected, actual):
-                print(f"Matched: {expected} == {actual}")
+                logger.info(f"Matched: {expected} == {actual}")
             else:
-                print(f"Not Matched: {expected} != {actual}")
+                logger.info(f"Not Matched: {expected} != {actual}")
                 raise AssertionError(f"Pattern does not match: {expected} != {actual}")
         else:  # it's not a regex, so we escape it
             if re.search(re.escape(expected), actual):
-                print(f"Matched: {expected} == {actual}")
+                logger.info(f"Matched: {expected} == {actual}")
             else:
-                print(f"Not Matched: {expected} != {actual}")
+                logger.info(f"Not Matched: {expected} != {actual}")
                 raise AssertionError(f"Pattern does not match: {expected} != {actual}")
 
 
@@ -77,7 +81,9 @@ def submit_order(vega, wallet_name, market_id, side, volume, price):
     )
 
 
-@pytest.mark.usefixtures("vega", "page", "opening_auction_market", "auth", "risk_accepted")
+@pytest.mark.usefixtures(
+    "vega", "page", "opening_auction_market", "auth", "risk_accepted"
+)
 def test_limit_order_trade_open_order(
     opening_auction_market, vega: VegaService, page: Page
 ):
@@ -103,7 +109,7 @@ def test_limit_order_trade_open_order(
         r"\d{1,2}/\d{1,2}/\d{4},\s*\d{1,2}:\d{2}:\d{2}\s*(?:AM|PM)",
         "-",
     ]
-    print("Assert Open orders:")
+    logger.info("Assert Open orders:")
     verify_data_grid(page, "Open", expected_open_order)
 
 

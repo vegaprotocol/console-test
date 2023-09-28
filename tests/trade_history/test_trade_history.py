@@ -3,6 +3,9 @@ import re
 from playwright.sync_api import expect
 from actions.vega import submit_order
 from conftest import init_vega
+import logging
+
+logger = logging.getLogger()
 
 
 @pytest.fixture(scope="module")
@@ -30,15 +33,15 @@ def verify_data_grid(page, data_test_id, expected_pattern):
         # We are using regex so that we can run tests in different timezones.
         if re.match(r"^\\d", expected):  # check if it's a regex
             if re.search(expected, actual):
-                print(f"Matched: {expected} == {actual}")
+                logger.info(f"Matched: {expected} == {actual}")
             else:
-                print(f"Not Matched: {expected} != {actual}")
+                logger.info(f"Not Matched: {expected} != {actual}")
                 raise AssertionError(f"Pattern does not match: {expected} != {actual}")
         else:  # it's not a regex, so we escape it
             if re.search(re.escape(expected), actual):
-                print(f"Matched: {expected} == {actual}")
+                logger.info(f"Matched: {expected} == {actual}")
             else:
-                print(f"Not Matched: {expected} != {actual}")
+                logger.info(f"Not Matched: {expected} != {actual}")
                 raise AssertionError(f"Pattern does not match: {expected} != {actual}")
 
 
@@ -75,6 +78,7 @@ def test_limit_order_new_trade_top_of_list(continuous_market, vega, page):
     page.goto(f"/#/markets/{continuous_market}")
 
     vega.forward("10s")
+    vega.wait_fn(10)
     vega.wait_for_total_catchup()
     expected_trade = [
         "103.50",

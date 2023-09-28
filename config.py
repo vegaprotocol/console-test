@@ -1,3 +1,8 @@
-# replace this with local docker image of latest develop branch of frontend-monorepo
-# for test_basic to work
-container_name = "vegaprotocol/trading:develop"
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+console_image_name = os.getenv(
+    "CONSOLE_IMAGE_NAME", default="vegaprotocol/trading:develop"
+)

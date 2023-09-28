@@ -6,17 +6,17 @@ on:
       - main
       - develop
   pull_request:
-    branches:
+    branches: 
       - main
       - develop
   workflow_dispatch:
     inputs:
       VEGA_VERSION:
-        description: "Vega version to test"
+        description: 'Vega version to test'
         required: true
         default: v0.73.0-preview.7
       CONSOLE_IMAGE_NAME:
-        description: "Console image name"
+        description: 'Console image name'
         required: true
         default: vegaprotocol/trading:develop
 jobs:
@@ -49,7 +49,6 @@ jobs:
           keys-case: upper
           export-variables: true
           log-variables: true
-
       #----------------------------------------------
       #  -----  install dependencies  -----
       #----------------------------------------------
@@ -69,7 +68,7 @@ jobs:
 
       - name: Install dependencies
         run: poetry install --no-interaction --no-root
-
+    
       #----------------------------------------------
       #  -----  find vega binaries path  -----
       #----------------------------------------------
@@ -117,7 +116,6 @@ jobs:
           name: playwright-trace
           path: ./traces/
           retention-days: 15
-
       #----------------------------------------------
       #  -----  upload logs  -----
       #----------------------------------------------

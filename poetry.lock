@@ -1136,8 +1136,8 @@ profile = ["pytest-profiling", "snakeviz"]
 [package.source]
 type = "git"
 url = "https://github.com/vegaprotocol/vega-market-sim.git"
-reference = "console_test"
-resolved_reference = "ac8f1543a6ff8d88b8d3f67b51454f674cd11f38"
+reference = "HEAD"
+resolved_reference = "54f667d60c0d7def5f041f10c6fdffb3845cead8"
 
 [[package]]
 name = "websocket-client"
@@ -1242,4 +1242,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.11"
-content-hash = "6f39ee1ed0187c7f1b1852ac944b27a9c2af705a7fb3ee6ca2bda069e5c1b4c1"
+content-hash = "bb77f578f57a758d299459d7afd5efa83a487889458e9594958c3c88c920e428"

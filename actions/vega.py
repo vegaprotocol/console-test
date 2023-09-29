@@ -1,7 +1,5 @@
 from typing import List, Tuple, Optional
 from vega_sim.service import VegaService, PeggedOrder
-from playwright.sync_api import Page
-
 
 def submit_order(
     vega: VegaService,

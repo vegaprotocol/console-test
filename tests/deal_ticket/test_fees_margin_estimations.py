@@ -3,6 +3,7 @@ from collections import namedtuple
 from playwright.sync_api import Page, expect
 from vega_sim.service import VegaService
 from actions.vega import submit_order
+from actions.utils import wait_for_toast_confirmation
 
 # Defined namedtuples
 WalletConfig = namedtuple("WalletConfig", ["name", "passphrase"])
@@ -39,7 +40,7 @@ def test_margin_and_fees_estimations(continuous_market, vega: VegaService, page:
     )
 
     page.get_by_test_id("place-order").click()
-    #page.wait_for_function("document.querySelector('[data-testid=\"toast-content\"]') && document.querySelector('[data-testid=\"toast-content\"]').innerText.includes('AWAITING CONFIRMATION')")
+    wait_for_toast_confirmation(page)
     vega.forward("10s")
     vega.wait_fn(10)
     vega.wait_for_total_catchup()
@@ -84,7 +85,7 @@ def test_margin_and_fees_estimations(continuous_market, vega: VegaService, page:
 
     # verify if we can submit order after reverted margin
     page.get_by_test_id("place-order").click()
-    # page.wait_for_function("document.querySelector('[data-testid=\"toast-content\"]') && document.querySelector('[data-testid=\"toast-content\"]').innerText.includes('AWAITING CONFIRMATION')")
+    wait_for_toast_confirmation(page)
     vega.forward("10s")
     vega.wait_fn(10)
     vega.wait_for_total_catchup()

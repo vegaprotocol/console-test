@@ -4,6 +4,7 @@ from vega_sim.service import VegaService
 from datetime import datetime, timedelta
 from conftest import init_vega
 from fixtures.market import setup_continuous_market
+from actions.utils import wait_for_toast_confirmation
 
 order_size = "order-size"
 order_price = "order-price"
@@ -42,7 +43,7 @@ def test_limit_buy_order_GTT(continuous_market, vega: VegaService, page: Page):
         "10 BTC @ 120.00 BTC"
     )
     page.get_by_test_id(place_order).click()
-    page.wait_for_function("document.querySelector('[data-testid=\"toast-content\"]') && document.querySelector('[data-testid=\"toast-content\"]').innerText.includes('AWAITING CONFIRMATION')")
+    wait_for_toast_confirmation(page)
     vega.forward("10s")
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
@@ -60,7 +61,7 @@ def test_limit_buy_order(continuous_market, vega: VegaService, page: Page):
     page.get_by_test_id(order_size).fill("10")
     page.get_by_test_id(order_price).fill("120")
     page.get_by_test_id(place_order).click()
-    page.wait_for_function("document.querySelector('[data-testid=\"toast-content\"]') && document.querySelector('[data-testid=\"toast-content\"]').innerText.includes('AWAITING CONFIRMATION')")
+    wait_for_toast_confirmation(page)
     vega.forward("10s")
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
@@ -86,7 +87,7 @@ def test_limit_sell_order(continuous_market, vega: VegaService, page: Page):
         "10 BTC @ 100.00 BTC"
     )
     page.get_by_test_id(place_order).click()
-    page.wait_for_function("document.querySelector('[data-testid=\"toast-content\"]') && document.querySelector('[data-testid=\"toast-content\"]').innerText.includes('AWAITING CONFIRMATION')")
+    wait_for_toast_confirmation(page)
     vega.forward("10s")
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
@@ -110,7 +111,7 @@ def test_market_sell_order(continuous_market, vega: VegaService, page: Page):
         "10 BTC @ market"
     )
     page.get_by_test_id(place_order).click()
-    page.wait_for_function("document.querySelector('[data-testid=\"toast-content\"]') && document.querySelector('[data-testid=\"toast-content\"]').innerText.includes('AWAITING CONFIRMATION')")
+    wait_for_toast_confirmation(page)
     vega.forward("10s")
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
@@ -128,7 +129,7 @@ def test_market_buy_order(continuous_market, vega: VegaService, page: Page):
     page.get_by_test_id(order_size).fill("10")
     page.get_by_test_id(tif).select_option("Fill or Kill (FOK)")
     page.get_by_test_id(place_order).click()
-    page.wait_for_function("document.querySelector('[data-testid=\"toast-content\"]') && document.querySelector('[data-testid=\"toast-content\"]').innerText.includes('AWAITING CONFIRMATION')")
+    wait_for_toast_confirmation(page)
     vega.forward("10s")
     vega.wait_fn(1)
     vega.wait_for_total_catchup()

@@ -26,6 +26,11 @@ docker_client = docker.from_env()
 logger = logging.getLogger()
 
 
+@pytest.hookimpl(tryfirst=True)
+def pytest_runtest_makereport(item, call):
+    outcome = "passed" if call.excinfo is None else "failed"
+    item.config.cache.set(item.nodeid, outcome)
+    
 def pytest_configure(config):
     worker_id = os.environ.get("PYTEST_XDIST_WORKER")
     if worker_id is not None:
@@ -122,11 +127,15 @@ def init_page(vega: VegaServiceNull, browser: Browser, request: pytest.FixtureRe
         finally:
             if not os.path.exists("traces"):
                 os.makedirs("traces")
-            try:
-                trace_path = os.path.join("traces", request.node.name + "trace.zip")
-                context.tracing.stop(path=trace_path)
-            except Exception as e:
-                logger.error(f"Failed to save trace: {e}")
+
+            # Check whether this test failed or passed
+            outcome = request.config.cache.get(request.node.nodeid, None)
+            if outcome != "passed":
+                try:
+                    trace_path = os.path.join("traces", request.node.name + "trace.zip")
+                    context.tracing.stop(path=trace_path)
+                except Exception as e:
+                    logger.error(f"Failed to save trace: {e}")
 
 
 # default vega & page fixtures with function scope (refreshed at each test) that can be used in tests

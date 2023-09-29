@@ -1,7 +1,6 @@
 from typing import List, Tuple, Optional
 from vega_sim.service import VegaService, PeggedOrder
 
-
 def submit_order(
     vega: VegaService,
     wallet_name: str,

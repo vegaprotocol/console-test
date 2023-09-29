@@ -226,7 +226,6 @@ def test_market_info_liquidit(page: Page):
     page.get_by_test_id(market_title_test_id).get_by_text(
         "Liquidity", exact=True
     ).click()
-    page.pause()
     fields = [
         ["Target Stake", "5.82757 tDAI"],
         ["Supplied Stake", "10,000.00 tDAI"],

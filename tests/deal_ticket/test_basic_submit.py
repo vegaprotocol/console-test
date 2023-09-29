@@ -4,6 +4,7 @@ from vega_sim.service import VegaService
 from datetime import datetime, timedelta
 from conftest import init_vega
 from fixtures.market import setup_continuous_market
+from actions.utils import wait_for_toast_confirmation
 
 order_size = "order-size"
 order_price = "order-price"
@@ -42,9 +43,9 @@ def test_limit_buy_order_GTT(continuous_market, vega: VegaService, page: Page):
         "10 BTC @ 120.00 BTC"
     )
     page.get_by_test_id(place_order).click()
-    page.get_by_test_id("toast-content").click()
-    vega.wait_fn(1)
+    wait_for_toast_confirmation(page)
     vega.forward("10s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
     page.get_by_test_id("All").click()
     # 7002-SORD-017
@@ -56,12 +57,13 @@ def test_limit_buy_order_GTT(continuous_market, vega: VegaService, page: Page):
 @pytest.mark.usefixtures("page", "auth", "risk_accepted")
 def test_limit_buy_order(continuous_market, vega: VegaService, page: Page):
     page.goto(f"/#/markets/{continuous_market}")
+    
     page.get_by_test_id(order_size).fill("10")
     page.get_by_test_id(order_price).fill("120")
     page.get_by_test_id(place_order).click()
-    page.get_by_test_id("toast-content").click()
-    vega.wait_fn(1)
+    wait_for_toast_confirmation(page)
     vega.forward("10s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
     page.get_by_test_id("All").click()
     # 7002-SORD-017
@@ -85,9 +87,9 @@ def test_limit_sell_order(continuous_market, vega: VegaService, page: Page):
         "10 BTC @ 100.00 BTC"
     )
     page.get_by_test_id(place_order).click()
-    page.get_by_test_id("toast-content").click()
-    vega.wait_fn(1)
+    wait_for_toast_confirmation(page)
     vega.forward("10s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
     page.get_by_test_id("All").click()
     expect(page.get_by_role("row").nth(2)).to_contain_text(
@@ -109,9 +111,9 @@ def test_market_sell_order(continuous_market, vega: VegaService, page: Page):
         "10 BTC @ market"
     )
     page.get_by_test_id(place_order).click()
-    page.get_by_test_id("toast-content").click()
-    vega.wait_fn(1)
+    wait_for_toast_confirmation(page)
     vega.forward("10s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
     
     page.get_by_test_id("All").click()
@@ -127,9 +129,9 @@ def test_market_buy_order(continuous_market, vega: VegaService, page: Page):
     page.get_by_test_id(order_size).fill("10")
     page.get_by_test_id(tif).select_option("Fill or Kill (FOK)")
     page.get_by_test_id(place_order).click()
-    page.get_by_test_id("toast-content").click()
-    vega.wait_fn(1)
+    wait_for_toast_confirmation(page)
     vega.forward("10s")
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
     page.get_by_test_id("All").click()
     # 7002-SORD-010

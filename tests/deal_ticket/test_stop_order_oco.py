@@ -6,6 +6,7 @@ from vega_sim.service import VegaService
 from actions.vega import submit_order
 from conftest import init_vega
 from fixtures.market import setup_continuous_market
+from actions.utils import wait_for_toast_confirmation
 
 # Defined namedtuples
 WalletConfig = namedtuple("WalletConfig", ["name", "passphrase"])
@@ -114,7 +115,7 @@ def test_submit_stop_order_market_oco_rejected(
     page.get_by_test_id(trigger_price_oco).fill("102")
     page.get_by_test_id(order_size_oco).fill("3")
     page.get_by_test_id(submit_stop_order).click()
-    page.get_by_test_id("toast-content").click()
+    wait_for_toast_confirmation(page)
     vega.forward("10s")
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
@@ -196,7 +197,7 @@ def test_submit_stop_oco_market_order_triggered(
     page.get_by_test_id(trigger_price_oco).fill("102")
     page.get_by_test_id(order_size_oco).fill("3")
     page.get_by_test_id(submit_stop_order).click()
-    page.get_by_test_id("toast-content").click()
+    wait_for_toast_confirmation(page)
     vega.forward("10s")
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
@@ -274,7 +275,7 @@ def test_submit_stop_oco_market_order_pending(
     page.get_by_test_id(trigger_price_oco).fill("120")
     page.get_by_test_id(order_size_oco).fill("2")
     page.get_by_test_id(submit_stop_order).click()
-    page.get_by_test_id("toast-content").click()
+    wait_for_toast_confirmation(page)
     vega.forward("10s")
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
@@ -315,7 +316,7 @@ def test_submit_stop_oco_limit_order_pending(
     # 7002-SORD-089
     page.get_by_test_id(order_limit_price_oco).fill("99")
     page.get_by_test_id(submit_stop_order).click()
-    page.get_by_test_id("toast-content").click()
+    wait_for_toast_confirmation(page)
     vega.forward("10s")
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
@@ -371,7 +372,7 @@ def test_submit_stop_oco_limit_order_cancel(
     # 7002-SORD-093
     page.get_by_test_id(order_limit_price_oco).fill("99")
     page.get_by_test_id(submit_stop_order).click()
-    page.get_by_test_id("toast-content").click()
+    wait_for_toast_confirmation(page)
     vega.forward("10s")
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
@@ -484,7 +485,7 @@ class TestStopOcoValidation:
         page.get_by_test_id(order_limit_price_oco).fill("99")
         for i in range(2):
             page.get_by_test_id(submit_stop_order).click()
-            page.get_by_test_id("toast-content").click()
+            wait_for_toast_confirmation(page)
             vega.forward("10s")
             vega.wait_fn(1)
             vega.wait_for_total_catchup()

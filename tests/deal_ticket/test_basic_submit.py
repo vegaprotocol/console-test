@@ -42,7 +42,7 @@ def test_limit_buy_order_GTT(continuous_market, vega: VegaService, page: Page):
         "10 BTC @ 120.00 BTC"
     )
     page.get_by_test_id(place_order).click()
-    #page.wait_for_function("document.querySelector('[data-testid=\"toast-content\"]') && document.querySelector('[data-testid=\"toast-content\"]').innerText.includes('AWAITING CONFIRMATION')")
+    page.wait_for_function("document.querySelector('[data-testid=\"toast-content\"]') && document.querySelector('[data-testid=\"toast-content\"]').innerText.includes('AWAITING CONFIRMATION')")
     vega.forward("10s")
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
@@ -56,6 +56,7 @@ def test_limit_buy_order_GTT(continuous_market, vega: VegaService, page: Page):
 @pytest.mark.usefixtures("page", "auth", "risk_accepted")
 def test_limit_buy_order(continuous_market, vega: VegaService, page: Page):
     page.goto(f"/#/markets/{continuous_market}")
+    
     page.get_by_test_id(order_size).fill("10")
     page.get_by_test_id(order_price).fill("120")
     page.get_by_test_id(place_order).click()

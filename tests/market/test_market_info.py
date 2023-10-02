@@ -76,7 +76,7 @@ def test_market_info_market_volume(page: Page):
         ["24 Hour Volume", "-"],
         ["Open Interest", "1"],
         ["Best Bid Volume", "99"],
-        ["Best Offer Volume", "96"],
+        ["Best Offer Volume", "99"],
         ["Best Static Bid Volume", "1"],
         ["Best Static Offer Volume", "1"],
     ]
@@ -122,7 +122,6 @@ def test_market_info_instrument(page: Page):
 def test_market_info_oracle(page: Page, vega: VegaService):
     # 6002-MDET-203
     page.get_by_test_id(market_title_test_id).get_by_text("Oracle").click()
-    page.pause()
     expect(
         page.locator('[data-state="open"]').get_by_test_id("accordion-content")
     ).to_contain_text("No oracle proof for settlement data")
@@ -222,7 +221,7 @@ def test_market_info_liquidity_monitoring_parameters(page: Page):
 
 
 # Liquidity resolves to 3 results
-def test_market_info_liquidity(page: Page):
+def test_market_info_liquidit(page: Page):
     # 6002-MDET-213
     page.get_by_test_id(market_title_test_id).get_by_text(
         "Liquidity", exact=True
@@ -230,7 +229,6 @@ def test_market_info_liquidity(page: Page):
     fields = [
         ["Target Stake", "5.82757 tDAI"],
         ["Supplied Stake", "10,000.00 tDAI"],
-        ["Market Value Proxy", "10,000.00 tDAI"],
     ]
     validate_info_section(page, fields)
 

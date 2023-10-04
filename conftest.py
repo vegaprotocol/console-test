@@ -9,7 +9,7 @@ import time
 from contextlib import contextmanager
 from vega_sim.null_service import VegaServiceNull
 from playwright.sync_api import Browser, Page
-from config import console_image_name
+from config import console_image_name, vega_version
 from fixtures.market import (
     setup_simple_market,
     setup_opening_auction_market,
@@ -53,6 +53,8 @@ def init_vega(request=None):
         "Starting VegaServiceNull",
         extra={"worker_id": os.environ.get("PYTEST_XDIST_WORKER")},
     )
+    logger.info(f"Using console image: {console_image_name}")
+    logger.info(f"Using vega version: {vega_version}")
     with VegaServiceNull(
         run_with_console=False,
         launch_graphql=False,

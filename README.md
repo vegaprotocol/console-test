@@ -30,7 +30,7 @@
     ```
     or
     ```bash
-    docker pull vegaprotocol/trading:mainnet
+    docker pull vegaprotocol/trading:main
     ```
    All available images can be found [here](https://hub.docker.com/r/vegaprotocol/trading/tags).
 1. **Start Docker**: Make sure your Docker daemon is running.

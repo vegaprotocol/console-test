@@ -50,7 +50,7 @@ def test_market_selector_filter(continuous_market, page: Page):
     )
     page.get_by_test_id("product-Perpetual").click()
     expect(page.get_by_test_id("market-selector-list")).to_contain_text(
-        "Perpetual markets coming soon."
+        "No perpetual markets."
     )
     page.get_by_test_id("product-Future").click()
     expect(page.locator('[data-testid="market-selector-list"] a')).to_have_count(2)

@@ -18,7 +18,7 @@ TERMINATE_WALLET = WalletConfig("FJMKnwfZdd48C8NqvYrG", "bY3DxwtsCstMIIZdNpKs")
 wallets = [MM_WALLET, MM_WALLET2, TERMINATE_WALLET]
 
 
-def hover_and_assert_tooltip(page, element_text):
+def hover_and_assert_tooltip(page: Page, element_text):
     element = page.get_by_text(element_text)
     element.hover()
     expect(page.get_by_role("tooltip")).to_be_visible()
@@ -62,7 +62,8 @@ class TestIcebergOrdersValidations:
     @pytest.mark.usefixtures("page", "auth", "risk_accepted")
     def test_iceberg_tooltips(self, continuous_market, page: Page):
         page.goto(f"/#/markets/{continuous_market}")
-        hover_and_assert_tooltip(page, "Iceberg")
+        page.get_by_test_id("iceberg").hover()
+        expect(page.get_by_role("tooltip")).to_be_visible()
         page.get_by_test_id("iceberg").click()
         hover_and_assert_tooltip(page, "Peak size")
         hover_and_assert_tooltip(page, "Minimum size")

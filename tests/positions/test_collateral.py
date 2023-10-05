@@ -41,11 +41,11 @@ def test_usage_breakdown(continuous_market, page: Page):
 
     # Margin health tooltip
     usage_breakdown.get_by_test_id("margin-health-chart-track").hover()
-    tooltip_labels = ["maintenance level", "search level", "initial level", "balance", "release level"]
-    tooltip_values = ["5.64713", "6.21184", "8.47069", "8.50269", "9.60012"]
+    tooltip_data = [("maintenance level", "5.64713"), ("search level", "6.21184"), ("initial level", "8.47069"), ("balance", "8.50269"), ("release level", "9.60012")]
 
-    for i in range(5):
-        expect(page.get_by_test_id(TOOLTIP_LABEL).nth(i)).to_have_text(tooltip_labels[i])
-        expect(page.get_by_test_id(TOOLTIP_VALUE).nth(i)).to_have_text(tooltip_values[i])
+    for index, (label, value) in enumerate(tooltip_data):
+        expect(page.get_by_test_id(TOOLTIP_LABEL).nth(index)).to_have_text(label)
+        expect(page.get_by_test_id(TOOLTIP_VALUE).nth(index)).to_have_text(value)
+
 
     page.get_by_test_id('dialog-close').click()

@@ -17,6 +17,7 @@ margin_required = "deal-ticket-fee-margin-required"
 item_value = "item-value"
 market_trading_mode = "market-trading-mode"
 
+
 @pytest.mark.skip("tbd")
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_margin_and_fees_estimations(continuous_market, vega: VegaService, page: Page):
@@ -36,7 +37,7 @@ def test_margin_and_fees_estimations(continuous_market, vega: VegaService, page:
     expect(page.get_by_test_id(notional)).to_have_text("Notional4,000.00 BTC")
     expect(page.get_by_test_id(fees)).to_have_text("Fees~402.00 tDAI")
     expect(page.get_by_test_id(margin_required)).to_have_text(
-        "Margin required1,661.72707 - 1,661.88832 tDAI"
+        "Margin required1,661.88832 tDAI"
     )
 
     page.get_by_test_id("place-order").click()
@@ -45,7 +46,7 @@ def test_margin_and_fees_estimations(continuous_market, vega: VegaService, page:
     vega.wait_fn(10)
     vega.wait_for_total_catchup()
     expect(page.get_by_test_id(margin_required)).to_have_text(
-        "Margin required1,661.72707 - 1,661.88832 tDAI "
+        "Margin required1,661.88832 tDAI "
     )
     page.get_by_test_id("toast-close").click()
 
@@ -55,7 +56,7 @@ def test_margin_and_fees_estimations(continuous_market, vega: VegaService, page:
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
     expect(page.get_by_test_id(margin_required)).to_have_text(
-        "Margin required897,716,007,278,782.40 - 897,716,007,278,798.50 tDAI "
+        "Margin required897,716,007,278,798.50 tDAI "
     )
     expect(page.get_by_test_id("deal-ticket-warning-margin")).to_contain_text(
         "You may not have enough margin available to open this position."
@@ -77,7 +78,7 @@ def test_margin_and_fees_estimations(continuous_market, vega: VegaService, page:
     vega.wait_for_total_catchup()
     page.reload()
     expect(page.get_by_test_id(margin_required)).to_have_text(
-        "Margin required1,684.36688 - 1,700.53688 tDAI"
+        "Margin required1,700.53688 tDAI"
     )
     expect(
         page.get_by_test_id(market_trading_mode).get_by_test_id(item_value)

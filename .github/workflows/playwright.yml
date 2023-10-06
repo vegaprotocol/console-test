@@ -23,6 +23,8 @@ jobs:
   test:
     timeout-minutes: 15
     runs-on: 8-cores
+    container:
+      image: mcr.microsoft.com/playwright/python:v1.38.0-jammy
     steps:
       - uses: actions/checkout@v3
 
@@ -97,11 +99,6 @@ jobs:
       - name: pull console
         run: |
           poetry run docker pull ${{ env.CONSOLE_IMAGE_NAME }}
-      #----------------------------------------------
-      #  -----  install playwright. -----
-      #----------------------------------------------
-      - name: Install Playwright
-        run: poetry run playwright install --with-deps chromium
       #----------------------------------------------
       #  ----- run tests. -----
       #----------------------------------------------

@@ -25,10 +25,12 @@ def test_transfer_fees(continuous_market, page: Page):
     # 1003-TRAN-023
 
     page.goto('/#/portfolio')
+
     page.select_option('[data-testid=transfer-form] [name="toAddress"]', index=1)
     page.get_by_test_id('select-asset').click()
     page.get_by_test_id('rich-select-option').click()
     page.locator('[data-testid=transfer-form] input[name="amount"]').fill('1')
+
     expect(page.get_by_test_id('transfer-fee')).to_be_visible()
     expect(page.get_by_test_id('transfer-fee')).to_have_text("0.001")
 
@@ -61,28 +63,38 @@ def test_transfer_tooltips(continuous_market, page: Page):
 
     page.goto('/#/portfolio')
 
+    page.select_option('[data-testid=transfer-form] [name="toAddress"]', index=1)
+    page.get_by_test_id('select-asset').click()
+    page.get_by_test_id('rich-select-option').click()
+    page.locator('[data-testid=transfer-form] input[name="amount"]').fill('1')
+
     # Check Include Transfer Fee tooltip
-    page.locator('label[for="include-transfer-fee"] div').hover()
-    expect(page.locator('[data-side="bottom"] div')).to_be_visible()
-    expect(page.locator('[data-side="bottom"] div').inner_text()).not_to_be_empty()
+    page.get_by_test_id('include-transfer-fee').hover()
+
+    expect(page.get_by_test_id('tooltip-content')).to_be_visible()
+    assert page.get_by_test_id('[tooltip-content').inner_text() != ""
+    
+    page.get_by_text('Transfer fee').click()
 
     # Check Transfer Fee tooltip
-    page.locator('div:text("Transfer fee")').hover()
-    expect(page.locator('[data-side="bottom"] div')).to_be_visible()
-    expect(page.locator('[data-side="bottom"] div').inner_text()).not_to_be_empty()
+    page.get_by_text('Transfer fee').hover()
+    expect(page.get_by_test_id('tooltip-content')).to_be_visible()
+    assert page.get_by_test_id('tooltip-content').inner_text() != ""
+    page.get_by_text('Transfer fee').click()
 
     # Check Amount to be transferred tooltip
-    page.locator('div:text("Amount to be transferred")').hover()
-    expect(page.locator('[data-side="bottom"] div')).to_be_visible()
-    expect(page.locator('[data-side="bottom"] div').inner_text()).not_to_be_empty()
+    page.get_by_text('Amount to be transferred').hover()
+    expect(page.get_by_test_id('tooltip-content')).to_be_visible()
+    assert page.get_by_test_id('tooltip-content').inner_text() != ""
+    page.get_by_text('Transfer fee').click()
 
     # Check Total amount (with fee) tooltip
-    page.locator('div:text("Total amount (with fee)")').hover()
-    expect(page.locator('[data-side="bottom"] div')).to_be_visible()
-    expect(page.locator('[data-side="bottom"] div').inner_text()).not_to_be_empty()
+    page.get_by_text('Total amount (with fee)').hover()
+    expect(page.get_by_test_id('tooltip-content')).to_be_visible()
+    assert page.get_by_test_id('tooltip-content').inner_text() != ""
 
 @pytest.mark.usefixtures("page", "auth", "risk_accepted",)
-def test_transfer_key_to_key(continuous_market, vega: VegaService, page: Page):
+def test_transfer_submit(continuous_market, vega: VegaService, page: Page):
     # 1003-TRAN-001
     # 1003-TRAN-006
     # 1003-TRAN-007
@@ -107,14 +119,12 @@ def test_transfer_key_to_key(continuous_market, vega: VegaService, page: Page):
     page.locator('[data-testid=transfer-form] input[name="amount"]').fill('1')
     expect(page.locator('[data-testid=transfer-form] input[name="amount"]')).not_to_be_empty()
     
-    page.pause()
     page.locator('[data-testid=transfer-form] [type="submit"]').click()
     wait_for_toast_confirmation(page)
-    page.pause()
     vega.forward("10s")
     vega.wait_fn(10)
     vega.wait_for_total_catchup()
-    page.pause()
+    # Ignore the actual text assert as this will need updating to confirmed
     expected_confirmation_text = re.compile(r"Awaiting confirmationPlease wait for your transaction to be confirmedView in block explorerTransferTo .{6}….{4}1\.00 tDAI")
     actual_confirmation_text = page.get_by_test_id('toast-content').text_content()
     print(f"Actual text is: {actual_confirmation_text}")

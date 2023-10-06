@@ -97,7 +97,7 @@ jobs:
       #  -----  pull console. -----
       #----------------------------------------------
       - name: Set up Docker
-        run: docker --version
+        run: curl -sSL https://get.docker.com/ | sh
 
       - name: pull console
         run: docker pull ${{ env.CONSOLE_IMAGE_NAME }}

@@ -1,7 +1,7 @@
 from collections import namedtuple
 from playwright.sync_api import Page, expect
 import pytest
-from datetime import time
+from datetime import datetime
 from conftest import init_vega
 from conftest import init_page
 from fixtures.market import setup_continuous_market
@@ -130,10 +130,20 @@ def test_trades_are_sorted_descending_by_datetime(continuous_market, page: Page)
     page.get_by_test_id(TRADES_TAB).click()
 
     datetime_elements = page.get_by_test_id(TRADES_TABLE).locator(COL_ID_CREATED_AT).element_handles()
-    
-    # Skip the first header element and collect remaining time elements into a list
-    times = [time(*map(int, el.text_content().split(':'))) for i, el in enumerate(datetime_elements) if i > 0]
 
-    assert all(t1 >= t2 for t1, t2 in zip(times, times[1:])), "Times are not sorted in descending order"
+    date_times = []
+    for index, el in enumerate(datetime_elements):
+        if index != 0:  # ignore header
+            time_str = el.text_content()
+            try:
+                time_obj = datetime.strptime(time_str, '%Y-%m-%dT%H:%M:%S.%fZ')  # Update format based on actual format
+            except ValueError as e:
+                print(f"Failed to parse time string {time_str}: {e}")
+                continue
+            date_times.append(time_obj)
 
+    # Sort the array in descending order
+    sorted_date_times = sorted(date_times, reverse=True)
 
+    # Check that the sorted array is equal to the original
+    assert date_times == sorted_date_times

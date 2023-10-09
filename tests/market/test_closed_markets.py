@@ -6,6 +6,10 @@ from playwright.sync_api import Page, expect
 from fixtures.market import setup_continuous_market
 from conftest import init_vega
 
+import vega_sim.proto.vega.data.v1 as oracles_protos
+import vega_sim.proto.vega.data_source_pb2 as data_source_protos
+import vega_sim.proto.vega.governance_pb2 as gov_protos
+import vega_sim.proto.vega as vega_protos
 
 @pytest.fixture(scope="class")
 def vega():
@@ -134,3 +138,50 @@ def test_terminated_market_no_settlement_date(page: Page, vega: VegaService):
 
     # TODO Create test for terminated market with settlement date in future
     # TODO Create test for terminated market with settlement date in past
+
+
+@pytest.mark.usefixtures("risk_accepted", "auth", "continuous_market")
+def test_future_closed(page: Page, vega: VegaService, continuous_market):
+    base_spec = vega.market_info(continuous_market)
+    now = vega.get_blockchain_time(in_seconds=True)
+    fut = base_spec.tradable_instrument.instrument.future
+
+    now = vega.get_blockchain_time(in_seconds=True)
+    print(f"Current Blockchain Time: {now}")
+    update_prod = gov_protos.UpdateInstrumentConfiguration(
+        code=base_spec.tradable_instrument.instrument.code,
+        future=gov_protos.UpdateFutureProduct(
+            quote_name=fut.quote_name,
+            data_source_spec_for_trading_termination=data_source_protos.DataSourceDefinition(
+                internal=data_source_protos.DataSourceDefinitionInternal(
+                    time=data_source_protos.DataSourceSpecConfigurationTime(
+                        conditions=[
+                            oracles_protos.spec.Condition(
+                                value=f"{now + 300}",
+                                operator=oracles_protos.spec.Condition.Operator.OPERATOR_GREATER_THAN_OR_EQUAL,
+                            )
+                        ]
+                    )
+                )
+            ),
+            data_source_spec_for_settlement_data=fut.data_source_spec_for_settlement_data.data,
+            data_source_spec_binding=vega_protos.markets.DataSourceSpecToFutureBinding(
+                settlement_data_property=fut.data_source_spec_binding.settlement_data_property,
+                trading_termination_property="vegaprotocol.builtin.timestamp",
+            ),
+        ),
+    )
+
+    update_status = vega.update_market(
+    proposal_key="mm",
+    market_id=continuous_market,
+    updated_instrument=update_prod,
+)
+    print(f"Update Status: {update_status}")
+    
+    vega.forward("10s")
+    vega.wait_fn(10)
+    vega.wait_for_total_catchup()
+    page.goto(f"/#/markets/all")
+    page.pause()
+

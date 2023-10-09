@@ -60,7 +60,7 @@ def test_show_trades(continuous_market, page: Page):
     # 6005-THIS-002
     market_id = continuous_market
     page.goto(f"/#/markets/{market_id}")
-    page.click(f"testId={TRADES_TAB}")
+    page.get_by_test_id(TRADES_TAB).click()
 
     expect(page.get_by_test_id(TRADES_TAB)).to_be_visible()
     expect(page.get_by_test_id(TRADES_TAB)).to_be_visible()
@@ -73,7 +73,7 @@ def test_show_trades_prices(continuous_market,  page: Page):
     page.goto(f"/#/markets/{market_id}")
     page.get_by_test_id(TRADES_TAB).click()
 
-    expect(page.get_by_test_id(TRADES_TAB).locator(f"{COL_ID_PRICE} {COL_HEADER}").first).to_have_text("Price")
+    expect(page.get_by_test_id(TRADES_TABLE).locator(f"{COL_ID_PRICE} {COL_HEADER}").first).to_have_text("Price")
     trade_prices_elements = page.get_by_test_id(TRADES_TABLE).locator(COL_ID_PRICE).element_handles()
     
     for trade_price_element in trade_prices_elements:
@@ -86,6 +86,7 @@ def test_show_trades_sizes(continuous_market, page: Page):
     market_id = continuous_market
     page.goto(f"/#/markets/{market_id}")
     page.get_by_test_id(TRADES_TAB).click()
+
     expect(page.get_by_test_id(TRADES_TABLE).locator(f"{COL_ID_SIZE} {COL_HEADER}").first).to_have_text("Size")
     trade_prices_elements = page.get_by_test_id(TRADES_TABLE).locator(COL_ID_SIZE).element_handles()
     
@@ -109,6 +110,19 @@ def test_show_trades_date_and_time(continuous_market, page: Page):
         assert inner_text, "The inner text should not be empty"
 
 @pytest.mark.usefixtures("risk_accepted", "auth")
+def test_copy_price_to_deal_ticket_form(continuous_market, page: Page):
+    # 6005-THIS-007
+    market_id = continuous_market
+    page.goto(f"/#/markets/{market_id}")
+    page.get_by_test_id(TRADES_TAB).click()
+
+    page.get_by_test_id("order-type-Limit").click()
+    last_price = float(page.locator(COL_ID_PRICE).last.inner_text())
+    formatted_last_price = "{:.5f}".format(last_price)
+    page.locator(COL_ID_PRICE).last.click()
+    expect(page.get_by_test_id("order-price")).to_have_value(formatted_last_price)
+
+@pytest.mark.usefixtures("risk_accepted", "auth")
 def test_trades_are_sorted_descending_by_datetime(continuous_market, page: Page):
     # 6005-THIS-006
     market_id = continuous_market
@@ -122,15 +136,4 @@ def test_trades_are_sorted_descending_by_datetime(continuous_market, page: Page)
 
     assert all(t1 >= t2 for t1, t2 in zip(times, times[1:])), "Times are not sorted in descending order"
 
-@pytest.mark.usefixtures("risk_accepted", "auth")
-def test_copy_price_to_deal_ticket_form(continuous_market, page: Page):
-    # 6005-THIS-007
-    market_id = continuous_market
-    page.goto(f"/#/markets/{market_id}")
-    page.get_by_test_id(TRADES_TAB).click()
 
-    page.get_by_test_id("order-type-Limit").click()
-    last_price = float(page.locator(COL_ID_PRICE).last.inner_text())
-    formatted_last_price = "{:.5f}".format(last_price)
-    page.locator(COL_ID_PRICE).last.click()
-    expect(page.get_by_test_id("order-price")).to_have_value(formatted_last_price)

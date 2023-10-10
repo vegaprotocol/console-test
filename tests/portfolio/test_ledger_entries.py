@@ -4,7 +4,6 @@ from playwright.sync_api import Page, expect
 from vega_sim.service import VegaService
 from datetime import datetime, timedelta
 from conftest import init_vega
-from fixtures.market import setup_continuous_market
 
 @pytest.fixture(scope="module")
 def vega(request):

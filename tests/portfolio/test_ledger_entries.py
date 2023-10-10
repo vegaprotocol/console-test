@@ -38,6 +38,4 @@ def test_ledger_entries_downloads(continuous_market,  page: Page):
     # Verify the download by asserting that the file exists
     downloaded_file_path = os.path.join(downloads_directory, download.suggested_filename)
     assert os.path.exists(downloaded_file_path), f"Download failed! File not found at: {downloaded_file_path}"
-    print(downloads_directory)
-    print("Download successful!")
 

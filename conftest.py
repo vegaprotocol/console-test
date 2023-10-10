@@ -16,12 +16,6 @@ from fixtures.market import (
     setup_continuous_market,
 )
 
-import sys
-
-# Workaround for current xdist issue with displaying live logs from multiple workers
-# https://github.com/pytest-dev/pytest-xdist/issues/402
-sys.stdout = sys.stderr
-
 docker_client = docker.from_env()
 logger = logging.getLogger()
 

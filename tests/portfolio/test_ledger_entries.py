@@ -1,22 +1,9 @@
 import os
 import pytest
 from playwright.sync_api import Page, expect
-from datetime import datetime, timedelta
-from conftest import init_vega
 
-@pytest.fixture(scope="module")
-def vega(request):
-    with init_vega(request) as vega:
-        yield vega
-
-
-@pytest.fixture(scope="module")
-def continuous_market(vega):
-    return setup_continuous_market(vega)
-
-
-@pytest.mark.usefixtures("page", "auth", "risk_accepted")
-def test_ledger_entries_downloads(continuous_market,  page: Page):
+@pytest.mark.usefixtures("page", "auth", "risk_accepted", "continuous_market")
+def test_ledger_entries_downloads(page: Page):
     page.goto("/#/portfolio")
     page.get_by_test_id("Ledger entries").click()
     expect(page.get_by_test_id("ledger-download-button")).to_be_enabled()
@@ -24,7 +11,7 @@ def test_ledger_entries_downloads(continuous_market,  page: Page):
     # 7007-LEEN-001
     # Get the user's Downloads directory
     downloads_directory = os.path.expanduser("~") + "/Downloads/"
-
+    page.pause()
     # Start waiting for the download
     with page.expect_download() as download_info:
     # Perform the action that initiates download

@@ -11,7 +11,6 @@ def test_ledger_entries_downloads(page: Page):
     # 7007-LEEN-001
     # Get the user's Downloads directory
     downloads_directory = os.path.expanduser("~") + "/Downloads/"
-    page.pause()
     # Start waiting for the download
     with page.expect_download() as download_info:
     # Perform the action that initiates download

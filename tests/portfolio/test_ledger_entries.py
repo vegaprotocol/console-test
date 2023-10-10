@@ -18,7 +18,7 @@ def continuous_market(vega):
 
 
 @pytest.mark.usefixtures("page", "auth", "risk_accepted")
-def test_ledger_entries_downloads(continuous_market, vega: VegaService, page: Page):
+def test_ledger_entries_downloads(continuous_market,  page: Page):
     page.goto("/#/portfolio")
     page.get_by_test_id("Ledger entries").click()
     expect(page.get_by_test_id("ledger-download-button")).to_be_enabled()

@@ -1,7 +1,6 @@
 import os
 import pytest
 from playwright.sync_api import Page, expect
-from vega_sim.service import VegaService
 from datetime import datetime, timedelta
 from conftest import init_vega
 

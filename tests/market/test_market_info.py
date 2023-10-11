@@ -29,7 +29,7 @@ def page(vega, browser, request):
 @pytest.fixture(autouse=True)
 def after_each(page: Page):
     yield
-    opened_element = page.locator('[data-state="open"]')
+    opened_element = page.locator('h3[data-state="open"]')
     if opened_element.all() and opened_element.get_by_role("button").is_visible():
         opened_element.get_by_role("button").click()
 
@@ -93,11 +93,14 @@ def test_market_info_insurance_pool(page: Page):
 def test_market_info_key_details(page: Page, vega: VegaService):
     # 6002-MDET-201
     page.get_by_test_id(market_title_test_id).get_by_text("Key details").click()
+    market_id = vega.find_market_id("BTC:DAI_2023")
+    short_market_id = market_id[:6] + "…" + market_id[-4:]
     fields = [
+        ["Market ID", short_market_id],
         ["Name", "BTC:DAI_2023"],
-        ["Market ID", vega.find_market_id("BTC:DAI_2023")],
         ["Parent Market ID", "-"],
         ["Insurance Pool Fraction", "-"],
+        ["Status", "Active"],
         ["Trading Mode", "Continuous"],
         ["Market Decimal Places", "5"],
         ["Position Decimal Places", "0"],
@@ -168,15 +171,22 @@ def test_market_info_risk_model(page: Page):
     fields = [
         ["Tau", "0.00011407711613050422"],
         ["Risk Aversion Parameter", "0.000001"],
+        ["Sigma", "1"],
     ]
     validate_info_section(page, fields)
 
 
-def test_market_info_risk_parameters(page: Page):
+def test_market_info_margin_scaling_factors(page: Page):
     # 6002-MDET-209
-    page.get_by_test_id(market_title_test_id).get_by_text("Risk parameters").click()
+    page.get_by_test_id(market_title_test_id).get_by_text(
+        "Margin scaling factors"
+    ).click()
     fields = [
-        ["Sigma", "1"],
+        ["Linear Slippage Factor", "0.001"],
+        ["Quadratic Slippage Factor", "0"],
+        ["Search Level", "1.1"],
+        ["Initial Margin", "1.5"],
+        ["Collateral Release", "1.7"],
     ]
     validate_info_section(page, fields)
 
@@ -185,8 +195,12 @@ def test_market_info_risk_factors(page: Page):
     # 6002-MDET-210
     page.get_by_test_id(market_title_test_id).get_by_text("Risk factors").click()
     fields = [
-        ["Short", "0.0542151884784801"],
-        ["Long", "0.0515314208453477"],
+        ["Long", "0.05153"],
+        ["Short", "0.05422"],
+        ["Max Leverage Long", "19.036"],
+        ["Max Leverage Short", "18.111"],
+        ["Max Initial Leverage Long", "12.691"],
+        ["Max Initial Leverage Short", "12.074"],
     ]
     validate_info_section(page, fields)
 

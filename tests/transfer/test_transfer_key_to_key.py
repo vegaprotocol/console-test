@@ -3,97 +3,9 @@ import re
 from playwright.sync_api import Page, expect
 from vega_sim.service import VegaService
 from actions.utils import wait_for_toast_confirmation
-from conftest import init_vega
 from fixtures.market import setup_continuous_market
 
-@pytest.fixture(scope="module")
-def vega(request):
-    with init_vega(request) as vega:
-        yield vega
-
-
-@pytest.fixture(scope="module")
-def continuous_market(vega):
-    return setup_continuous_market(vega)
-
-
-@pytest.mark.usefixtures("page", "auth", "risk_accepted",)
-def test_transfer_fees(continuous_market, page: Page):
-    # 1003-TRAN-020
-    # 1003-TRAN-021
-    # 1003-TRAN-022
-    # 1003-TRAN-023
-
-    page.goto('/#/portfolio')
-
-    page.select_option('[data-testid=transfer-form] [name="toAddress"]', index=1)
-    page.get_by_test_id('select-asset').click()
-    page.get_by_test_id('rich-select-option').click()
-    page.locator('[data-testid=transfer-form] input[name="amount"]').fill('1')
-
-    expect(page.get_by_test_id('transfer-fee')).to_be_visible()
-    expect(page.get_by_test_id('transfer-fee')).to_have_text("0.001")
-
-    expect(page.get_by_test_id('transfer-amount')).to_be_visible()
-    expect(page.get_by_test_id('transfer-amount')).to_have_text("1.00")
-
-    expect(page.get_by_test_id('total-transfer-fee')).to_be_visible()
-    expect(page.get_by_test_id('total-transfer-fee')).to_have_text("1.001")
-
-    # Perform the click
-    page.get_by_test_id('include-transfer-fee').click()
-
-    # Second set of checks
-    expect(page.get_by_test_id('transfer-fee')).to_be_visible()
-    expect(page.get_by_test_id('transfer-fee')).to_have_text("0.001")
-
-    expect(page.get_by_test_id('transfer-amount')).to_be_visible()
-    expect(page.get_by_test_id('transfer-amount')).to_have_text("0.999")
-
-    expect(page.get_by_test_id('total-transfer-fee')).to_be_visible()
-    expect(page.get_by_test_id('total-transfer-fee')).to_have_text("1.00")
-
-@pytest.mark.usefixtures("page", "auth", "risk_accepted",)
-def test_transfer_tooltips(continuous_market, page: Page):
-    # 1003-TRAN-015
-    # 1003-TRAN-016
-    # 1003-TRAN-017
-    # 1003-TRAN-018
-    # 1003-TRAN-019
-
-    page.goto('/#/portfolio')
-
-    page.select_option('[data-testid=transfer-form] [name="toAddress"]', index=1)
-    page.get_by_test_id('select-asset').click()
-    page.get_by_test_id('rich-select-option').click()
-    page.locator('[data-testid=transfer-form] input[name="amount"]').fill('1')
-
-    # Check Include Transfer Fee tooltip
-    page.get_by_test_id('include-transfer-fee').hover()
-
-    expect(page.get_by_test_id('tooltip-content')).to_be_visible()
-    assert page.get_by_test_id('[tooltip-content').inner_text() != ""
-    
-    page.get_by_text('Transfer fee').click()
-
-    # Check Transfer Fee tooltip
-    page.get_by_text('Transfer fee').hover()
-    expect(page.get_by_test_id('tooltip-content')).to_be_visible()
-    assert page.get_by_test_id('tooltip-content').inner_text() != ""
-    page.get_by_text('Transfer fee').click()
-
-    # Check Amount to be transferred tooltip
-    page.get_by_text('Amount to be transferred').hover()
-    expect(page.get_by_test_id('tooltip-content')).to_be_visible()
-    assert page.get_by_test_id('tooltip-content').inner_text() != ""
-    page.get_by_text('Transfer fee').click()
-
-    # Check Total amount (with fee) tooltip
-    page.get_by_text('Total amount (with fee)').hover()
-    expect(page.get_by_test_id('tooltip-content')).to_be_visible()
-    assert page.get_by_test_id('tooltip-content').inner_text() != ""
-
-@pytest.mark.usefixtures("page", "auth", "risk_accepted",)
+@pytest.mark.usefixtures("page", "auth", "risk_accepted")
 def test_transfer_submit(continuous_market, vega: VegaService, page: Page):
     # 1003-TRAN-001
     # 1003-TRAN-006

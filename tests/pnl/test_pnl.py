@@ -58,12 +58,12 @@ def test_pnl(continuous_market, vega: VegaService, page: Page):
 
     # profit Trading unrealised
     page.get_by_test_id("manage-vega-wallet").click()
-    page.locator('[role="menuitemradio"]').nth(1).click(position={ "x": 0, "y": 0})
+    page.locator('[role="menuitemradio"] >> .mr-2.uppercase').nth(1).click(position={ "x": 0, "y": 0}, force=True)
     check_pnl_color_value(realised_pnl, "rgb(0, 0, 0)", "0.00")
     check_pnl_color_value(unrealised_pnl, "rgb(1, 145, 75)", "4.00")
 
     # neutral Trading unrealised
-    page.locator('[role="menuitemradio"]').nth(2).click(position={ "x": 0, "y": 0})
+    page.locator('[role="menuitemradio"] >> .mr-2.uppercase').nth(2).click(position={ "x": 0, "y": 0}, force=True)
     check_pnl_color_value(realised_pnl, "rgb(0, 0, 0)", "0.00")
     check_pnl_color_value(unrealised_pnl, "rgb(0, 0, 0)", "0.00")
 
@@ -133,11 +133,11 @@ def test_pnl(continuous_market, vega: VegaService, page: Page):
 
     # profit trading realised
     page.get_by_test_id("manage-vega-wallet").click()
-    page.locator('[role="menuitemradio"]').nth(1).click(position={ "x": 0, "y": 0})
+    page.locator('[role="menuitemradio"] >> .mr-2.uppercase').nth(1).click(position={ "x": 0, "y": 0}, force=True)
     check_pnl_color_value(realised_pnl, "rgb(1, 145, 75)", "8.00")
     check_pnl_color_value(unrealised_pnl, "rgb(0, 0, 0)", "0.00")
 
     # loss trading realised
-    page.locator('[role="menuitemradio"]').nth(0).click(position={ "x": 0, "y": 0})
+    page.locator('[role="menuitemradio"] >> .mr-2.uppercase').nth(0).click(position={ "x": 0, "y": 0}, force=True)
     check_pnl_color_value(realised_pnl, "rgb(236, 0, 60)", "-8.00")
     check_pnl_color_value(unrealised_pnl, "rgb(0, 0, 0)", "0.00")

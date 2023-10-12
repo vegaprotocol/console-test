@@ -3,7 +3,6 @@ import re
 from playwright.sync_api import Page, expect
 from vega_sim.service import VegaService
 from actions.utils import wait_for_toast_confirmation
-from fixtures.market import setup_continuous_market
 
 @pytest.mark.usefixtures("page", "auth", "risk_accepted")
 def test_transfer_submit(continuous_market, vega: VegaService, page: Page):
@@ -34,10 +33,9 @@ def test_transfer_submit(continuous_market, vega: VegaService, page: Page):
     page.locator('[data-testid=transfer-form] [type="submit"]').click()
     wait_for_toast_confirmation(page)
     vega.forward("10s")
-    vega.wait_fn(10)
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
-    # Ignore the actual text assert as this will need updating to confirmed
-    expected_confirmation_text = re.compile(r"Awaiting confirmationPlease wait for your transaction to be confirmedView in block explorerTransferTo .{6}….{4}1\.00 tDAI")
+    expected_confirmation_text = re.compile(r"Transfer completeYour transaction has been confirmed View in block explorerTransferTo .{6}….{6}1\.00 tDAI")
     actual_confirmation_text = page.get_by_test_id('toast-content').text_content()
     print(f"Actual text is: {actual_confirmation_text}")
     assert expected_confirmation_text.search(actual_confirmation_text), f"Expected pattern not found in {actual_confirmation_text}"

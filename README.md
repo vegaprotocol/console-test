@@ -19,6 +19,10 @@
     ```bash
     poetry install
     ```
+1. **Install playwright**:
+    ```bash
+    playwright install
+    ```
 1. **Download the necessary binaries: Run the following command within your Python environment (use force so that the binaries are overwritten, current version depends on the environment you want to check):
     ```bash
     python -m vega_sim.tools.load_binaries --force --version $VEGA_VERSION

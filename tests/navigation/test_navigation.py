@@ -27,6 +27,7 @@ def test_network_switcher(page: Page):
 @pytest.mark.usefixtures("risk_accepted")
 def test_navbar_pages(page: Page):
     page.goto("/#/disclaimer")
+    
     navbar = page.locator('nav[aria-label="Main"]')
     assert_links(navbar)
 
@@ -34,6 +35,7 @@ def test_navbar_pages(page: Page):
 @pytest.mark.usefixtures("risk_accepted")
 def test_navigation_mobile(page: Page):
     page.goto("/#/disclaimer")
+    page.pause()
     page.set_viewport_size({"width": 800, "height": 1040})
     navbar = page.locator('nav[aria-label="Main"]')
 
@@ -59,7 +61,7 @@ def test_navigation_mobile(page: Page):
 
 def assert_links(container: Locator):
     pages = [
-        {"name": "Markets", "href": "#/markets/all"},
+        {"name": "Markets", "href": "#/markets"},
         {"name": "Trading", "href": "#/markets/"},
         {"name": "Portfolio", "href": "#/portfolio"},
     ]

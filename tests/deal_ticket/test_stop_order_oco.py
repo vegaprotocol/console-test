@@ -4,7 +4,7 @@ from collections import namedtuple
 from playwright.sync_api import Page, expect
 from vega_sim.service import VegaService
 from actions.vega import submit_order
-from conftest import init_vega
+from conftest import init_vega, page
 from fixtures.market import setup_continuous_market
 from actions.utils import wait_for_toast_confirmation
 
@@ -88,7 +88,7 @@ def create_position(vega: VegaService, market_id):
     vega.wait_fn(1)
     vega.wait_for_total_catchup
 
-@pytest.mark.skip("core issue")
+
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_submit_stop_order_market_oco_rejected(
     continuous_market, vega: VegaService, page: Page
@@ -171,7 +171,7 @@ def test_submit_stop_order_market_oco_rejected(
     trigger_value_list = ["Mark < 102.00", "Mark > 103.00"]
     assert trigger_price_list.sort() == trigger_value_list.sort()
 
-@pytest.mark.skip("core issue")
+
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_submit_stop_oco_market_order_triggered(
     continuous_market, vega: VegaService, page: Page
@@ -253,7 +253,7 @@ def test_submit_stop_oco_market_order_triggered(
     trigger_value_list = ["Mark < 102.00", "Mark > 103.00"]
     assert trigger_price_list.sort() == trigger_value_list.sort()
 
-@pytest.mark.skip("core issue")
+
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_submit_stop_oco_market_order_pending(
     continuous_market, vega: VegaService, page: Page
@@ -267,7 +267,7 @@ def test_submit_stop_oco_market_order_pending(
     page.get_by_test_id(stop_market_order_btn).is_visible()
     page.get_by_test_id(stop_market_order_btn).click()
     page.get_by_test_id(order_side_sell).click()
-    page.get_by_test_id(trigger_below).click()
+    page.locator("label").filter(has_text="Falls below").click()
     page.get_by_test_id(trigger_price).fill("99")
     page.get_by_test_id(order_size).fill("3")
     page.get_by_test_id(oco).click()
@@ -290,7 +290,7 @@ def test_submit_stop_oco_market_order_pending(
         "PendingOCO"
     )
 
-@pytest.mark.skip("core issue")
+
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_submit_stop_oco_limit_order_pending(
     continuous_market, vega: VegaService, page: Page
@@ -304,7 +304,7 @@ def test_submit_stop_oco_limit_order_pending(
     page.get_by_test_id(stop_limit_order_btn).is_visible()
     page.get_by_test_id(stop_limit_order_btn).click()
     page.get_by_test_id(order_side_sell).click()
-    page.get_by_test_id(trigger_below).click()
+    page.locator("label").filter(has_text="Falls below").click()
     page.get_by_test_id(trigger_price).fill("102")
     page.get_by_test_id(order_size).fill("3")
     page.get_by_test_id(order_price).fill("103")
@@ -345,7 +345,7 @@ def test_submit_stop_oco_limit_order_pending(
     trigger_value_list = ["Limit < 102.00", "Limit > 103.00"]
     assert trigger_price_list.sort() == trigger_value_list.sort()
 
-@pytest.mark.skip("core issue")
+
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_submit_stop_oco_limit_order_cancel(
     continuous_market, vega: VegaService, page: Page
@@ -359,7 +359,7 @@ def test_submit_stop_oco_limit_order_cancel(
     page.get_by_test_id(stop_limit_order_btn).is_visible()
     page.get_by_test_id(stop_limit_order_btn).click()
     page.get_by_test_id(order_side_sell).click()
-    page.get_by_test_id(trigger_below).click()
+    page.locator("label").filter(has_text="Falls below").click()
     page.get_by_test_id(trigger_price).fill("102")
     page.get_by_test_id(order_size).fill("3")
     page.get_by_test_id(order_price).fill("103")
@@ -460,7 +460,7 @@ class TestStopOcoValidation:
 
         expect(page.locator('[for="order-size-oco"]')).to_have_text("Size")
         expect(page.locator('[for="order-price-oco"]')).to_have_text("Price")
-    @pytest.mark.skip("core issue")
+    
     @pytest.mark.usefixtures("page", "auth", "risk_accepted")
     def test_maximum_number_of_active_stop_orders_oco(
         self, continuous_market, vega: VegaService, page: Page
@@ -470,12 +470,11 @@ class TestStopOcoValidation:
         page.get_by_test_id(stop_orders_tab).click()
         create_position(vega, market_id)
         wait_for_graphql_response(page, "stopOrders")
-
         page.get_by_test_id(stop_order_btn).click()
         page.get_by_test_id(stop_limit_order_btn).is_visible()
         page.get_by_test_id(stop_limit_order_btn).click()
         page.get_by_test_id(order_side_sell).click()
-        page.get_by_test_id(trigger_below).click()
+        page.locator("label").filter(has_text="Falls below").click()
         page.get_by_test_id(trigger_price).fill("102")
         page.get_by_test_id(order_size).fill("3")
         page.get_by_test_id(order_price).fill("103")

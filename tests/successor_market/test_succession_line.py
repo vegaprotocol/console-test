@@ -18,16 +18,15 @@ def successor_market(vega: VegaService):
         market_id=parent_market_id,
     )
     vega.forward("10s")
-    vega.wait_fn(10)
+    vega.wait_fn(1)
     vega.wait_for_total_catchup()
     return successor_market_id
 
 
 
 @pytest.mark.usefixtures("page", "risk_accepted")
-def test_succession_line(page: Page, successor_market, vega: VegaService):
-    successor_market_id = successor_market
-    page.goto(f"/#/markets/{successor_market_id}")
+def test_succession_line(page: Page, successor_market):
+    page.goto(f"/#/markets/{successor_market}")
     page.get_by_test_id("Info").click()
     page.get_by_text("Succession line").click()
 

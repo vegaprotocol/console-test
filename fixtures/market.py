@@ -100,13 +100,22 @@ def setup_simple_successor_market(
         market_name,
         proposal_key=MM_WALLET.name,
         settlement_asset_id=tdai_id,
-        termination_key=TERMINATE_WALLET.name,
+        termination_key=MM_WALLET2.name,
         market_decimals=5,
         approve_proposal=approve_proposal,
         forward_time_to_enactment=approve_proposal,
         parent_market_id=parent_market_id,
         parent_market_insurance_pool_fraction=0.5,
     )
+    submit_liquidity(vega, MM_WALLET.name, market_id)
+    submit_multiple_orders(
+        vega, MM_WALLET.name, market_id, "SIDE_SELL", [[1, 110], [1, 105]]
+    )
+    submit_multiple_orders(
+        vega, MM_WALLET2.name, market_id, "SIDE_BUY", [[1, 90], [1, 95]]
+    )
+
+    submit_order(vega, "Key 1", market_id, "SIDE_BUY", 1, 110)
 
     vega.forward("10s")
     vega.wait_fn(1)

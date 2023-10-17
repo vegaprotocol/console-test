@@ -59,7 +59,7 @@ def test_navigation_mobile(page: Page):
 
 def assert_links(container: Locator):
     pages = [
-        {"name": "Markets", "href": "#/markets/all"},
+        {"name": "Markets", "href": "#/markets"},
         {"name": "Trading", "href": "#/markets/"},
         {"name": "Portfolio", "href": "#/portfolio"},
     ]

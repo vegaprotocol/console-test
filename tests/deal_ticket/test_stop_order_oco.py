@@ -380,6 +380,7 @@ def test_submit_stop_oco_limit_order_cancel(
     page.get_by_test_id(close_toast).click()
     wait_for_graphql_response(page, "stopOrders")
     page.get_by_test_id(cancel).first.click()
+    wait_for_toast_confirmation(page)
     vega.forward("10s")
     vega.wait_fn(1)
     vega.wait_for_total_catchup()

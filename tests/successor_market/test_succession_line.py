@@ -1,17 +1,27 @@
 import pytest
 from playwright.sync_api import Page, expect
 from vega_sim.service import VegaService
-from fixtures.market import setup_simple_market, setup_simple_successor_market
+from fixtures.market import setup_continuous_market, setup_simple_successor_market
 
 
 @pytest.fixture
 @pytest.mark.usefixtures("vega")
 def successor_market(vega: VegaService):
-    parent_market_id = setup_simple_market(vega)
+    parent_market_id = setup_continuous_market(vega)
     tdai_id = vega.find_asset_id(symbol="tDAI")
-    return setup_simple_successor_market(
+    successor_market_id = setup_simple_successor_market(
         vega, parent_market_id, tdai_id, "successor_market"
     )
+    vega.settle_market(
+        settlement_key="FJMKnwfZdd48C8NqvYrG",
+        settlement_price=110,
+        market_id=parent_market_id,
+    )
+    vega.forward("10s")
+    vega.wait_fn(1)
+    vega.wait_for_total_catchup()
+    return successor_market_id
+
 
 
 @pytest.mark.usefixtures("page", "risk_accepted")

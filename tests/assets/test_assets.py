@@ -73,12 +73,13 @@ def test_asset_details(page: Page):
         value = pair.get("value", "")
         label_tooltip = pair.get("labelTooltip", "")
         value_tooltip = pair.get("valueToolTip", "")
-
+    
         if label == "ID":
+            expect(page.get_by_role("button", name="Copy id to clipboard")).to_be_visible()
             asset_id_text = page.locator(f"[data-testid='{index}_value']").inner_text()
-            assert re.match(
-            r"^[0-9a-f]{6}\u2026[0-9a-f]{4}$", asset_id_text
-            ), f"Expected ID to match pattern but got {asset_id_text}"
+            pattern = r"^[0-9a-f]{6}\u2026[0-9a-f]{4}"
+
+            assert re.match(pattern, asset_id_text), f"Expected ID to match pattern but got {asset_id_text}"
 
         else:
             expect(page.locator(f"[data-testid='{index}_label']")).to_have_text(label)

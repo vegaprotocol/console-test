@@ -30,7 +30,8 @@ logger = logging.getLogger()
 def pytest_runtest_makereport(item, call):
     outcome = "passed" if call.excinfo is None else "failed"
     item.config.cache.set(item.nodeid, outcome)
-    
+
+
 def pytest_configure(config):
     worker_id = os.environ.get("PYTEST_XDIST_WORKER")
     if worker_id is not None:
@@ -155,8 +156,7 @@ def page(vega, browser, request):
 
 
 # Set auth token so eager connection for MarketSim wallet is successful
-@pytest.fixture(scope="function")
-def auth(vega: VegaServiceNull, page: Page):
+def auth_setup(vega: VegaServiceNull, page: Page):
     DEFAULT_WALLET_NAME = "MarketSim"  # This is the default wallet name within VegaServiceNull and CANNOT be changed
 
     # Calling get_keypairs will internally call _load_tokens for the given wallet
@@ -188,6 +188,11 @@ def auth(vega: VegaServiceNull, page: Page):
         "wallet_api_token": wallet_api_token,
         "public_key": keypairs["Key 1"],
     }
+
+
+@pytest.fixture(scope="function")
+def auth(vega: VegaServiceNull, page: Page):
+    return auth_setup(vega, page)
 
 
 # Set 'risk accepted' flag, so that the risk dialog doesn't show up

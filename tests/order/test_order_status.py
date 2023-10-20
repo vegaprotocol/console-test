@@ -1,4 +1,3 @@
-from collections import namedtuple
 import pytest
 from playwright.sync_api import Page, expect
 from vega_sim.service import VegaService, PeggedOrder
@@ -6,18 +5,7 @@ from conftest import auth_setup, init_page, init_vega, risk_accepted_setup
 from fixtures.market import setup_continuous_market, setup_simple_market
 from actions.utils import wait_for_toast_confirmation
 
-# Defined namedtuples
-WalletConfig = namedtuple("WalletConfig", ["name", "passphrase"])
-
-# Wallet Configurations
-MM_WALLET = WalletConfig("mm", "pin")
-MM_WALLET2 = WalletConfig("mm2", "pin2")
-TERMINATE_WALLET = WalletConfig("FJMKnwfZdd48C8NqvYrG", "bY3DxwtsCstMIIZdNpKs")
-
-wallets = [MM_WALLET, MM_WALLET2, TERMINATE_WALLET]
-
 order_tab = "tab-orders"
-table_row = ".ag-center-cols-container .ag-row"
 
 
 @pytest.fixture(scope="module")
@@ -268,28 +256,28 @@ def test_order_sorted(page: Page):
 
 def test_order_status_active(page: Page):
     # 7002-SORD-041
-    expect(page.get_by_test_id("tab-orders")).to_contain_text(
+    expect(page.get_by_test_id(order_tab)).to_contain_text(
         "market-2Futr" + "0" + "-10" + "Limit" + "Active" + "150.00" + "GTC"
     )
 
 
 def test_status_expired(page: Page):
     # 7002-SORD-042
-    expect(page.get_by_test_id("tab-orders")).to_contain_text(
+    expect(page.get_by_test_id(order_tab)).to_contain_text(
         "market-3Futr" + "0" + "-10" + "Limit" + "Expired" + "120.00" + "GTT:"
     )
 
 
 def test_order_status_Stopped(page: Page):
     # 7002-SORD-044
-    expect(page.get_by_test_id("tab-orders")).to_contain_text(
+    expect(page.get_by_test_id(order_tab)).to_contain_text(
         "market-1Futr" + "0" + "-100" + "Limit" + "Stopped" + "130.00" + "IOC"
     )
 
 
 def test_order_status_partially_filled(page: Page):
     # 7002-SORD-045
-    expect(page.get_by_test_id("tab-orders")).to_contain_text(
+    expect(page.get_by_test_id(order_tab)).to_contain_text(
         "market-2Futr" + "99" + "+100" + "Limit" + "Partially Filled" + "104.00" + "IOC"
     )
 
@@ -297,7 +285,7 @@ def test_order_status_partially_filled(page: Page):
 def test_order_status_filled(page: Page):
     # 7002-SORD-046
     # 7003-MORD-020
-    expect(page.get_by_test_id("tab-orders")).to_contain_text(
+    expect(page.get_by_test_id(order_tab)).to_contain_text(
         "market-1Futr" + "100" + "-100" + "Limit" + "Filled" + "88.00" + "GTC"
     )
 
@@ -305,7 +293,7 @@ def test_order_status_filled(page: Page):
 def test_order_status_rejected(page: Page):
     # 7002-SORD-047
     # 7003-MORD-018
-    expect(page.get_by_test_id("tab-orders")).to_contain_text(
+    expect(page.get_by_test_id(order_tab)).to_contain_text(
         "market-1Futr"
         + "0"
         + "-10,000,000,000"
@@ -319,7 +307,7 @@ def test_order_status_rejected(page: Page):
 def test_order_status_parked(page: Page):
     #  7002-SORD-048
     #  7003-MORD-016
-    expect(page.get_by_test_id("tab-orders")).to_contain_text(
+    expect(page.get_by_test_id(order_tab)).to_contain_text(
         "market-5Futr"
         + "0"
         + "-60"
@@ -332,7 +320,7 @@ def test_order_status_parked(page: Page):
 
 def test_order_status_pegged_ask(page: Page):
     #  7003-MORD-016
-    expect(page.get_by_test_id("tab-orders")).to_contain_text(
+    expect(page.get_by_test_id(order_tab)).to_contain_text(
         "market-4Futr"
         + "0"
         + "-60"
@@ -345,7 +333,7 @@ def test_order_status_pegged_ask(page: Page):
 
 def test_order_status_pegged_bid(page: Page):
     #  7003-MORD-016
-    expect(page.get_by_test_id("tab-orders")).to_contain_text(
+    expect(page.get_by_test_id(order_tab)).to_contain_text(
         "market-4Futr"
         + "0"
         + "+40"
@@ -358,7 +346,7 @@ def test_order_status_pegged_bid(page: Page):
 
 def test_order_status_pegged_mid(page: Page):
     #  7003-MORD-016
-    expect(page.get_by_test_id("tab-orders")).to_contain_text(
+    expect(page.get_by_test_id(order_tab)).to_contain_text(
         "market-4Futr"
         + "0"
         + "+20"
@@ -384,7 +372,7 @@ def test_order_amend_order(vega: VegaService, page: Page):
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
 
-    expect(page.get_by_test_id("tab-orders")).to_contain_text(
+    expect(page.get_by_test_id(order_tab)).to_contain_text(
         "market-2Futr" + "0" + "-15" + "Limit" + "Active" + "170.00" + "GTC"
     )
 
@@ -401,7 +389,7 @@ def test_order_cancel_single_order(vega: VegaService, page: Page):
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
 
-    expect(page.get_by_test_id("tab-orders")).to_contain_text(
+    expect(page.get_by_test_id(order_tab)).to_contain_text(
         "market-3Futr" + "0" + "+10" + "Limit" + "Cancelled" + "60.00" + "GTC"
     )
 

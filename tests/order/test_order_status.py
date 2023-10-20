@@ -304,6 +304,7 @@ def test_order_status_filled(page: Page):
 
 def test_order_status_rejected(page: Page):
     # 7002-SORD-047
+    # 7003-MORD-018
     expect(page.get_by_test_id("tab-orders")).to_contain_text(
         "market-1Futr"
         + "0"
@@ -317,6 +318,7 @@ def test_order_status_rejected(page: Page):
 
 def test_order_status_parked(page: Page):
     #  7002-SORD-048
+    #  7003-MORD-016
     expect(page.get_by_test_id("tab-orders")).to_contain_text(
         "market-5Futr"
         + "0"
@@ -329,6 +331,7 @@ def test_order_status_parked(page: Page):
 
 
 def test_order_status_pegged_ask(page: Page):
+    #  7003-MORD-016
     expect(page.get_by_test_id("tab-orders")).to_contain_text(
         "market-4Futr"
         + "0"
@@ -341,6 +344,7 @@ def test_order_status_pegged_ask(page: Page):
 
 
 def test_order_status_pegged_bid(page: Page):
+    #  7003-MORD-016
     expect(page.get_by_test_id("tab-orders")).to_contain_text(
         "market-4Futr"
         + "0"
@@ -353,6 +357,7 @@ def test_order_status_pegged_bid(page: Page):
 
 
 def test_order_status_pegged_mid(page: Page):
+    #  7003-MORD-016
     expect(page.get_by_test_id("tab-orders")).to_contain_text(
         "market-4Futr"
         + "0"

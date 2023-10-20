@@ -221,7 +221,7 @@ def markets(vega: VegaService):
 
     vega.submit_order(
         trading_key="Key 1",
-        market_id=market_2,
+        market_id=market_3,
         time_in_force="TIME_IN_FORCE_GTC",
         order_type="TYPE_LIMIT",
         side="SIDE_BUY",
@@ -402,11 +402,10 @@ def test_order_cancel_single_order(vega: VegaService, page: Page):
     vega.wait_for_total_catchup()
 
     expect(page.get_by_test_id("tab-orders")).to_contain_text(
-        "market-2Futr" + "0" + "+10" + "Limit" + "Cancelled" + "60.00" + "GTC"
+        "market-3Futr" + "0" + "+10" + "Limit" + "Cancelled" + "60.00" + "GTC"
     )
 
 
-@pytest.mark.skip("to investigate why cancel all orders button is not visible")
 def test_order_cancel_all_orders(vega: VegaService, page: Page):
     #  7003-MORD-009
     #  7003-MORD-010
@@ -420,4 +419,8 @@ def test_order_cancel_all_orders(vega: VegaService, page: Page):
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
 
-    # TBD: assertions
+    expect(page.get_by_test_id("cancelAll")).not_to_be_visible()
+    expect(page.get_by_test_id("cancel")).not_to_be_visible()
+    expect(
+        page.locator('.ag-cell[col-id="status"]', has_text="Cancelled")
+    ).to_have_count(7)

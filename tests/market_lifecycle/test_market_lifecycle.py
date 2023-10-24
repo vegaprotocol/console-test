@@ -1,10 +1,16 @@
 import pytest
 import vega_sim.api.governance as governance
+import re
 
 from collections import namedtuple
 from playwright.sync_api import Page, expect
 from vega_sim.service import VegaService, PeggedOrder
+import vega_sim.proto.vega as vega_protos
+import vega_sim.api.governance as governance
 from actions.vega import submit_order
+from fixtures.market import setup_continuous_market
+from datetime import datetime
+from datetime import timedelta
 
 # Defined namedtuples
 WalletConfig = namedtuple("WalletConfig", ["name", "passphrase"])
@@ -121,3 +127,48 @@ def test_market_lifecycle(proposed_market, vega: VegaService, page: Page):
     # check market state is now settled
     expect(trading_mode).to_have_text("No trading")
     expect(market_state).to_have_text("Settled")
+
+
+@pytest.mark.usefixtures("page", "risk_accepted", "continuous_market")
+def test_market_closing_banners(page: Page, continuous_market, vega: VegaService):
+    market_id = continuous_market
+    page.goto(f"/#/markets/{market_id}")
+    proposalID = vega.update_market_state(
+        continuous_market,
+        "mm",
+        vega_protos.governance.MarketStateUpdateType.MARKET_STATE_UPDATE_TYPE_TERMINATE,
+        approve_proposal=False,
+        vote_enactment_time = datetime.now() + timedelta(weeks=1),
+        forward_time_to_enactment = False,
+        price=107,
+    )
+    may_close_warning_pattern = r"TRADING ON MARKET BTC:DAI_2023 MAY STOP ON \d+ \w+\.\s*THERE IS OPEN PROPOSAL TO CLOSE THIS MARKET\.\nProposed final price is 107\.00 BTC\.\nView proposal"
+    match_result = re.fullmatch(may_close_warning_pattern, page.locator(".grow").inner_text())
+    assert match_result is not None
+
+    vega.update_market_state(
+        continuous_market,
+        "mm",
+        vega_protos.governance.MarketStateUpdateType.MARKET_STATE_UPDATE_TYPE_TERMINATE,
+        approve_proposal=False,
+        vote_enactment_time = datetime.now() + timedelta(weeks=1),
+        forward_time_to_enactment = False,
+        price=110,
+    )
+    
+    expect(page.locator(".grow")).to_have_text("Trading on Market BTC:DAI_2023 may stop. There are open proposals to close this marketView proposals")
+
+    governance.approve_proposal( 
+        proposal_id=proposalID,
+        wallet=vega.wallet,
+        key_name="mm"
+        
+    )
+    vega.forward("60s")
+    vega.wait_fn(10)
+    vega.wait_for_total_catchup()
+  
+    will_close_pattern = r"TRADING ON MARKET BTC:DAI_2023 WILL STOP ON \d+ \w+\nYou will no longer be able to hold a position on this market when it closes in \d+ days \d+ hours\. The final price will be 107\.00 BTC\."
+    match_result = re.fullmatch(will_close_pattern, page.locator(".grow").inner_text())
+    assert match_result is not None
+    

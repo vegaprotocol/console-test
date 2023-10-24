@@ -117,13 +117,15 @@ def test_price_monitoring(simple_market, vega: VegaService, page: Page):
         vega, MM_WALLET2.name, simple_market, "SIDE_SELL", initial_volume, initial_price
     )
 
-    vega.forward("10s")
-    vega.wait_fn(1)
-    vega.wait_for_total_catchup()
+    
 
     expect(
         page.get_by_test_id(liquidity_supplied).get_by_test_id(item_value)
     ).to_have_text("100.00 (>100%)")
+
+    vega.forward("10s")
+    vega.wait_fn(1)
+    vega.wait_for_total_catchup()
 
     page.goto(f"/#/markets/all")
     # temporary skip
@@ -163,8 +165,7 @@ def test_price_monitoring(simple_market, vega: VegaService, page: Page):
 
     vega.forward("10s")
     vega.wait_fn(1)
-    vega.wait_for_total_catchup()
-
+    vega.wait_for_total_catchup() 
     expect(
         page.get_by_test_id(price_monitoring_bounds_row).first.get_by_text(
             "135.44204 BTC"

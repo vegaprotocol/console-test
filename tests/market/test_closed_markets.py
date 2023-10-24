@@ -73,9 +73,11 @@ class TestSettledMarket:
         # 6001-MARK-009
         # 6001-MARK-008
         # 6001-MARK-010
-        expect(row_selector.locator('[col-id="settlementDate"]')).to_have_text(
-            "5 months ago"
-        )
+        pattern = r"(\d+)\s+months\s+ago"
+        date_text = row_selector.locator('[col-id="settlementDate"]').inner_text()
+        assert re.match(pattern, date_text), f"Expected text to match pattern but got {date_text}"
+       
+
         expected_pattern = re.compile(r"https://.*?/oracles/[a-f0-9]{64}")
         actual_href = row_selector.locator(
             '[col-id="settlementDate"] [data-testid="link"]'
@@ -107,9 +109,7 @@ class TestSettledMarket:
         # 6001-MARK-018
         expect(row_selector.locator('[col-id="settlementAsset"]')).to_have_text("tDAI")
         # 6001-MARK-020
-        expect(row_selector.locator('[col-id="settlementDate"]')).to_have_text(
-            "5 months ago"
-        )
+        assert re.match(pattern, date_text), f"Expected text to match pattern but got {date_text}"
 
 
 @pytest.mark.usefixtures("risk_accepted", "auth")

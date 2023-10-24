@@ -116,9 +116,6 @@ def test_price_monitoring(simple_market, vega: VegaService, page: Page):
     submit_order(
         vega, MM_WALLET2.name, simple_market, "SIDE_SELL", initial_volume, initial_price
     )
-
-    
-
     expect(
         page.get_by_test_id(liquidity_supplied).get_by_test_id(item_value)
     ).to_have_text("100.00 (>100%)")
@@ -126,6 +123,9 @@ def test_price_monitoring(simple_market, vega: VegaService, page: Page):
     vega.forward("10s")
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
+    expect(
+        page.get_by_test_id(liquidity_supplied).get_by_test_id(item_value)
+    ).to_have_text("50.00 (>100%)")
 
     page.goto(f"/#/markets/all")
     # temporary skip
@@ -184,7 +184,7 @@ def test_price_monitoring(simple_market, vega: VegaService, page: Page):
     )
     expect(
         page.get_by_test_id(liquidity_supplied).get_by_test_id(item_value)
-    ).to_have_text("100.00 (17.57%)")
+    ).to_have_text("50.00 (8.78%)")
 
     # cancel order to increase liquidity
     vega.cancel_order(MM_WALLET2.name, simple_market, to_cancel)
@@ -202,6 +202,7 @@ def test_price_monitoring(simple_market, vega: VegaService, page: Page):
     )
     # commented out because we have an issue #4233
     # expect(page.get_by_text("Opening auction")).to_be_hidden()
+    
     expect(
         page.get_by_test_id(liquidity_supplied).get_by_test_id(item_value)
-    ).to_have_text("100.00 (>100%)")
+    ).to_have_text("50.00 (>100%)")

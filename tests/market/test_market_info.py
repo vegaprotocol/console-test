@@ -49,7 +49,7 @@ def test_market_info_current_fees(page: Page):
     # 6002-MDET-101
     page.get_by_test_id(market_title_test_id).get_by_text("Current fees").click()
     fields = [
-        ["Maker Fee", "10.00%"],
+        ["Maker Fee", "10%"],
         ["Infrastructure Fee", "0.05%"],
         ["Liquidity Fee", "0.00%"],
         ["Total Fees", "10.05%"],
@@ -253,7 +253,7 @@ def test_market_info_liquidity_price_range(page: Page):
         "Liquidity price range"
     ).click()
     fields = [
-        ["Liquidity Price Range", "100.00% of mid price"],
+        ["Liquidity Price Range", "100% of mid price"],
         ["Lowest Price", "0.00 BTC"],
         ["Highest Price", "205.00 BTC"],
     ]

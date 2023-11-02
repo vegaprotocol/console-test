@@ -6,7 +6,7 @@ from vega_sim.service import VegaService
 from actions.vega import submit_order
 from conftest import init_vega, page
 from fixtures.market import setup_continuous_market
-from actions.utils import wait_for_toast_confirmation
+from actions.utils import wait_for_toast_confirmation, verify_row
 
 # Defined namedtuples
 WalletConfig = namedtuple("WalletConfig", ["name", "passphrase"])
@@ -122,54 +122,34 @@ def test_submit_stop_order_market_oco_rejected(
 
     page.get_by_test_id(close_toast).click()
     wait_for_graphql_response(page, "stopOrders")
-    page.get_by_role(row_table).locator(market_name_col).nth(1).is_visible()
+    page.locator('[col-id="submission.size"]').nth(0).click()
 
-    expect((page.get_by_role(row_table).locator(market_name_col)).nth(1)).to_have_text(
-        "BTC:DAI_2023Futr"
-    )
+    expected_values_row_1 = {
+        "market.tradableInstrument.instrument.code": "BTC:DAI_2023Futr",
+        "trigger": "Mark > 103.00",
+        "expiresAt": "",
+        "submission.size": "+3",
+        "submission.type": "Market",
+        "status": "RejectedOCO", 
+        "submission.price": "-",
+        "submission.timeInForce": "FOK",
+        "updatedAt": ""
+    }
+    
+    verify_row(page, expected_values_row_1)
 
-    expect((page.get_by_role(row_table).locator(expiresAt_col)).nth(1)).to_have_text("")
-    expect((page.get_by_role(row_table).locator(size_col)).nth(1)).to_have_text("+3")
-    # 7002-SORD-083
-    expect((page.get_by_role(row_table).locator(submission_type)).nth(1)).to_have_text(
-        "Market"
-    )
-    expect((page.get_by_role(row_table).locator(status_col)).nth(1)).to_have_text(
-        "RejectedOCO"
-    )
-    expect((page.get_by_role(row_table).locator(price_col)).nth(1)).to_have_text("-")
-    expect((page.get_by_role(row_table).locator(timeInForce_col)).nth(1)).to_have_text(
-        "FOK"
-    )
-    expect(
-        (page.get_by_role(row_table).locator(updatedAt_col)).nth(1)
-    ).not_to_be_empty()
-
-    expect((page.get_by_role(row_table).locator(market_name_col)).nth(2)).to_have_text(
-        "BTC:DAI_2023Futr"
-    )
-
-    expect((page.get_by_role(row_table).locator(expiresAt_col)).nth(2)).to_have_text("")
-    expect((page.get_by_role(row_table).locator(size_col)).nth(2)).to_have_text("+3")
-    expect((page.get_by_role(row_table).locator(submission_type)).nth(2)).to_have_text(
-        "Market"
-    )
-    expect((page.get_by_role(row_table).locator(status_col)).nth(2)).to_have_text(
-        "RejectedOCO"
-    )
-    expect((page.get_by_role(row_table).locator(price_col)).nth(2)).to_have_text("-")
-    expect((page.get_by_role(row_table).locator(timeInForce_col)).nth(2)).to_have_text(
-        "FOK"
-    )
-    expect(
-        (page.get_by_role(row_table).locator(updatedAt_col)).nth(2)
-    ).not_to_be_empty()
-    # 7002-SORD-084
-    trigger_price_list = (
-        page.locator(".ag-center-cols-container").locator(trigger_col).all_inner_texts()
-    )
-    trigger_value_list = ["Mark < 102.00", "Mark > 103.00"]
-    assert trigger_price_list.sort() == trigger_value_list.sort()
+    expected_values_row_2 = {
+        "market.tradableInstrument.instrument.code": "BTC:DAI_2023Futr",
+        "trigger": "Mark < 102.00",
+        "expiresAt": "",
+        "submission.size": "+3",
+        "submission.type": "Market",
+        "status": "RejectedOCO", 
+        "submission.price": "-",
+        "submission.timeInForce": "FOK",
+        "updatedAt": ""
+    }
+    verify_row(page, expected_values_row_2, row_index=3)
 
 
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
@@ -204,54 +184,34 @@ def test_submit_stop_oco_market_order_triggered(
 
     page.get_by_test_id(close_toast).click()
     wait_for_graphql_response(page, "stopOrders")
-    page.get_by_role(row_table).locator(market_name_col).nth(1).is_visible()
+    page.locator('[col-id="submission.size"]').nth(0).click()
 
-    expect((page.get_by_role(row_table).locator(market_name_col)).nth(1)).to_have_text(
-        "BTC:DAI_2023Futr"
-    )
+    expected_values_row_1 = {
+        "market.tradableInstrument.instrument.code": "BTC:DAI_2023Futr",
+        "trigger": "Mark > 103.00",
+        "expiresAt": "",
+        "submission.size": "+3",
+        "submission.type": "Market",
+        "status": "RejectedOCO", 
+        "submission.price": "-",
+        "submission.timeInForce": "FOK",
+        "updatedAt": ""
+    }
+    
+    verify_row(page, expected_values_row_1)
 
-    expect((page.get_by_role(row_table).locator(expiresAt_col)).nth(1)).to_have_text("")
-    expect((page.get_by_role(row_table).locator(size_col)).nth(1)).to_have_text("+3")
-    expect((page.get_by_role(row_table).locator(submission_type)).nth(1)).to_have_text(
-        "Market"
-    )
-
-    expect((page.get_by_role(row_table).locator(price_col)).nth(1)).to_have_text("-")
-    expect((page.get_by_role(row_table).locator(timeInForce_col)).nth(1)).to_have_text(
-        "FOK"
-    )
-    expect(
-        (page.get_by_role(row_table).locator(updatedAt_col)).nth(1)
-    ).not_to_be_empty()
-
-    expect((page.get_by_role(row_table).locator(market_name_col)).nth(2)).to_have_text(
-        "BTC:DAI_2023Futr"
-    )
-    expect((page.get_by_role(row_table).locator(expiresAt_col)).nth(2)).to_have_text("")
-    expect((page.get_by_role(row_table).locator(size_col)).nth(2)).to_have_text("+3")
-    expect((page.get_by_role(row_table).locator(submission_type)).nth(2)).to_have_text(
-        "Market"
-    )
-
-    expect((page.get_by_role(row_table).locator(price_col)).nth(2)).to_have_text("-")
-    expect((page.get_by_role(row_table).locator(timeInForce_col)).nth(2)).to_have_text(
-        "FOK"
-    )
-    expect(
-        (page.get_by_role(row_table).locator(updatedAt_col)).nth(2)
-    ).not_to_be_empty()
-
-    status = (
-        page.locator(".ag-center-cols-container").locator(status_col).all_inner_texts()
-    )
-    value = ["StoppedOCO", "TriggeredOCO"]
-    assert status.sort() == value.sort()
-
-    trigger_price_list = (
-        page.locator(".ag-center-cols-container").locator(trigger_col).all_inner_texts()
-    )
-    trigger_value_list = ["Mark < 102.00", "Mark > 103.00"]
-    assert trigger_price_list.sort() == trigger_value_list.sort()
+    expected_values_row_2 = {
+        "market.tradableInstrument.instrument.code": "BTC:DAI_2023Futr",
+        "trigger": "Mark < 102.00",
+        "expiresAt": "",
+        "submission.size": "+3",
+        "submission.type": "Market",
+        "status": "RejectedOCO", 
+        "submission.price": "-",
+        "submission.timeInForce": "FOK",
+        "updatedAt": ""
+    }
+    verify_row(page, expected_values_row_2, row_index=3)
 
 
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
@@ -281,14 +241,34 @@ def test_submit_stop_oco_market_order_pending(
     vega.wait_for_total_catchup()
     page.get_by_test_id(close_toast).click()
     wait_for_graphql_response(page, "stopOrders")
-    page.get_by_role(row_table).locator(market_name_col).nth(1).is_visible()
+    page.locator('[col-id="submission.size"]').nth(0).click()
 
-    expect((page.get_by_role(row_table).locator(status_col)).nth(1)).to_have_text(
-        "PendingOCO"
-    )
-    expect((page.get_by_role(row_table).locator(status_col)).nth(2)).to_have_text(
-        "PendingOCO"
-    )
+    expected_values_row_1 = {
+        "market.tradableInstrument.instrument.code": "BTC:DAI_2023Futr",
+        "trigger": "Mark < 99.00",
+        "expiresAt": "",
+        "submission.size": "-3",
+        "submission.type": "Market",
+        "status": "PendingOCO", 
+        "submission.price": "-",
+        "submission.timeInForce": "FOK",
+        "updatedAt": ""
+    }
+    
+    verify_row(page, expected_values_row_1)
+
+    expected_values_row_2 = {
+        "market.tradableInstrument.instrument.code": "BTC:DAI_2023Futr",
+        "trigger": "Mark > 120.00",
+        "expiresAt": "",
+        "submission.size": "-2",
+        "submission.type": "Market",
+        "status": "PendingOCO", 
+        "submission.price": "-",
+        "submission.timeInForce": "FOK",
+        "updatedAt": ""
+    }
+    verify_row(page, expected_values_row_2, row_index=3)
 
 
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
@@ -323,28 +303,36 @@ def test_submit_stop_oco_limit_order_pending(
 
     page.get_by_test_id(close_toast).click()
     wait_for_graphql_response(page, "stopOrders")
-    page.get_by_role(row_table).locator(market_name_col).nth(1).is_visible()
-
-    expect((page.get_by_role(row_table).locator(submission_type)).nth(1)).to_have_text(
-        "Limit"
-    )
-    expect((page.get_by_role(row_table).locator(submission_type)).nth(2)).to_have_text(
-        "Limit"
-    )
-
-    price = (
-        page.locator(".ag-center-cols-container").locator(price_col).all_inner_texts()
-    )
-    prices = ["103.00", "99.00"]
-    assert price.sort() == prices.sort()
-
+    page.locator('[col-id="submission.size"]').nth(0).click()
     # 7002-SORD-091
-    trigger_price_list = (
-        page.locator(".ag-center-cols-container").locator(trigger_col).all_inner_texts()
-    )
-    trigger_value_list = ["Limit < 102.00", "Limit > 103.00"]
-    assert trigger_price_list.sort() == trigger_value_list.sort()
+    expected_values_row_1 = {
+        "market.tradableInstrument.instrument.code": "BTC:DAI_2023Futr",
+        "trigger": "Mark < 102.00",
+        "expiresAt": "",
+        "submission.size": "-3",
+        "submission.type": "Limit",
+        "status": "PendingOCO", 
+        "submission.price": "103.00",
+        "submission.timeInForce": "FOK",
+        "updatedAt": ""
+    }
+    verify_row(page, expected_values_row_1)
 
+    expected_values_row_2 = {
+        "market.tradableInstrument.instrument.code": "BTC:DAI_2023Futr",
+        "trigger": "Mark > 120.00",
+        "expiresAt": "",
+        "submission.size": "-2",
+        "submission.type": "Limit",
+        "status": "PendingOCO", 
+        "submission.price": "99.00",
+        "submission.timeInForce": "FOK",
+        "updatedAt": ""
+    }
+    verify_row(page, expected_values_row_2, row_index=3)
+
+   
+    
 
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")
 def test_submit_stop_oco_limit_order_cancel(
@@ -385,13 +373,35 @@ def test_submit_stop_oco_limit_order_cancel(
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
     page.get_by_test_id(close_toast).first.click()
+    wait_for_graphql_response(page, "stopOrders")
+    page.locator('[col-id="submission.size"]').nth(0).click()
+   
+    expected_values_row_1 = {
+        "market.tradableInstrument.instrument.code": "BTC:DAI_2023Futr",
+        "trigger": "Mark < 102.00",
+        "expiresAt": "",
+        "submission.size": "-3",
+        "submission.type": "Limit",
+        "status": "CancelledOCO", 
+        "submission.price": "103.00",
+        "submission.timeInForce": "FOK",
+        "updatedAt": ""
+    }
+    
+    verify_row(page, expected_values_row_1, grid_id = "Stop orders", row_index=2)
 
-    expect(
-        page.locator(".ag-center-cols-container").locator('[col-id="status"]').first
-    ).to_have_text("CancelledOCO")
-    expect(
-        page.locator(".ag-center-cols-container").locator('[col-id="status"]').last
-    ).to_have_text("CancelledOCO")
+    expected_values_row_2 = {
+        "market.tradableInstrument.instrument.code": "BTC:DAI_2023Futr",
+        "trigger": "Mark > 120.00",
+        "expiresAt": "",
+        "submission.size": "-2",
+        "submission.type": "Limit",
+        "status": "CancelledOCO",
+        "submission.price": "99.00",
+        "submission.timeInForce": "FOK",
+        "updatedAt": ""
+    }
+    verify_row(page, expected_values_row_2, row_index=3)
 
 
 class TestStopOcoValidation:

@@ -5,6 +5,7 @@ from vega_sim.service import VegaService
 from actions.vega import submit_order
 from conftest import init_vega
 from fixtures.market import setup_continuous_market
+from actions.utils import verify_trades_grid, wait_for_graphql_response, verify_orderbook_grid, verify_row
 
 # Defined namedtuples
 WalletConfig = namedtuple("WalletConfig", ["name", "passphrase"])
@@ -59,6 +60,8 @@ class TestIcebergOrdersValidations:
             (page.get_by_role("row").locator('[col-id="type"]')).nth(1)
         ).to_have_text("Limit (Iceberg)")
 
+
+    #TODO Refactor to Jest
     @pytest.mark.usefixtures("page", "auth", "risk_accepted")
     def test_iceberg_tooltips(self, continuous_market, page: Page):
         page.goto(f"/#/markets/{continuous_market}")
@@ -68,6 +71,7 @@ class TestIcebergOrdersValidations:
         hover_and_assert_tooltip(page, "Peak size")
         hover_and_assert_tooltip(page, "Minimum size")
 
+    #TODO Refactor to Jest
     @pytest.mark.usefixtures("page", "auth", "risk_accepted")
     def test_iceberg_validations(self, continuous_market, page: Page):
         page.goto(f"/#/markets/{continuous_market}")
@@ -109,66 +113,97 @@ def test_iceberg_open_order(continuous_market, vega: VegaService, page: Page):
     vega.forward("10s")
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
+    wait_for_graphql_response(page, "Positions")
+    expected_values = {
+        "marketCode": "BTC:DAI_2023tDAIFutr",
+        "openVolume": "-989,947.00",
+        "markPrice": "101.50101.50",
+        "margin": "885.704321.0x",
+        "liquidationPrice": "9,756.50813",
+        "realisedPNL": "-6.00",
+        "unrealisedPNL": "0.00",
+    }
+    verify_row(page, expected_values, row_index=2)
+    expected_values = {
+        "instrument-code": "BTC:DAI_2023Futr",
+        "remaining": "99",
+        "size": "-102",
+        "type": "Limit (Iceberg)",
+        "status": "Active",
+        "price": "101.00",
+        "timeInForce": "GTC",
+        "updatedAt": "",
+    }
+    verify_row(page, expected_values, grid_id= "Open", row_index=2)
+    #TODO how do we validate trades
 
-    page.wait_for_selector(".ag-center-cols-container .ag-row")
-    expect(
-        page.locator(
-            ".ag-center-cols-container .ag-row [col-id='openVolume'] [data-testid='stack-cell-primary']"
-        )
-    ).to_have_text("-98")
-    page.get_by_test_id("Open").click()
-    page.wait_for_selector(".ag-center-cols-container .ag-row")
+    trades_content = [
+        [101.50, 99, ],
+        [107.50, 1, ],
+        
+    ]
+    page.pause()
+    #TODO trades grid validate
+    verify_trades_grid(page, trades_content)
+    orderbook_content = [
+        [110.00000, 1, 103],
+        [101.00000, 3, 102],
+        [99.00000, 99, 99],
+        # mid
+        [95.00000, 1, 1],
+        [90.00000, 1, 2],
+    ]
+   
+    verify_orderbook_grid(page, orderbook_content, last_trade_price = "101.50")
 
-    expect(
-        page.locator(".ag-center-cols-container .ag-row [col-id='remaining']")
-    ).to_have_text("99")
-    expect(
-        page.locator(".ag-center-cols-container .ag-row [col-id='size']")
-    ).to_have_text("-102")
-    expect(
-        page.locator(".ag-center-cols-container .ag-row [col-id='type'] ")
-    ).to_have_text("Limit (Iceberg)")
-    expect(
-        page.locator(".ag-center-cols-container .ag-row [col-id='status']")
-    ).to_have_text("Active")
-    expect(page.get_by_test_id("price-10100000")).to_be_visible
-    expect(page.get_by_test_id("ask-vol-10100000")).to_have_text("3")
-    page.get_by_test_id("Trades").click()
-    expect(page.locator('[id^="cell-price-"]').first).to_have_text("101.50")
-    expect(page.locator('[id^="cell-size-"]').first).to_have_text("99")
-
+    
     submit_order(vega, MM_WALLET2.name, continuous_market, "SIDE_BUY", 103, 101)
 
     vega.forward("10s")
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
+    orderbook_content = [
+        [110.00000, 1, 1],
+        # mid
+        [101.00000, 1, 1],
+        [95.00000, 1, 2],
+        [90.00000, 1, 3],
+    ]
+   
+    verify_orderbook_grid(page, orderbook_content, last_trade_price = "101.00")
     expect(
         page.locator(
             '[data-testid="tab-open-orders"] .ag-center-cols-container .ag-row'
         )
     ).not_to_be_visible
-    page.get_by_test_id("Closed").click()
-    expect(
-        page.locator(".ag-center-cols-container .ag-row [col-id='remaining']").first
-    ).to_have_text("102")
-    expect(
-        page.locator(
-            "[data-testid=\"tab-closed-orders\"] .ag-center-cols-container .ag-row [col-id='size']"
-        ).first
-    ).to_have_text("-102")
-    expect(
-        page.locator(
-            "[data-testid=\"tab-closed-orders\"] .ag-center-cols-container .ag-row [col-id='type']"
-        ).first
-    ).to_have_text("Limit (Iceberg)")
-    expect(
-        page.locator(
-            "[data-testid=\"tab-closed-orders\"] .ag-center-cols-container .ag-row [col-id='status']"
-        ).first
-    ).to_have_text("Filled")
-    expect(page.locator('[id^="cell-price-"]').nth(2)).to_have_text("101.00")
-    expect(page.locator('[id^="cell-size-"]').nth(2)).to_have_text("3")
 
+    expected_values = {
+        "instrument-code": "BTC:DAI_2023Futr",
+        "remaining": "102",
+        "size": "-102",
+        "type": "Limit (Iceberg)",
+        "status": "Filled",
+        "price": "101.00",
+        "timeInForce": "GTC",
+        "updatedAt": "",
+    }
+    verify_row(page, expected_values, grid_id= "Closed", row_index=2)
+    page.pause()
+    expected_values = {
+        "price": "101.00",
+        "size": "3",
+        "createdAt": ""
+    }
+    verify_row(page, expected_values, grid_id= "Trades")
+
+    expected_values = {
+        "price": "99.50",
+        "size": "99",
+        "createdAt": ""
+    }
+    verify_trades_grid(page, expected_values, grid_id= "Trades", trade_row_index=1)
+
+   
 
 def verify_order_label(page: Page, test_id: str, expected_text: str):
     element = page.get_by_test_id(test_id)

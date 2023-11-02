@@ -5,8 +5,7 @@ from vega_sim.service import VegaService
 from actions.vega import submit_order
 from fixtures.market import setup_simple_market
 from conftest import init_vega
-
-from actions.utils import wait_for_toast_confirmation
+from actions.utils import wait_for_toast_confirmation, verify_row
 
 
 # Defined namedtuples
@@ -110,10 +109,17 @@ def test_market_monitoring_auction_price_volatility_limit_order(page: Page, simp
     vega.forward("10s")
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
-    page.get_by_test_id("All").click()
-    expect(page.get_by_role("row").nth(2)).to_contain_text(
-        "BTC:DAI_2023Futr0+1LimitActive110.00GTC"
-    )
+    expected_values = {
+        "instrument-code": "BTC:DAI_2023Futr",
+        "remaining": "0",
+        "size": "+1",
+        "type": "Limit",
+        "status": "Active",
+        "price": "110.00",
+        "timeInForce": "GTC",
+        "updatedAt": ""
+    }
+    verify_row(page, expected_values, grid_id="All")
 
 @pytest.mark.usefixtures("page", "risk_accepted", "simple_market", "auth", "setup_market_monitoring_auction")
 def test_market_monitoring_auction_price_volatility_market_order(page: Page, simple_market):

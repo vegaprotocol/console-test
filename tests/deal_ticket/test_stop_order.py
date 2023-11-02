@@ -6,6 +6,7 @@ from actions.vega import submit_order
 from datetime import datetime, timedelta
 from conftest import init_vega
 from fixtures.market import setup_continuous_market
+from actions.utils import verify_row, wait_for_graphql_response
 
 # Defined namedtuples
 WalletConfig = namedtuple("WalletConfig", ["name", "passphrase"])
@@ -46,32 +47,6 @@ price_col = '[col-id="submission.price"]'
 timeInForce_col = '[col-id="submission.timeInForce"]'
 updatedAt_col = '[col-id="updatedAt"]'
 close_toast = "toast-close"
-
-
-def wait_for_graphql_response(page, query_name, timeout=5000):
-    response_data = {}
-
-    def handle_response(route, request):
-        if "graphql" in request.url:
-            response = request.response()
-            if response is not None:
-                json_response = response.json()
-                if json_response and "data" in json_response:
-                    data = json_response["data"]
-                    if query_name in data:
-                        response_data["data"] = data
-                        route.continue_()
-                        return
-        route.continue_()
-
-    # Register the route handler
-    page.route("**", handle_response)
-
-    # Wait for the response data to be populated
-    page.wait_for_timeout(timeout)
-
-    # Unregister the route handler
-    page.unroute("**", handle_response)
 
 
 def create_position(vega: VegaService, market_id):
@@ -118,29 +93,22 @@ def test_submit_stop_order_rejected(continuous_market, vega: VegaService, page: 
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
     page.get_by_test_id(close_toast).click()
+    page.pause()
     wait_for_graphql_response(page, "stopOrders")
-    page.get_by_role(row_table).locator(market_name_col).nth(1).is_visible()
-    expect((page.get_by_role(row_table).locator(market_name_col)).nth(1)).to_have_text(
-        "BTC:DAI_2023Futr"
-    )
-    expect((page.get_by_role(row_table).locator(trigger_col)).nth(1)).to_have_text(
-        "Mark > 103.00"
-    )
-    expect((page.get_by_role(row_table).locator(expiresAt_col)).nth(1)).to_have_text("")
-    expect((page.get_by_role(row_table).locator(size_col)).nth(1)).to_have_text("+3")
-    expect((page.get_by_role(row_table).locator(submission_type)).nth(1)).to_have_text(
-        "Market"
-    )
-    expect((page.get_by_role(row_table).locator(status_col)).nth(1)).to_have_text(
-        "Rejected"
-    )
-    expect((page.get_by_role(row_table).locator(price_col)).nth(1)).to_have_text("-")
-    expect((page.get_by_role(row_table).locator(timeInForce_col)).nth(1)).to_have_text(
-        "FOK"
-    )
-    expect(
-        (page.get_by_role(row_table).locator(updatedAt_col)).nth(1)
-    ).not_to_be_empty()
+    #TODO Update expected values
+    expected_values_row_1 = {
+        "market.tradableInstrument.instrument.code": "BTC:DAI_2023Futr",
+        "trigger": "Mark > 103.00",
+        "expiresAt": "",
+        "submission.size": "+3",
+        "submission.type": "Market",
+        "status": "RejectedOCO", 
+        "submission.price": "-",
+        "submission.timeInForce": "FOK",
+        "updatedAt": ""
+    }
+    
+    verify_row(page, expected_values_row_1)
 
 @pytest.mark.skip("core issue")
 @pytest.mark.usefixtures("page", "vega", "continuous_market", "auth", "risk_accepted")

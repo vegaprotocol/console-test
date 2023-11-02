@@ -3,6 +3,7 @@ import re
 from playwright.sync_api import expect
 from actions.vega import submit_order
 from conftest import init_vega
+from actions.utils import wait_for_graphql_response
 import logging
 
 logger = logging.getLogger()
@@ -43,34 +44,6 @@ def verify_data_grid(page, data_test_id, expected_pattern):
             else:
                 logger.info(f"Not Matched: {expected} != {actual}")
                 raise AssertionError(f"Pattern does not match: {expected} != {actual}")
-
-
-# Required so that we can get liquidation price - Could also become a helper
-def wait_for_graphql_response(page, query_name, timeout=5000):
-    response_data = {}
-
-    def handle_response(route, request):
-        if "graphql" in request.url:
-            response = request.response()
-            if response is not None:
-                json_response = response.json()
-                if json_response and "data" in json_response:
-                    data = json_response["data"]
-                    if query_name in data:
-                        response_data["data"] = data
-                        route.continue_()
-                        return
-        route.continue_()
-
-    # Register the route handler
-    page.route("**", handle_response)
-
-    # Wait for the response data to be populated
-    page.wait_for_timeout(timeout)
-
-    # Unregister the route handler
-    page.unroute("**", handle_response)
-
 
 @pytest.mark.usefixtures("page", "continuous_market", "auth", "risk_accepted")
 def test_limit_order_new_trade_top_of_list(continuous_market, vega, page):

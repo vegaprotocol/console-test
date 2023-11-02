@@ -4,7 +4,7 @@ from vega_sim.service import VegaService
 from datetime import datetime, timedelta
 from conftest import init_vega
 from fixtures.market import setup_continuous_market
-from actions.utils import wait_for_toast_confirmation
+from actions.utils import wait_for_toast_confirmation, verify_row
 
 order_size = "order-size"
 order_price = "order-price"
@@ -14,17 +14,14 @@ market_order = "order-type-Market"
 tif = "order-tif"
 expire = "expire"
 
-
 @pytest.fixture(scope="module")
 def vega(request):
     with init_vega(request) as vega:
         yield vega
 
-
 @pytest.fixture(scope="module")
 def continuous_market(vega):
     return setup_continuous_market(vega)
-
 
 @pytest.mark.usefixtures("page", "auth", "risk_accepted")
 def test_limit_buy_order_GTT(continuous_market, vega: VegaService, page: Page):
@@ -47,11 +44,18 @@ def test_limit_buy_order_GTT(continuous_market, vega: VegaService, page: Page):
     vega.forward("10s")
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
-    page.get_by_test_id("All").click()
     # 7002-SORD-017
-    expect(page.get_by_role("row").nth(2)).to_contain_text(
-        "BTC:DAI_2023Futr10+10LimitFilled120.00GTT:"
-    )
+    expected_values = {
+        "instrument-code": "BTC:DAI_2023Futr",
+        "remaining": "10",
+        "size": "+10",
+        "type": "Limit",
+        "status": "Filled",
+        "price": "120.00",
+        "timeInForce": "GTT",
+        "updatedAt": ""
+    }
+    verify_row(page, expected_values, grid_id="All")
 
 
 @pytest.mark.usefixtures("page", "auth", "risk_accepted")
@@ -67,9 +71,17 @@ def test_limit_buy_order(continuous_market, vega: VegaService, page: Page):
     vega.wait_for_total_catchup()
     page.get_by_test_id("All").click()
     # 7002-SORD-017
-    expect(page.get_by_role("row").nth(2)).to_contain_text(
-        "BTC:DAI_2023Futr10+10LimitFilled120.00GTC"
-    )
+    expected_values = {
+        "instrument-code": "BTC:DAI_2023Futr",
+        "remaining": "10",
+        "size": "+10",
+        "type": "Limit",
+        "status": "Filled",
+        "price": "120.00",
+        "timeInForce": "GTC",
+        "updatedAt": ""
+    }
+    verify_row(page, expected_values, grid_id="All")
 
 
 @pytest.mark.usefixtures("page", "auth", "risk_accepted")
@@ -91,10 +103,17 @@ def test_limit_sell_order(continuous_market, vega: VegaService, page: Page):
     vega.forward("10s")
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
-    page.get_by_test_id("All").click()
-    expect(page.get_by_role("row").nth(2)).to_contain_text(
-        "BTC:DAI_2023Futr10-10LimitFilled100.00GFN"
-    )
+    expected_values = {
+        "instrument-code": "BTC:DAI_2023Futr",
+        "remaining": "10",
+        "size": "-10",
+        "type": "Limit",
+        "status": "Filled",
+        "price": "100.00",
+        "timeInForce": "GFN",
+        "updatedAt": ""
+    }
+    verify_row(page, expected_values, grid_id="All")
 
 
 @pytest.mark.usefixtures("page", "auth", "risk_accepted")
@@ -115,11 +134,17 @@ def test_market_sell_order(continuous_market, vega: VegaService, page: Page):
     vega.forward("10s")
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
-    
-    page.get_by_test_id("All").click()
-    expect(page.get_by_role("row").nth(2)).to_contain_text(
-        "BTC:DAI_2023Futr10-10MarketFilled-IOC"
-    )
+    expected_values = {
+        "instrument-code": "BTC:DAI_2023Futr",
+        "remaining": "10",
+        "size": "-10",
+        "type": "Market",
+        "status": "Filled",
+        "price": "-",
+        "timeInForce": "IOC",
+        "updatedAt": ""
+    }
+    verify_row(page, expected_values, grid_id="All")
 
 
 @pytest.mark.usefixtures("page", "auth", "risk_accepted")
@@ -133,10 +158,17 @@ def test_market_buy_order(continuous_market, vega: VegaService, page: Page):
     vega.forward("10s")
     vega.wait_fn(1)
     vega.wait_for_total_catchup()
-    page.get_by_test_id("All").click()
     # 7002-SORD-010
     # 0003-WTXN-012
     # 0003-WTXN-003
-    expect(page.get_by_role("row").nth(2)).to_contain_text(
-        "BTC:DAI_2023Futr10+10MarketFilled-FOK"
-    )
+    expected_values = {
+        "instrument-code": "BTC:DAI_2023Futr",
+        "remaining": "10",
+        "size": "+10",
+        "type": "Market",
+        "status": "Filled",
+        "price": "-",
+        "timeInForce": "FOK",
+        "updatedAt": ""
+    }
+    verify_row(page, expected_values, grid_id="All")

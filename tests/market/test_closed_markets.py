@@ -115,7 +115,7 @@ class TestSettledMarket:
 @pytest.mark.usefixtures("risk_accepted", "auth")
 def test_terminated_market_no_settlement_date(page: Page, vega: VegaService):
     setup_continuous_market(vega)
-    governance.settle_oracle(
+    governance.submit_settlement_data(
         wallet=vega.wallet,
         oracle_name="INVALID_ORACLE",
         settlement_price=110,

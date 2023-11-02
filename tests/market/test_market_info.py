@@ -51,7 +51,7 @@ def test_market_info_current_fees(page: Page):
     fields = [
         ["Maker Fee", "10%"],
         ["Infrastructure Fee", "0.05%"],
-        ["Liquidity Fee", "0.00%"],
+        ["Liquidity Fee", "0%"],
         ["Total Fees", "10.05%"],
     ]
     validate_info_section(page, fields)

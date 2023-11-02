@@ -14,9 +14,9 @@ def vega():
 
 
 @pytest.fixture(scope="class")
-def create_settled_market(vega):
+def create_settled_market(vega: VegaService):
     market_id = setup_continuous_market(vega)
-    vega.settle_market(
+    vega.submit_termination_and_settlement_data(
         settlement_key="FJMKnwfZdd48C8NqvYrG",
         settlement_price=110,
         market_id=market_id,

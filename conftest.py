@@ -60,6 +60,8 @@ def init_vega(request=None):
         extra={"worker_id": os.environ.get("PYTEST_XDIST_WORKER")},
     )
     logger.info(f"Using console image: {console_image_name}")
+    #TODO log the real vega-version being used
+    # This is the vegaversion being set in .env, if you haven't installed locally this isn't the version you will use
     logger.info(f"Using vega version: {vega_version}")
     with VegaServiceNull(
         run_with_console=False,

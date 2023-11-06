@@ -11,6 +11,7 @@ from actions.vega import submit_order
 from fixtures.market import setup_continuous_market
 from datetime import datetime
 from datetime import timedelta
+from vega_sim.service import MarketStateUpdateType
 
 # Defined namedtuples
 WalletConfig = namedtuple("WalletConfig", ["name", "passphrase"])
@@ -98,30 +99,28 @@ def test_market_lifecycle(proposed_market, vega: VegaService, page: Page):
     # check market state is now active and trading mode is continuous
     expect(trading_mode).to_have_text("Continuous")
     expect(market_state).to_have_text("Active")
-
     # put invalid oracle to trigger market termination
-    governance.settle_oracle(
-        wallet=vega.wallet,
-        oracle_name="INVALID_ORACLE",
-        settlement_price=1,
+    governance.submit_oracle_data(
         key_name=TERMINATE_WALLET.name,
+        payload={"trading.terminated": "true"},
+        wallet=vega.wallet
     )
+    
     vega.forward("60s")
-    vega.wait_fn(1)
+    vega.wait_fn(10)
     vega.wait_for_total_catchup()
-
     # market state should be changed to "Trading Terminated" because of the invalid oracle
     expect(trading_mode).to_have_text("No trading")
     expect(market_state).to_have_text("Trading Terminated")
 
     # settle market
-    vega.settle_market(
+    vega.submit_termination_and_settlement_data(
         settlement_key=TERMINATE_WALLET.name,
         settlement_price=100,
         market_id=market_id,
     )
-    vega.forward("10s")
-    vega.wait_fn(1)
+    vega.forward("60s")
+    vega.wait_fn(10)
     vega.wait_for_total_catchup()
 
     # check market state is now settled
@@ -136,7 +135,7 @@ def test_market_closing_banners(page: Page, continuous_market, vega: VegaService
     proposalID = vega.update_market_state(
         continuous_market,
         "mm",
-        vega_protos.governance.MarketStateUpdateType.MARKET_STATE_UPDATE_TYPE_TERMINATE,
+        MarketStateUpdateType.Terminate,
         approve_proposal=False,
         vote_enactment_time = datetime.now() + timedelta(weeks=1),
         forward_time_to_enactment = False,
@@ -149,7 +148,7 @@ def test_market_closing_banners(page: Page, continuous_market, vega: VegaService
     vega.update_market_state(
         continuous_market,
         "mm",
-        vega_protos.governance.MarketStateUpdateType.MARKET_STATE_UPDATE_TYPE_TERMINATE,
+        MarketStateUpdateType.Terminate,
         approve_proposal=False,
         vote_enactment_time = datetime.now() + timedelta(weeks=1),
         forward_time_to_enactment = False,

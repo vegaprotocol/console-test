@@ -16,8 +16,8 @@ def test_transfer_submit(continuous_market, vega: VegaService, page: Page):
     page.goto('/#/portfolio')
     
     expect(page.get_by_test_id('transfer-form')).to_be_visible
-    page.select_option('[data-testid=transfer-form] [name="toAddress"]', index=1)
-    
+    page.select_option('[data-testid=transfer-form] [name="toVegaKey"]', index=2)
+    page.select_option('[data-testid=transfer-form] [name="fromAccount"]', index=1)
     page.get_by_test_id('select-asset').click()
     expect(page.get_by_test_id('rich-select-option')).to_have_count(1)
     

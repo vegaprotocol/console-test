@@ -99,18 +99,16 @@ def test_market_lifecycle(proposed_market, vega: VegaService, page: Page):
     # check market state is now active and trading mode is continuous
     expect(trading_mode).to_have_text("Continuous")
     expect(market_state).to_have_text("Active")
-
     # put invalid oracle to trigger market termination
-    governance.submit_settlement_data(
-        wallet=vega.wallet,
-        oracle_name="INVALID_ORACLE",
-        settlement_price=1,
+    governance.submit_oracle_data(
         key_name=TERMINATE_WALLET.name,
+        payload={"trading.terminated": "true"},
+        wallet=vega.wallet
     )
+    
     vega.forward("60s")
-    vega.wait_fn(1)
+    vega.wait_fn(10)
     vega.wait_for_total_catchup()
-
     # market state should be changed to "Trading Terminated" because of the invalid oracle
     expect(trading_mode).to_have_text("No trading")
     expect(market_state).to_have_text("Trading Terminated")
@@ -121,8 +119,8 @@ def test_market_lifecycle(proposed_market, vega: VegaService, page: Page):
         settlement_price=100,
         market_id=market_id,
     )
-    vega.forward("10s")
-    vega.wait_fn(1)
+    vega.forward("60s")
+    vega.wait_fn(10)
     vega.wait_for_total_catchup()
 
     # check market state is now settled

@@ -49,12 +49,10 @@ def test_transfer_submit(continuous_market, vega: VegaService, page: Page):
 
 @pytest.mark.usefixtures("page", "auth", "risk_accepted")
 def test_transfer_vesting_below_minimum(continuous_market, vega: VegaService, page: Page):
-
     vega.update_network_parameter(
-    "mm", parameter="transfer.minTransferQuantumMultiple", new_value="100000"
+    "mm", parameter="transfer.minTransferQuantumMultiple", new_value="100000" 
     )
     vega.wait_for_total_catchup()
-    
     
     create_and_faucet_wallet(vega=vega, wallet=PARTY_A, amount=1e3)
     create_and_faucet_wallet(vega=vega, wallet=PARTY_B, amount=1e5)
@@ -104,6 +102,7 @@ def test_transfer_vesting_below_minimum(continuous_market, vega: VegaService, pa
     page.reload()
     page.get_by_test_id('select-asset').click()
     page.get_by_test_id('rich-select-option').click()
+    
     option_value = page.locator('[data-testid="transfer-form"] [name="fromAccount"] option[value^="ACCOUNT_TYPE_VESTED_REWARDS"]').first.get_attribute("value")
 
     page.select_option('[data-testid="transfer-form"] [name="fromAccount"]', option_value)
@@ -120,7 +119,8 @@ def test_transfer_vesting_below_minimum(continuous_market, vega: VegaService, pa
         asset= asset_id,
         amount= 24.999999,
     )
-    vega.wait_fn(1)
+    vega.forward("10s")
+    vega.wait_fn(10)
     vega.wait_for_total_catchup()
     
     page.get_by_text("Use max").first.click()

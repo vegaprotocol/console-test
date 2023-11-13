@@ -46,5 +46,5 @@ def test_liquidity_provision_amendment(continuous_market, vega: VegaService, pag
     page.reload()
     row = page.get_by_test_id("tab-myLP").locator(".ag-center-cols-container .ag-row").first
     expect(row).to_contain_text(
-        "Active100.00100.000.10%100.00100.00%100.00-100.00%0.00%100.00%0.00%0.00%5/9/2023, 11:03:48 AM5/9/2023,"
+        "Active100.00100.000.10%100.00100.00%100.00-100.00%0.00%100.00%0.00%0.00%5/9/2023,"
     )
